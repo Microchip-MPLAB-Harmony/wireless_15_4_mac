@@ -1,7 +1,7 @@
 ﻿![Microchip logo](https://raw.githubusercontent.com/wiki/Microchip-MPLAB-Harmony/Microchip-MPLAB-Harmony.github.io/images/microchip_logo.png)
 ![Harmony logo small](https://raw.githubusercontent.com/wiki/Microchip-MPLAB-Harmony/Microchip-MPLAB-Harmony.github.io/images/microchip_mplab_harmony_logo_small.png)
 
-# MPLAB® Harmony 3 replaceme
+# MPLAB® Harmony 3 Standalone IEEE 802.15.4 Mac Layer
 
 MPLAB® Harmony 3 is an extension of the MPLAB® ecosystem for creating embedded firmware solutions for Microchip 32-bit SAM and PIC® microcontroller and microprocessor devices.  Refer to the following links for more information.
 
@@ -11,20 +11,23 @@ MPLAB® Harmony 3 is an extension of the MPLAB® ecosystem for creating embedded
 - [Microchip MPLAB® Harmony](https://www.microchip.com/mplab/mplab-harmony)
 - [Microchip MPLAB® Harmony Pages](https://microchip-mplab-harmony.github.io/)
 
-This repository contains the MPLAB® Harmony 3 replaceme solutions and example applications. Quickly incorporate connectivity to your designs with replaceme ICs, modules, software and development kits that make connecting effortless for your customers. Our comprehensive replaceme portfolio has the technology to meet your range, data rate, interoperability, frequency and topology needs. Refer to the following links for release notes, training materials, and interface reference information.
+This repository contains the MPLAB® Harmony 3 Standalone IEEE 802.15.4 Mac Layer for PIC32CX-BZ2 platform devices. 
+The MAC core layer abstracts and implements IEEE 802.15.4-2015 compliant functionalities for Non-Beacon enabled network support. Refer to
+the following links for release notes, training materials, and interface
+reference information.
 
 - [Release Notes](./release_notes.md)
-- [MPLAB® Harmony License](Microchip_SLA001.md)
-- [MPLAB® Harmony 3 replaceme API Help](https://microchip-mplab-harmony.github.io/replaceme)
+- [MPLAB® Harmony License](mplab_harmony_license.md)
+- [MPLAB® Harmony 3 Standalone IEEE 802.15.4 Mac Layer Wiki](https://github.com/Microchip-MPLAB-Harmony/wireless_15_4_mac/wiki)
+- [MPLAB® Harmony 3 Standalone IEEE 802.15.4 Mac Layer API Help](https://microchip-mplab-harmony.github.io/wireless_15_4_mac)
 
 # Contents Summary
 
-| Folder     | Description                                               |
-| ---        | ---                                                       |
-| apps       | Example applications for replaceme library components     |
-| config     | replaceme module configuration file                       |
-| docs       | replaceme library help documentation                      |
-| drivers    | Driver/Firmware files for different products              |
+| Folder     | Description                                                       |
+| -----------| ------------------------------------------------------------------|
+| config     | Standalone IEEE 802.15.4 Mac Layer module configuration file |
+| docs       | Standalone IEEE 802.15.4 Mac Layer library API documentation|
+| drivers    | Mac layer files and dependent files for pic32cxbz2 products     |
 
 
 ____
