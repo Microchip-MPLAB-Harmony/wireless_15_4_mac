@@ -38,6 +38,7 @@
 /* === Includes ============================================================= */
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 #include <stdbool.h>
 #include "pal.h"
 #include "bmm.h"
@@ -391,6 +392,7 @@ static void MAC_WakeUpFromDeepSleep(void)
     MAC_Ds_Param_t param1;
     uint8_t channelAfterSleep;
         
+    memset (&param1, 0, sizeof(param1)); 
     memcpy4ByteAligned(&param1,&mdsParam,sizeof(mdsParam));
     
     macPib.mac_CoordExtendedAddress = param1.mac_CoordExtAddr;
