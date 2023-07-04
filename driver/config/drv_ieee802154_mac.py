@@ -34,6 +34,10 @@ def instantiateComponent(ieee802154mac):
     global requiredComponents
     requiredComponents = [
         "IEEE_802154_PHY",
+        "HarmonyCore",
+        "sys_time",
+        "pic32cx_bz2_devsupport",
+        "RTOS",
         "trng"
     ]
     

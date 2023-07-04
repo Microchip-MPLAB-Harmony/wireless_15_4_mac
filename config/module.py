@@ -40,4 +40,8 @@ def loadModule():
         ieee802154mac  = Module.CreateComponent('IEEE_802154_MAC', 'IEEE 802.15.4 MAC', 'Wireless/Drivers/IEEE 802.15.4', 'driver/config/drv_ieee802154_mac.py')
         ieee802154mac.setDisplayType('Standalone MAC Driver')
         ieee802154mac.addDependency('ieee802154phyDependency', 'IEEE 802.15.4 PHY', 'IEEE 802.15.4 PHY', True, True)
+        ieee802154mac.addDependency('HarmonyCoreDependency', 'Core Service', 'Core', True, True)
+        ieee802154mac.addDependency('SysTimeDependency', 'SYS_TIME', 'SYS_TIME', True, True)
+        ieee802154mac.addDependency('FreeRtosDependency', 'RTOS', 'RTOS', True, True)
+        ieee802154mac.addDependency('DeviceSupportDependency', 'Device_Support', 'Device_Support', True, True)
         ieee802154mac.addCapability('ieee802154mac_Capability', 'IEEE 802.15.4 MAC', True)

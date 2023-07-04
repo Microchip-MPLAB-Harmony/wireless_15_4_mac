@@ -1214,9 +1214,7 @@
     None 
  */
 
-#if defined(MAC_SECURITY_ZIP)
-#define MAX_KEY_ID_FIELD_LEN                (1)
-#else
+#ifdef MAC_SECURITY_ZIP
 #define MAX_KEY_ID_FIELD_LEN                (9)
 #endif
 
