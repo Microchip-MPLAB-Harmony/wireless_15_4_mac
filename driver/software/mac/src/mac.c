@@ -301,21 +301,20 @@ PHY_Retval_t sendFrame(MAC_FrameInfo_t *macFrame, uint8_t csmaType, bool frameRe
 typedef __PACKED_STRUCT mac_ds_param
 {
     uint64_t mac_CoordExtAddr;  
-    uint64_t mac_ieee_addr;      
-    uint16_t mac_CoordShtAddr; 
-    uint16_t mac_short_addr;
-    uint16_t panid;
-    uint16_t dummy;
-    uint16_t mac_max_frame_total_wait_time;
-    uint16_t mac_response_wait_time; 
-    uint8_t mac_state;  
-    uint8_t mac_radio_sleep_state; 
-    uint8_t mac_poll_state; 
-    uint8_t mac_associated_PAN_coord;   
-    uint8_t mac_auto_request; 
-	uint8_t mac_batt_life_ext_periods; 
-	uint8_t mac_dsn; 
-    uint8_t phy_current_channel;
+    uint64_t mac_ieee_addr; 
+    uint32_t mac_CoordShtAddr; 
+    uint32_t mac_short_addr;
+    uint32_t panid;
+    uint32_t mac_max_frame_total_wait_time;
+    uint32_t mac_response_wait_time; 
+    uint32_t mac_state;  
+    uint32_t mac_radio_sleep_state; 
+    uint32_t mac_poll_state; 
+    uint32_t mac_associated_PAN_coord;   
+    uint32_t mac_auto_request; 
+    uint32_t mac_batt_life_ext_periods; 
+    uint32_t mac_dsn; 
+    uint32_t phy_current_channel;
 }MAC_Ds_Param_t;
 
 static uint16_t    macshortaddr; 
