@@ -48,16 +48,10 @@
 /* === Prototypes ========================================================== */
 
 /* === Implementation ====================================================== */
-#if (defined __GNUC__)
 void __attribute__((weak)) USR_MLME_CommStatusInd(
 		WPAN_AddrSpec_t *SrcAddrSpec,
 		WPAN_AddrSpec_t *DstAddrSpec,
 		uint8_t status)
-#else
-void USR_MLME_CommStatusInd(WPAN_AddrSpec_t *SrcAddrSpec,
-		WPAN_AddrSpec_t *DstAddrSpec,
-		uint8_t status)
-#endif
 {
 	/* Keep compiler happy. */
 	SrcAddrSpec = SrcAddrSpec;

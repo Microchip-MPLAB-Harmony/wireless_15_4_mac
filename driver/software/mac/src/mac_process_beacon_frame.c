@@ -109,6 +109,7 @@ void MAC_ProcessBeaconFrame(buffer_t *beacon)
 	WPAN_Pandescriptor_t *pand_long_start_p = NULL;
 	WPAN_Pandescriptor_t pandLong;
 	MLME_ScanConf_t *msc = NULL;
+    PHY_Retval_t pibStatus = PHY_FAILURE;
     PibValue_t pib_channel;
     PibValue_t pib_channelpage;
     
@@ -139,15 +140,15 @@ void MAC_ProcessBeaconFrame(buffer_t *beacon)
 		if (
 			((MAC_SCAN_ACTIVE == macScanState) ||
 			(MAC_SCAN_PASSIVE == macScanState)) &&
-			macPib.mac_AutoRequest
+			(macPib.mac_AutoRequest == 1U)
 			) {
 			/*
 			 * mac_conf_buf_ptr points to the buffer allocated for
 			 * scan
 			 * confirmation.
 			 */
-			msc =  (MLME_ScanConf_t *)BMM_BUFFER_POINTER(
-					((buffer_t *)macConfBufPtr));
+			msc =  (MLME_ScanConf_t *)MAC_BUFFER_POINTER(
+					((buffer_t *)((void *)macConfBufPtr)));
 
 			/*
 			 * The PAN descriptor list is updated with the
@@ -155,7 +156,7 @@ void MAC_ProcessBeaconFrame(buffer_t *beacon)
 			 * received beacon
 			 */
 			pand_long_start_p
-				= (WPAN_Pandescriptor_t *)&msc->scanResultList;
+				= (WPAN_Pandescriptor_t *)((void *)(&msc->scanResultList));
 		}
 
 		/*
@@ -178,16 +179,15 @@ void MAC_ProcessBeaconFrame(buffer_t *beacon)
 					macParseData.srcAddr.longAddress);
 		}
 
-		PHY_PibGet(phyCurrentChannel, (uint8_t *)&pib_channel);
+		pibStatus = PHY_PibGet(phyCurrentChannel, (uint8_t *)&pib_channel);
         pandLong.LogicalChannel = pib_channel.pib_value_8bit;
-        PHY_PibGet(phyCurrentPage, (uint8_t *)&pib_channelpage);
+        pibStatus = PHY_PibGet(phyCurrentPage, (uint8_t *)&pib_channelpage);
 		pandLong.ChannelPage    = pib_channelpage.pib_value_8bit;
 		pandLong.SuperframeSpec
 			= macParseData.macPayloadData.beaconData.
 				superframeSpec;
 		pandLong.GTSPermit
-			= macParseData.macPayloadData.beaconData.
-				gtsSpec>> 7;
+			= (bool)(macParseData.macPayloadData.beaconData.gtsSpec >> 7U);
 		pandLong.LinkQuality    = macParseData.ppduLinkQuality;
 #ifdef ENABLE_TSTAMP
 		pandLong.TimeStamp      = macParseData.timeStamp;
@@ -206,7 +206,7 @@ void MAC_ProcessBeaconFrame(buffer_t *beacon)
 		if (
 			((MAC_SCAN_ACTIVE == macScanState) ||
 			(MAC_SCAN_PASSIVE == macScanState)) &&
-			macPib.mac_AutoRequest
+			(macPib.mac_AutoRequest == 1U)
 			) {
 			/*
 			 * This flag is used to indicate a match of the current
@@ -227,8 +227,7 @@ void MAC_ProcessBeaconFrame(buffer_t *beacon)
 			 * mode, the coordinator address, and the Logical
 			 * Channel are same.
 			 */
-			for (index = 0; index < msc->ResultListSize;
-					index++, pand_long_start_p++) {
+			for (index = 0; index < msc->ResultListSize; index++) {
 				if ((pandLong.CoordAddrSpec.PANId ==
 						pand_long_start_p->CoordAddrSpec
 						.PANId) &&
@@ -272,6 +271,7 @@ void MAC_ProcessBeaconFrame(buffer_t *beacon)
 						}
 					}
 				}
+                pand_long_start_p++;
 			}
 
 			/*
@@ -282,12 +282,12 @@ void MAC_ProcessBeaconFrame(buffer_t *beacon)
 			if ((!matchflag) &&
 					(msc->ResultListSize <
 					MAX_PANDESCRIPTORS)) {
-				memcpy(pand_long_start_p, &pandLong,
-						sizeof(pandLong));
+				(void)memcpy(pand_long_start_p, &pandLong, sizeof(pandLong));
 				msc->ResultListSize++;
 			}
 		}
 	}
+    (void)pibStatus;
 
 #if (MAC_BEACON_NOTIFY_INDICATION == 1)
 
@@ -310,12 +310,13 @@ void MAC_ProcessBeaconFrame(buffer_t *beacon)
 	 * generated
 	 */
 	if ((macParseData.macPayloadData.beaconData.beaconPayloadLen >
-			0) ||
-			(!macPib.mac_AutoRequest)
+			0U) ||
+			((macPib.mac_AutoRequest) == 0U)
 			) {
 		MLME_BeaconNotifyInd_t *mbni
-			= (MLME_BeaconNotifyInd_t *)BMM_BUFFER_POINTER(((
+			= (MLME_BeaconNotifyInd_t *)MAC_BUFFER_POINTER(((
 					buffer_t *)beacon));
+        qmm_status_t  qmmStatus = QMM_QUEUE_FULL;
 
 		/* The beacon notify indication structure is built */
 		mbni->cmdcode       = MLME_BEACON_NOTIFY_INDICATION;
@@ -325,7 +326,7 @@ void MAC_ProcessBeaconFrame(buffer_t *beacon)
 			= macParseData.macPayloadData.beaconData.
 				pendingAddrSpec;
 
-		if ((numaddrshort > 0) || (numaddrlong > 0)) {
+		if ((numaddrshort > 0U) || (numaddrlong > 0U)) {
 			mbni->AddrList
 				= macParseData.macPayloadData.beaconData
 					.pendingAddrList;
@@ -343,8 +344,9 @@ void MAC_ProcessBeaconFrame(buffer_t *beacon)
 		 * the buffer
 		 * is freed up.
 		 */
-		qmm_queue_append(&macNhleQueue, (buffer_t *)beacon);
+		qmmStatus = qmm_queue_append(&macNhleQueue, (buffer_t *)beacon);
         WPAN_PostTask();
+        (void)qmmStatus;
 	} else
 #endif /* (MAC_BEACON_NOTIFY_INDICATION == 1) */
 	{

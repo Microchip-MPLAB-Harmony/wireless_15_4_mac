@@ -48,20 +48,12 @@
 /* === Prototypes ========================================================== */
 
 /* === Implementation ====================================================== */
-#if (defined __GNUC__)
 void __attribute__((weak))
 #ifdef ENABLE_TSTAMP
 USR_MCPS_DataConf(uint8_t msduHandle, uint8_t status, uint32_t Timestamp)
 #else
 USR_MCPS_DataConf(uint8_t msduHandle, uint8_t status)
 #endif  /* ENABLE_TSTAMP */
-#else
-#ifdef ENABLE_TSTAMP
-void USR_MCPS_DataConf(uint8_t msduHandle, uint8_t status, uint32_t Timestamp)
-#else
-void USR_MCPS_DataConf(uint8_t msduHandle, uint8_t status)
-#endif  /* ENABLE_TSTAMP */
-#endif
 {
 	/* Keep compiler happy. */
 	msduHandle = msduHandle;

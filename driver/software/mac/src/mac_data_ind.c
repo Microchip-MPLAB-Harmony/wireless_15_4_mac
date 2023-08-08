@@ -59,12 +59,12 @@
 /*
  * Mask of the GTS descriptor counter
  */
-#define GTS_DESCRIPTOR_COUNTER_MASK     (0x07)
+#define GTS_DESCRIPTOR_COUNTER_MASK     (7U)
 
 /*
  * Extract the PAN Coordinator bit from the Superframe Spec.
  */
-#define GET_PAN_COORDINATOR(spec)      (((spec) & 0x4000) >> 14)
+#define GET_PAN_COORDINATOR(spec)      (((spec) & 0x4000U) >> 14U)
 
 #if (MAC_PAN_ID_CONFLICT_NON_PC == 1)
 
@@ -78,7 +78,7 @@
 
 /* === Prototypes ========================================================== */
 
-static bool ParseMpdu(MAC_FrameInfo_t *frameptr);
+static bool ParseMpdu(MAC_FrameInfo_t *rxFramePtr);
 static bool ProcessDataIndNotTransient(buffer_t *b_ptr,
 		MAC_FrameInfo_t *f_ptr);
 
@@ -110,11 +110,13 @@ static bool TxPanIdConfNotif(void);
  *
  * @param msg Pointer to the buffer header.
  */
-void MAC_ProcessTalDataInd(uint8_t *msg)
+void MAC_ProcessPhyDataInd(void *msg)
 {
 	buffer_t *bufPtr = (buffer_t *)msg;
-	MAC_FrameInfo_t *frameptr = (MAC_FrameInfo_t *)BMM_BUFFER_POINTER(bufPtr);
-	bool processedTalDataIndication = false;
+    qmm_status_t  qmmStatus = QMM_QUEUE_FULL;
+    PAL_Status_t palStatus;
+	MAC_FrameInfo_t *frameptr = (MAC_FrameInfo_t *)MAC_BUFFER_POINTER(bufPtr);
+	bool processedPhyDataIndication = false;
 
 	macParseData.mpduLength = frameptr->mpdu[0];
 
@@ -125,7 +127,8 @@ void MAC_ProcessTalDataInd(uint8_t *msg)
 
 #ifdef PROMISCUOUS_MODE
     PibValue_t pib_value;
-    PHY_PibGet(macPromiscuousMode, (uint8_t *)&pib_value);
+    PHY_Retval_t pibStatus;
+    pibStatus = PHY_PibGet(macPromiscuousMode, (uint8_t *)&pib_value);
 	if (pib_value.pib_value_8bit) {
 		/*
 		 * In promiscuous mode all received frames are forwarded to the
@@ -133,6 +136,7 @@ void MAC_ProcessTalDataInd(uint8_t *msg)
 		 * primitives.
 		 */
 		PromModeRxFrame(bufPtr, frameptr);
+        (void)pibStatus;
 		return;
 	}
 
@@ -156,11 +160,11 @@ void MAC_ProcessTalDataInd(uint8_t *msg)
 		 * MAC internal event queue.
 		 */
 		if (FCF_FRAMETYPE_MAC_CMD == macParseData.frameType) {
-			if (DATAREQUEST == macParseData.macCommand ||
-					BEACONREQUEST ==
-					macParseData.macCommand) {
-				qmm_queue_append(&phyMacQueue, bufPtr);
+			if (DATAREQUEST == ((FrameMsgtype_t)macParseData.macCommand) ||
+					BEACONREQUEST == ((FrameMsgtype_t)macParseData.macCommand)) {
+				qmmStatus = qmm_queue_append(&phyMacQueue, bufPtr);
                 WPAN_PostTask();
+                (void)qmmStatus;
 				return;
 			}
 		}
@@ -178,7 +182,7 @@ void MAC_ProcessTalDataInd(uint8_t *msg)
 			 * Continue with handling the "real" non-transient MAC
 			 * states now.
 			 */
-			processedTalDataIndication
+			processedPhyDataIndication
 				= ProcessDataIndNotTransient(
 					bufPtr, frameptr);
 		}
@@ -186,7 +190,7 @@ void MAC_ProcessTalDataInd(uint8_t *msg)
 #if (MAC_SCAN_SUPPORT == 1)
 		else {
 			/* Scanning is ongoing. */
-			processedTalDataIndication
+			processedPhyDataIndication
 				= ProcessDataIndScanning(bufPtr);
 		}
 #endif /* (MAC_SCAN_SUPPORT == 1) */
@@ -210,11 +214,11 @@ void MAC_ProcessTalDataInd(uint8_t *msg)
 		switch (macParseData.frameType) {
 		case FCF_FRAMETYPE_MAC_CMD:
 		{
-			switch (macParseData.macCommand) {
+			switch ((FrameMsgtype_t)macParseData.macCommand) {
 #if (MAC_ASSOCIATION_INDICATION_RESPONSE == 1)
 			case ASSOCIATIONREQUEST:
 				MAC_ProcessAssociateRequest(bufPtr);
-				processedTalDataIndication = true;
+				processedPhyDataIndication = true;
 				break;
 #endif /* (MAC_ASSOCIATION_INDICATION_RESPONSE == 1) */
 
@@ -223,7 +227,7 @@ void MAC_ProcessTalDataInd(uint8_t *msg)
 			{
 				MAC_ProcessDisassociateNotification(bufPtr);
 
-				processedTalDataIndication = true;
+				processedPhyDataIndication = true;
 
 				/*
 				 * Device needs to scan for networks again,
@@ -236,9 +240,9 @@ void MAC_ProcessTalDataInd(uint8_t *msg)
 
 			case DATAREQUEST:
 #if (MAC_INDIRECT_DATA_FFD == 1)
-				if (indirectDataQueue.size > 0) {
+				if (indirectDataQueue.size > 0U) {
 					MAC_ProcessDataRequest(bufPtr);
-					processedTalDataIndication = true;
+					processedPhyDataIndication = true;
 				} else {
 					MAC_HandleTxNullDataFrame();
 				}
@@ -252,7 +256,7 @@ void MAC_ProcessTalDataInd(uint8_t *msg)
 #if (MAC_ORPHAN_INDICATION_RESPONSE == 1)
 			case ORPHANNOTIFICATION:
 				MAC_ProcessOrphanNotification(bufPtr);
-				processedTalDataIndication = true;
+				processedPhyDataIndication = true;
 				break;
 #endif /* (MAC_ORPHAN_INDICATION_RESPONSE == 1) */
 
@@ -267,7 +271,7 @@ void MAC_ProcessTalDataInd(uint8_t *msg)
 					 * requests.
 					 */
 					MAC_ProcessBeaconRequest(bufPtr);
-					processedTalDataIndication = true;
+					processedPhyDataIndication = true;
 				}
 				break;
 #endif /* (MAC_START_REQUEST_CONFIRM == 1) */
@@ -280,23 +284,25 @@ void MAC_ProcessTalDataInd(uint8_t *msg)
 				 * entire PAN.
 				 */
 				MAC_ProcessCoordRealign(bufPtr);
-				processedTalDataIndication = true;
+				processedPhyDataIndication = true;
 				break;
 #endif  /* (MAC_SYNC_LOSS_INDICATION == 1) */
 
 			default:
-				break;
+                processedPhyDataIndication = false;
+                break;
 			}
 		}
 		break; /* case FCF_FRAMETYPE_MAC_CMD: */
 
 		case FCF_FRAMETYPE_DATA:
 			MAC_ProcessDataFrame(bufPtr);
-			processedTalDataIndication = true;
+			processedPhyDataIndication = true;
 			break;
 
 		default:
-			break;
+            processedPhyDataIndication = false;
+            break;
 		}
 		break;
 		/* MAC_POLL_EXPLICIT, MAC_POLL_IMPLICIT */
@@ -310,31 +316,34 @@ void MAC_ProcessTalDataInd(uint8_t *msg)
 		 * or a null data frame.
 		 */
 		if ((FCF_FRAMETYPE_MAC_CMD == macParseData.frameType) &&
-				(ASSOCIATIONRESPONSE ==
-				macParseData.macCommand)
+				(ASSOCIATIONRESPONSE == (FrameMsgtype_t)macParseData.macCommand)
 				) {
 			/* This is the expected association response frame. */
-			PAL_TimerStop(Timer_PollWaitTime);
+			palStatus = PAL_TimerStop(Timer_PollWaitTime);
 			MAC_ProcessAssociateResponse(bufPtr);
-			processedTalDataIndication = true;
+			processedPhyDataIndication = true;
 		} else if (FCF_FRAMETYPE_DATA == macParseData.frameType) {
 			MAC_ProcessDataFrame(bufPtr);
-			processedTalDataIndication = true;
-		}
-
+			processedPhyDataIndication = true;
+		}        
+        else{
+            // do nothing
+        }
+        (void)palStatus;
 		break;
 		/*  MAC_AWAIT_ASSOC_RESPONSE */
 #endif /* (MAC_ASSOCIATION_REQUEST_CONFIRM == 1) */
 
 	default:
-		break;
+        processedPhyDataIndication = false;
+        break;
 	}
 
 	/* If message is not processed */
-	if (!processedTalDataIndication) {
+	if (!processedPhyDataIndication) {
 		bmm_buffer_free(bufPtr);
 	}
-} /* MAC_ProcessTalDataInd() */
+} /* MAC_ProcessPhyDataInd() */
 
 #if (MAC_SCAN_SUPPORT == 1)
 
@@ -349,6 +358,7 @@ void MAC_ProcessTalDataInd(uint8_t *msg)
 static bool ProcessDataIndScanning(buffer_t *b_ptr)
 {
 	bool processedInScanning = false;
+    PAL_Status_t palStatus;
 
 	/*
 	 * We are in a scanning process now (mac_scan_state is not
@@ -383,7 +393,7 @@ static bool ProcessDataIndScanning(buffer_t *b_ptr)
 
 #endif  /* (MAC_PAN_ID_CONFLICT_AS_PC == 1) */
 #if (MAC_PAN_ID_CONFLICT_NON_PC == 1)
-			if (macPib.mac_AssociatedPANCoord &&
+			if ((macPib.mac_AssociatedPANCoord == 1U) &&
 					((MAC_ASSOCIATED == macState) ||
 					(MAC_COORDINATOR == macState))
 					) {
@@ -402,14 +412,13 @@ static bool ProcessDataIndScanning(buffer_t *b_ptr)
 	/* Orphan scan */
 	case MAC_SCAN_ORPHAN:
 		if (FCF_FRAMETYPE_MAC_CMD == macParseData.frameType &&
-				COORDINATORREALIGNMENT ==
-				macParseData.macCommand) {
+				COORDINATORREALIGNMENT == (FrameMsgtype_t)macParseData.macCommand) {
 			/*
 			 * Received coordinator realignment frame in the middle
 			 * of
 			 * an orphan scan.
 			 */
-			PAL_TimerStop(Timer_ScanDuration);
+			palStatus = PAL_TimerStop(Timer_ScanDuration);
 
 			MAC_ProcessOrphanRealign(b_ptr);
 			processedInScanning = true;
@@ -418,9 +427,11 @@ static bool ProcessDataIndScanning(buffer_t *b_ptr)
 #endif /* (MAC_SCAN_ORPHAN_REQUEST_CONFIRM == 1) */
 
 	default:
+        processedInScanning = false;
         break;
 	}
 
+    (void)palStatus;
 	return (processedInScanning);
 }
 
@@ -451,7 +462,7 @@ static bool ProcessDataIndNotTransient(buffer_t *b_ptr, MAC_FrameInfo_t *f_ptr)
 		switch (macParseData.frameType) {
 		case FCF_FRAMETYPE_MAC_CMD:
 		{
-			switch (macParseData.macCommand) {
+			switch ((FrameMsgtype_t)macParseData.macCommand) {
 #if (MAC_ASSOCIATION_INDICATION_RESPONSE == 1)
 			case ASSOCIATIONREQUEST:
 				MAC_ProcessAssociateRequest(b_ptr);
@@ -468,7 +479,7 @@ static bool ProcessDataIndNotTransient(buffer_t *b_ptr, MAC_FrameInfo_t *f_ptr)
 
 #if (MAC_INDIRECT_DATA_FFD == 1)
 			case DATAREQUEST:
-				if (indirectDataQueue.size > 0) {
+				if (indirectDataQueue.size > 0U) {
 					MAC_ProcessDataRequest(b_ptr);
 					processedInNotTransient = true;
 				} else {
@@ -491,13 +502,14 @@ static bool ProcessDataIndNotTransient(buffer_t *b_ptr, MAC_FrameInfo_t *f_ptr)
 
 #if (MAC_PAN_ID_CONFLICT_AS_PC == 1)
 			case PANIDCONFLICTNOTIFICAION:
-				MAC_SyncLoss(MAC_PAN_ID_CONFLICT);
+				MAC_SyncLoss((uint8_t)MAC_PAN_ID_CONFLICT);
 				break;
 
 #endif  /* (MAC_PAN_ID_CONFLICT_AS_PC == 1) */
 
 			default:
-				break;
+                processedInNotTransient = false;
+                break;
 			}
 		}
 		break;
@@ -516,7 +528,8 @@ static bool ProcessDataIndNotTransient(buffer_t *b_ptr, MAC_FrameInfo_t *f_ptr)
 #endif  /* (MAC_PAN_ID_CONFLICT_AS_PC == 1) */
 
 		default:
-			break;
+            processedInNotTransient = false;
+            break;
 		}
 	}
 	break;
@@ -539,7 +552,7 @@ static bool ProcessDataIndNotTransient(buffer_t *b_ptr, MAC_FrameInfo_t *f_ptr)
 				 * Corodinator. */
 #if ((MAC_PAN_ID_CONFLICT_NON_PC == 1) && (MAC_ASSOCIATION_REQUEST_CONFIRM == \
 				1))
-				if (macPib.mac_AssociatedPANCoord &&
+				if ((macPib.mac_AssociatedPANCoord == 1U)&&
 						(MAC_IDLE !=
 						macState)) {
 					CheckForPanIdConflictNonPc(false);
@@ -552,7 +565,7 @@ static bool ProcessDataIndNotTransient(buffer_t *b_ptr, MAC_FrameInfo_t *f_ptr)
 			break;
 
 			case FCF_FRAMETYPE_MAC_CMD:
-				switch (macParseData.macCommand) {
+				switch ((FrameMsgtype_t)macParseData.macCommand) {
 #if (MAC_DISASSOCIATION_BASIC_SUPPORT == 1)
 				case DISASSOCIATIONNOTIFICATION:
 					MAC_ProcessDisassociateNotification(
@@ -609,7 +622,7 @@ static bool ProcessDataIndNotTransient(buffer_t *b_ptr, MAC_FrameInfo_t *f_ptr)
 
 #if (MAC_INDIRECT_DATA_FFD == 1)
 				case DATAREQUEST:
-					if (indirectDataQueue.size > 0) {
+					if (indirectDataQueue.size > 0U) {
 						MAC_ProcessDataRequest(b_ptr);
 						processedInNotTransient
 							= true;
@@ -627,7 +640,8 @@ static bool ProcessDataIndNotTransient(buffer_t *b_ptr, MAC_FrameInfo_t *f_ptr)
 
 #endif /* (MAC_ORPHAN_INDICATION_RESPONSE == 1) */
 				default:
-					break;
+                    processedInNotTransient = false;
+                    break;
 				}
 				break;
 
@@ -637,13 +651,15 @@ static bool ProcessDataIndNotTransient(buffer_t *b_ptr, MAC_FrameInfo_t *f_ptr)
 				break;
 
 			default:
-				break;
+                processedInNotTransient = false;
+                break;
 			}
 		}
 		break;
 	/* MAC_IDLE, MAC_ASSOCIATED, MAC_COORDINATOR */
 
 	default:
+        processedInNotTransient = false;
         break;
 	}
 
@@ -667,15 +683,15 @@ static bool ParseMpdu(MAC_FrameInfo_t *rxFramePtr)
 #if ((defined MAC_SECURITY_ZIP)  || (defined MAC_SECURITY_2006))
 	uint8_t payloadIndex[4] = {0};
 #endif
-	uint8_t payloadLoc = 0;
+	uint8_t payloadLoc = 0U;
 	uint8_t tempByte;
 	uint16_t fcf;
 	uint8_t *tempFramePtr = &(rxFramePtr->mpdu[1]);
+    bool retVal = true;
 	/* temp_frame_ptr points now to first octet of FCF. */
 
 	/* Extract the FCF. */
 	fcf = convert_byte_array_to_16_bit(tempFramePtr);
-//	fcf = CLE16_TO_CPU_ENDIAN(fcf);
 	macParseData.fcf = fcf;
 	tempFramePtr += 2;
 
@@ -697,15 +713,17 @@ static bool ParseMpdu(MAC_FrameInfo_t *rxFramePtr)
 
 #endif
 
-	macParseData.frameType = FCF_GET_FRAMETYPE(fcf);
+	macParseData.frameType = (uint8_t)FCF_GET_FRAMETYPE(fcf);
 
 	if (FCF_FRAMETYPE_MAC_CMD == macParseData.frameType) {
 		macParseData.macCommand = *tempFramePtr;
 	}
 
 #if ((defined MAC_SECURITY_ZIP)  || (defined MAC_SECURITY_2006))
-	if (fcf & FCF_SECURITY_ENABLED) {
+	if ((fcf & FCF_SECURITY_ENABLED) == FCF_SECURITY_ENABLED) {
 		MAC_Retval_t status;
+        PHY_Retval_t pibStatus;
+        qmm_status_t  qmmStatus;
         PibValue_t pib_value;
 		status = MAC_Unsecure(&macParseData, &rxFramePtr->mpdu[1],
 				tempFramePtr, payloadIndex);
@@ -734,12 +752,12 @@ static bool ParseMpdu(MAC_FrameInfo_t *rxFramePtr)
 
 			/* Get the buffer body from buffer header */
 			MLME_CommStatusInd_t *csi
-				= (MLME_CommStatusInd_t *)BMM_BUFFER_POINTER(
+				= (MLME_CommStatusInd_t *)MAC_BUFFER_POINTER(
 					buffer_header);
 
 			csi->cmdcode = MLME_COMM_STATUS_INDICATION;
             
-            PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+            pibStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_value);
 
 			csi->PANId = pib_value.pib_value_16bit;
 
@@ -749,15 +767,17 @@ static bool ParseMpdu(MAC_FrameInfo_t *rxFramePtr)
 			csi->DstAddrMode = macParseData.destAddrMode;
 			csi->DstAddr = macParseData.destAddr.longAddress;
 
-			csi->status = status;
+			csi->status = (uint8_t)status;
 
-			qmm_queue_append(&macNhleQueue, buffer_header);
+			qmmStatus = qmm_queue_append(&macNhleQueue, buffer_header);
             WPAN_PostTask();
 
 			/*
 			 * Return false - this will lead to the release of the
 			 * original buffer.
 			 */
+            (void)pibStatus;
+            (void)qmmStatus;
 			return false;
 		}
 	} else {
@@ -770,11 +790,11 @@ static bool ParseMpdu(MAC_FrameInfo_t *rxFramePtr)
 	switch (macParseData.frameType) {
 	case FCF_FRAMETYPE_BEACON:
 		/* Get the Super frame specification */
-		memcpy(
-				&macParseData.macPayloadData.beaconData.superframeSpec,
+		(void)memcpy(
+				((uint8_t *)(&macParseData.macPayloadData.beaconData.superframeSpec)),
 				&tempFramePtr[payloadLoc],
 				sizeof(uint16_t));
-		payloadLoc += sizeof(uint16_t);
+		payloadLoc += (uint8_t)sizeof(uint16_t);
 
 		/* Get the GTS specification */
 		macParseData.macPayloadData.beaconData.gtsSpec
@@ -789,9 +809,9 @@ static bool ParseMpdu(MAC_FrameInfo_t *rxFramePtr)
 			= (macParseData.macPayloadData.beaconData.gtsSpec
 				&
 				GTS_DESCRIPTOR_COUNTER_MASK);
-		if (tempByte > 0) {
+		if (tempByte > 0U) {
 			/* 1 octet GTS direction */
-			payloadLoc += 1 + tempByte;
+			payloadLoc += 1U + tempByte;
 		}
 
 		/* Get the Pending address specification */
@@ -811,23 +831,19 @@ static bool ParseMpdu(MAC_FrameInfo_t *rxFramePtr)
 			uint8_t number_bytes_long_addr = NUM_LONG_PEND_ADDR(
 					macParseData.macPayloadData.beaconData.pendingAddrSpec);
 
-			if ((number_bytes_short_addr) ||
-					(number_bytes_long_addr)) {
+			if ((number_bytes_short_addr > 0U) ||
+					(number_bytes_long_addr > 0U)) {
 				macParseData.macPayloadData.beaconData.
 				pendingAddrList
 					= &tempFramePtr[payloadLoc];
 			}
 
-			if (number_bytes_short_addr) {
-				payloadLoc
-					+= (number_bytes_short_addr *
-						sizeof(uint16_t));
+			if (number_bytes_short_addr > 0U) {
+				payloadLoc += (number_bytes_short_addr * (uint8_t)sizeof(uint16_t));
 			}
 
-			if (number_bytes_long_addr) {
-				payloadLoc
-					+= (number_bytes_long_addr *
-						sizeof(uint64_t));
+			if (number_bytes_long_addr > 0U) {
+				payloadLoc += (number_bytes_long_addr * (uint8_t)sizeof(uint64_t));
 			}
 		}
 
@@ -849,7 +865,7 @@ static bool ParseMpdu(MAC_FrameInfo_t *rxFramePtr)
 		break;
 
 	case FCF_FRAMETYPE_DATA:
-		if (macParseData.macPayloadLength) {
+		if ((macParseData.macPayloadLength) > 0U) {
 			/*
 			 * In case the device got a frame with a corrupted
 			 * payload
@@ -892,7 +908,7 @@ static bool ParseMpdu(MAC_FrameInfo_t *rxFramePtr)
 		 */
 		payloadLoc = 1;
 
-		switch (macParseData.macCommand) {
+		switch ((FrameMsgtype_t)macParseData.macCommand) {
 #if (MAC_ASSOCIATION_INDICATION_RESPONSE == 1)
 		case ASSOCIATIONREQUEST:
 			macParseData.macPayloadData.assocReqData.
@@ -903,14 +919,13 @@ static bool ParseMpdu(MAC_FrameInfo_t *rxFramePtr)
 
 #if (MAC_ASSOCIATION_REQUEST_CONFIRM == 1)
 		case ASSOCIATIONRESPONSE:
-			memcpy(
-					&macParseData.macPayloadData.assocResponseData.shortAddr,
+			(void)memcpy(
+					((uint8_t *)(&macParseData.macPayloadData.assocResponseData.shortAddr)),
 					&tempFramePtr[payloadLoc],
-					sizeof(uint16_t));
-			payloadLoc += sizeof(uint16_t);
+					(uint8_t)sizeof(uint16_t));
+			payloadLoc += (uint8_t)sizeof(uint16_t);
 			macParseData.macPayloadData.assocResponseData.
-			assocStatus
-				= tempFramePtr[payloadLoc];
+			assocStatus = tempFramePtr[payloadLoc];
 			break;
 #endif /* (MAC_ASSOCIATION_REQUEST_CONFIRM == 1) */
 
@@ -923,26 +938,16 @@ static bool ParseMpdu(MAC_FrameInfo_t *rxFramePtr)
 #endif /* (MAC_DISASSOCIATION_BASIC_SUPPORT == 1) */
 
 		case COORDINATORREALIGNMENT:
-			memcpy(
-					&macParseData.macPayloadData.coordRealignData.panId,
-					&tempFramePtr[payloadLoc],
-					sizeof(uint16_t));
-			payloadLoc += sizeof(uint16_t);
-			memcpy(
-					&macParseData.macPayloadData.coordRealignData.coordShortAddr,
-					&tempFramePtr[payloadLoc],
-					sizeof(uint16_t));
-			payloadLoc += sizeof(uint16_t);
+			(void)memcpy(((uint8_t *)(&macParseData.macPayloadData.coordRealignData.panId)), &tempFramePtr[payloadLoc], sizeof(uint16_t));
+			payloadLoc += (uint8_t)sizeof(uint16_t);
+			(void)memcpy(((uint8_t *)(&macParseData.macPayloadData.coordRealignData.coordShortAddr)), &tempFramePtr[payloadLoc], sizeof(uint16_t));
+			payloadLoc += (uint8_t)sizeof(uint16_t);
 
 			macParseData.macPayloadData.coordRealignData.
-			logicalChannel
-				= tempFramePtr[payloadLoc++];
+			logicalChannel = tempFramePtr[payloadLoc++];
 
-			memcpy(
-					&macParseData.macPayloadData.coordRealignData.shortAddr,
-					&tempFramePtr[payloadLoc],
-					sizeof(uint16_t));
-			payloadLoc += sizeof(uint16_t);
+			(void)memcpy(((uint8_t *)(&macParseData.macPayloadData.coordRealignData.shortAddr)), &tempFramePtr[payloadLoc], sizeof(uint16_t));
+			payloadLoc += (uint8_t)sizeof(uint16_t);
 
 			/*
 			 * If frame version subfield indicates a 802.15.4-2006
@@ -950,7 +955,7 @@ static bool ParseMpdu(MAC_FrameInfo_t *rxFramePtr)
 			 * the channel page is appended as additional
 			 * information element.
 			 */
-			if (fcf & FCF_FRAME_VERSION_2006) {
+			if ((fcf & FCF_FRAME_VERSION_2006) == FCF_FRAME_VERSION_2006) {
 				macParseData.macPayloadData.
 				coordRealignData.channelPage
 					= tempFramePtr[payloadLoc++];
@@ -969,14 +974,16 @@ static bool ParseMpdu(MAC_FrameInfo_t *rxFramePtr)
 			break;
 
 		default:
-            return false;
+            retVal = false;
+            break;
 		}
 		break;
 
 	default:
-		return false;
-	}
-	return true;
+		retVal = false;
+        break;
+    }
+    return retVal;
 } /* ParseMpdu() */
 
 /**
@@ -988,14 +995,15 @@ static bool ParseMpdu(MAC_FrameInfo_t *rxFramePtr)
  * @param frame Pointer to recived frame
  */
 
-void PHY_RxFrameCallback(PHY_FrameInfo_t *frame)
+void PHY_RxFrameCallback(PHY_FrameInfo_t *rxFrame)
 {
     buffer_t *buffer_header;
 	MAC_FrameInfo_t *macRxFrame;
     uint8_t frameLen = 0;
     uint8_t *framePtr = NULL;
+    qmm_status_t  qmmStatus;
 
-    frameLen = frame->mpdu[0];
+    frameLen = rxFrame->mpdu[0];
     
 	/* Allocate a buffer */
 	buffer_header = bmm_buffer_alloc(LARGE_BUFFER_SIZE);
@@ -1006,36 +1014,38 @@ void PHY_RxFrameCallback(PHY_FrameInfo_t *frame)
 	}
 
 	/* Get the buffer body from buffer header */
-	macRxFrame = (MAC_FrameInfo_t *)BMM_BUFFER_POINTER(
+	macRxFrame = (MAC_FrameInfo_t *)MAC_BUFFER_POINTER(
 			buffer_header);
 
 	framePtr = (uint8_t *)macRxFrame + LARGE_BUFFER_SIZE - frameLen;
     
     macRxFrame->mpdu = framePtr;
 
-	if((frameLen > 0) && (NULL != frame->mpdu))
+	if((frameLen > 0U) && (NULL != rxFrame->mpdu))
     {
-        memcpy(macRxFrame->mpdu, frame->mpdu, frameLen);
+        (void)memcpy(macRxFrame->mpdu, rxFrame->mpdu, frameLen);
     }
     
-    macRxFrame->msgType = TAL_DATA_INDICATION;
+    macRxFrame->msgType = (FrameMsgtype_t)PHY_DATA_INDICATION;
       
-	if (NULL == frame->buffer_header) {
+	if (NULL == rxFrame->buffer_header) {
 		return;
 	}
 
-	qmm_queue_append(&phyMacQueue, buffer_header);
+	qmmStatus = qmm_queue_append(&phyMacQueue, buffer_header);
     
-    bmm_buffer_free(frame->buffer_header);
+    bmm_buffer_free(rxFrame->buffer_header);
     
     WPAN_PostTask();
+    (void)qmmStatus;
 }
 
 #ifdef PROMISCUOUS_MODE
 static void PromModeRxFrame(buffer_t *b_ptr, MAC_FrameInfo_t *f_ptr)
 {
+    qmm_status_t qmmStatus;
 	MCPS_DataInd_t *mdi
-		= (MCPS_DataInd_t *)BMM_BUFFER_POINTER(b_ptr);
+		= (MCPS_DataInd_t *)MAC_BUFFER_POINTER(b_ptr);
 
 	/*
 	 * In promiscous mode the MCPS_DATA.indication is used as container
@@ -1073,8 +1083,9 @@ static void PromModeRxFrame(buffer_t *b_ptr, MAC_FrameInfo_t *f_ptr)
 	mdi->cmdcode = MCPS_DATA_INDICATION;
 
 	/* Append MCPS data indication to MAC-NHLE queue */
-	qmm_queue_append(&macNhleQueue, b_ptr);
+	qmmStatus = qmm_queue_append(&macNhleQueue, b_ptr);
     WPAN_PostTask();
+    (void)qmmStatus;
 }
 
 #endif  /* PROMISCUOUS_MODE */
@@ -1098,9 +1109,10 @@ static void CheckForPanIdConflictAsPc(bool inScan)
 	 * network.
 	 */
     PibValue_t pib_value;
-    PHY_PibGet(macPANId, (uint8_t *)&pib_value);
-	if (GET_PAN_COORDINATOR(macParseData.macPayloadData.beaconData.
-			superframeSpec)) {
+    PHY_Retval_t pibStatus;
+    pibStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+	if ((GET_PAN_COORDINATOR(macParseData.macPayloadData.beaconData.
+			superframeSpec)) == 1U) {
 		if (
 #if ((MAC_SCAN_ACTIVE_REQUEST_CONFIRM == 1) || \
 			(MAC_SCAN_PASSIVE_REQUEST_CONFIRM == 1))
@@ -1113,9 +1125,10 @@ static void CheckForPanIdConflictAsPc(bool inScan)
 #endif /* ((MAC_SCAN_ACTIVE_REQUEST_CONFIRM == 1) ||
 		 *(MAC_SCAN_PASSIVE_REQUEST_CONFIRM == 1)) */
 			) {
-			MAC_SyncLoss(MAC_PAN_ID_CONFLICT);
+			MAC_SyncLoss((uint8_t)MAC_PAN_ID_CONFLICT);
 		}
 	}
+    (void)pibStatus;
 }
 
 #endif  /* (MAC_PAN_ID_CONFLICT_AS_PC == 1) */
@@ -1137,14 +1150,15 @@ static void CheckForPanIdConflictNonPc(bool inScan)
 	 * in the Superframe Specification field of the beacon frame.
 	 */
     PibValue_t pib_value;
-	if (GET_PAN_COORDINATOR(macParseData.macPayloadData.beaconData.
-			superframeSpec)) {
+    bool status = false;
+    PHY_Retval_t pibStatus = PHY_FAILURE;
+	if ((GET_PAN_COORDINATOR(macParseData.macPayloadData.beaconData.superframeSpec)) == 1U) {
 		/*
 		 * The received beacon frame is from a PAN Coordinator
 		 * (not necessarily ours).
 		 * Now check if the PAN-Id is ours.
 		 */ 
-        PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+        pibStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_value);
 		if (
 #if ((MAC_SCAN_ACTIVE_REQUEST_CONFIRM == 1) || \
 			(MAC_SCAN_PASSIVE_REQUEST_CONFIRM == 1))
@@ -1168,10 +1182,12 @@ static void CheckForPanIdConflictNonPc(bool inScan)
 				(macParseData.srcAddr.longAddress !=
 				macPib.mac_CoordExtendedAddress)
 				) {
-				TxPanIdConfNotif();
+				status = TxPanIdConfNotif();
+                (void)status;
 			}
 		}
 	}
+    (void)pibStatus;
 }
 
 #endif /* (MAC_PAN_ID_CONFLICT_NON_PC == 1) */
@@ -1189,7 +1205,7 @@ static void CheckForPanIdConflictNonPc(bool inScan)
  */
 static bool TxPanIdConfNotif(void)
 {
-	MAC_Retval_t talTxStatus;
+	PHY_Retval_t phyStatus = PHY_FAILURE;
 	uint8_t frameLen;
 	uint8_t *framePtr;
 	uint16_t fcf;
@@ -1202,7 +1218,7 @@ static bool TxPanIdConfNotif(void)
 	}
 
 	MAC_FrameInfo_t *panIdConfFrame
-		= (MAC_FrameInfo_t *)BMM_BUFFER_POINTER(panIdConfBuffer);
+		= (MAC_FrameInfo_t *)MAC_BUFFER_POINTER(panIdConfBuffer);
 
 	panIdConfFrame->msgType = PANIDCONFLICTNOTIFICAION;
 
@@ -1232,12 +1248,12 @@ static bool TxPanIdConfNotif(void)
 	 * Build the command frame id.
 	 * This is actually being written into "transmitFrame->payload[0]".
 	 */
-	*framePtr = PANIDCONFLICTNOTIFICAION;
+	*framePtr = (uint8_t)PANIDCONFLICTNOTIFICAION;
 
 	/* Source Address */
 	framePtr -= 8;
     
-    PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
+    phyStatus = PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
     convert_64_bit_to_byte_array(pib_value.pib_value_64bit, framePtr);
   
 
@@ -1248,7 +1264,8 @@ static bool TxPanIdConfNotif(void)
 
 	/* Destination PAN-Id */
 	framePtr -= 2;
-    PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+    phyStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+
     convert_16_bit_to_byte_array(pib_value.pib_value_16bit, framePtr);
     
 
@@ -1273,10 +1290,11 @@ static bool TxPanIdConfNotif(void)
 
 	/* Finished building of frame. */
 	panIdConfFrame->mpdu = framePtr;
+    (void)phyStatus;
 	/* In Nonbeacon build the frame is sent with unslotted CSMA-CA. */
-	talTxStatus = sendFrame(panIdConfFrame, CSMA_UNSLOTTED, true);
+	phyStatus = sendFrame(panIdConfFrame, CSMA_UNSLOTTED, true);
 
-	if (MAC_SUCCESS == talTxStatus) {
+	if (PHY_SUCCESS == phyStatus) {
 		MAKE_MAC_BUSY();
 		return true;
 	} else {

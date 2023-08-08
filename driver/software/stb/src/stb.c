@@ -123,7 +123,7 @@ STB_Ccm_t STB_CcmSecure(uint8_t *buffer,
     SAL_AesStatus_t aesStatus = AES_FAILURE;
     STB_Ccm_t stbCcmStatus = STB_CCM_FAILURE;
 
-	switch (sec_level) {
+	switch ((Security_Level_t)sec_level) {
 	case SECURITY_00_LEVEL:
 		/* No MIC & No Encryption at Security Level -0 */
 		mic_len = LEN_MIC_00;
@@ -169,12 +169,14 @@ STB_Ccm_t STB_CcmSecure(uint8_t *buffer,
 		break;
 
 	default:
+        mic_len = (uint8_t)STB_CCM_MICERR;
+        enc_flag = ENCRYPTION_NOT_REQD;
 		break;
 	}
 
 	/* Test on correct parameters. */
 
-	if ((sec_level & ~0x7) ||
+	if (((sec_level & ~0x7U) == 0xf8U) ||
 			(buffer == NULL) ||
 			(nonce == NULL) ||
 			((uint16_t)pld_len + (uint16_t)hdr_len +
@@ -206,11 +208,11 @@ STB_Ccm_t STB_CcmSecure(uint8_t *buffer,
 		 * ECB encryption is always the initial encryption mode.
 		 */
 		aesStatus = SAL_AesSetKey(key, AES_KEYSIZE);
-        if(aesStatus != 0)
+        if(aesStatus != AES_SUCCESS)
         {
             return(STB_CCM_FAILURE);
         }
-		memcpy(last_key, key, AES_KEYSIZE);
+		(void)memcpy(last_key, key, AES_KEYSIZE);
 		key_change = false;
 	}
    

@@ -121,7 +121,8 @@ void MAC_GenMCPSDataConf(buffer_t *buf, uint8_t status, uint8_t handle,
 void MAC_GenMCPSDataConf(buffer_t *buf, uint8_t status, uint8_t handle)
 #endif  /* ENABLE_TSTAMP */
 {
-	MCPS_DataConf_t *mdc = (MCPS_DataConf_t *)BMM_BUFFER_POINTER(buf);
+    qmm_status_t  qmmStatus = QMM_QUEUE_FULL;
+	MCPS_DataConf_t *mdc = (MCPS_DataConf_t *)MAC_BUFFER_POINTER(buf);
 
 	mdc->cmdcode = MCPS_DATA_CONFIRM;
 	mdc->msduHandle = handle;
@@ -130,8 +131,9 @@ void MAC_GenMCPSDataConf(buffer_t *buf, uint8_t status, uint8_t handle)
 	mdc->Timestamp = timestamp;
 #endif  /* ENABLE_TSTAMP */
 
-	qmm_queue_append(&macNhleQueue, buf);
+	qmmStatus = qmm_queue_append(&macNhleQueue, buf);
     WPAN_PostTask();
+    (void)qmmStatus;
 }
 
 /**
@@ -144,15 +146,16 @@ void MAC_GenMCPSDataConf(buffer_t *buf, uint8_t status, uint8_t handle)
  *
  * @param msg Pointer to the MCPS-DATA.request parameter
  */
-void MAC_MCPS_DataRequest(uint8_t *msg)
+void MAC_MCPS_DataRequest(void *msg)
 {
 	MAC_Retval_t status = FAILURE;
+    PHY_Retval_t phyTxStatus;
 	MCPS_DataReq_t mdr;
 
-	memcpy(&mdr, BMM_BUFFER_POINTER(
+	(void)memcpy(((void *)&mdr), MAC_BUFFER_POINTER(
 			(buffer_t *)msg), sizeof(MCPS_DataReq_t));
 
-	if ((mdr.TxOptions & WPAN_TXOPT_INDIRECT) == 0) {
+	if ((mdr.TxOptions & WPAN_TXOPT_INDIRECT) == 0U) {
 		/*
 		 * Data Requests for a coordinator using direct transmission are
 		 * accepted in all non-transient states (no polling and no
@@ -175,9 +178,9 @@ void MAC_MCPS_DataRequest(uint8_t *msg)
 	}
 	/*To check the broadcst address*/
 	uint16_t broadcastCheck;
-	ADDR_COPY_DST_SRC_16(broadcastCheck, mdr.DstAddr);
+	ADDR_COPY_DST_SRC_16(broadcastCheck, ((uint16_t)(mdr.DstAddr)));
 	/* Check whether somebody requests an ACK of broadcast frames */
-	if ((mdr.TxOptions & WPAN_TXOPT_ACK) &&
+	if (((mdr.TxOptions & WPAN_TXOPT_ACK) == WPAN_TXOPT_ACK) &&
 			(FCF_SHORT_ADDR == mdr.DstAddrMode) &&
 			(BROADCAST == broadcastCheck)) {
 		MAC_GenMCPSDataConf((buffer_t *)msg,
@@ -221,7 +224,7 @@ void MAC_MCPS_DataRequest(uint8_t *msg)
 
 	/* Now all is fine, continue... */
 	MAC_FrameInfo_t *transmitFrame
-		= (MAC_FrameInfo_t *)BMM_BUFFER_POINTER((buffer_t *)msg);
+		= (MAC_FrameInfo_t *)MAC_BUFFER_POINTER((buffer_t *)msg);
 
 	/* Store the message type */
 	transmitFrame->msgType = MCPS_MESSAGE;
@@ -253,7 +256,7 @@ void MAC_MCPS_DataRequest(uint8_t *msg)
 	 */
 #if (MAC_INDIRECT_DATA_FFD == 1)
 	if (
-		(mdr.TxOptions & WPAN_TXOPT_INDIRECT) &&
+		((mdr.TxOptions & WPAN_TXOPT_INDIRECT) == WPAN_TXOPT_INDIRECT) &&
 		((MAC_PAN_COORD_STARTED == macState) ||
 		(MAC_COORDINATOR == macState))
 		) {
@@ -302,12 +305,14 @@ void MAC_MCPS_DataRequest(uint8_t *msg)
 		 * retries. */
 
 #ifdef MAC_SECURITY_ZIP
-		if (transmitFrame->mpdu[1] & FCF_SECURITY_ENABLED) {
-			MCPS_DataReq_t pmdr;
+		if ((transmitFrame->mpdu[1] & FCF_SECURITY_ENABLED) == FCF_SECURITY_ENABLED) {
+			MCPS_DataReq_t pmdr = {0};
+            bool retVal = false;
 
-			BuildSecMcpsDataFrame(&pmdr, transmitFrame);
+			retVal = BuildSecMcpsDataFrame(&pmdr, transmitFrame);
+            (void)retVal;
 
-			if (pmdr.SecurityLevel > 0) {
+			if (pmdr.SecurityLevel > 0U) {
 				/* Secure the Frame */
 				MAC_Retval_t buildSec = MAC_Secure(transmitFrame,	\
 						transmitFrame->macPayload,
@@ -333,9 +338,9 @@ void MAC_MCPS_DataRequest(uint8_t *msg)
 
 		/* In Non beacon build the frame is sent with unslotted CSMA-CA.
 		**/
-		status = sendFrame(transmitFrame, CSMA_UNSLOTTED, true);
+		phyTxStatus = sendFrame(transmitFrame, CSMA_UNSLOTTED, true);
 
-		if (MAC_SUCCESS == status) {
+		if (PHY_SUCCESS == phyTxStatus) {
 			MAKE_MAC_BUSY();
 		} else {
 			/* Transmission to TAL failed, generate confirmation
@@ -365,10 +370,11 @@ void MAC_MCPS_DataRequest(uint8_t *msg)
  */
 void MAC_ProcessDataFrame(buffer_t *bufPtr)
 {
+    qmm_status_t  qmmStatus = QMM_QUEUE_FULL;
 	MCPS_DataInd_t *mdi
-		= (MCPS_DataInd_t *)BMM_BUFFER_POINTER(bufPtr);
+		= (MCPS_DataInd_t *)MAC_BUFFER_POINTER(bufPtr);
 
-	if (macParseData.macPayloadLength == 0) {
+	if (macParseData.macPayloadLength == 0U) {
 		/*
 		 * A null frame is neither indicated to the higher layer
 		 * nor checked for for frame pending bit set, since
@@ -402,6 +408,10 @@ void MAC_ProcessDataFrame(buffer_t *bufPtr)
 				ADDR_COPY_DST_SRC_64(mdi->SrcAddr,
 						macParseData.srcAddr.longAddress);
 			}
+            else
+            {
+                // do nothing
+            }
 		} else {
 			/*
 			 * Even if the Source address mode is zero, and the
@@ -495,7 +505,8 @@ void MAC_ProcessDataFrame(buffer_t *bufPtr)
 			mdi->cmdcode = MCPS_DATA_INDICATION;
 
 			/* Append MCPS data indication to MAC-NHLE queue */
-			qmm_queue_append(&macNhleQueue, bufPtr);
+			qmmStatus = qmm_queue_append(&macNhleQueue, bufPtr);
+            (void)qmmStatus;
 
 		} /* End of duplicate detection. */
 
@@ -503,7 +514,7 @@ void MAC_ProcessDataFrame(buffer_t *bufPtr)
 		 * data frame.
 		 */
 #if (MAC_INDIRECT_DATA_BASIC == 1)
-		if (macParseData.fcf & FCF_FRAME_PENDING) {
+		if ((macParseData.fcf & FCF_FRAME_PENDING) == FCF_FRAME_PENDING) {
 #if (MAC_START_REQUEST_CONFIRM == 1)
 
 			/* An node that is not PAN coordinator may poll for
@@ -512,6 +523,7 @@ void MAC_ProcessDataFrame(buffer_t *bufPtr)
 #endif  /* (MAC_START_REQUEST_CONFIRM == 1) */
 			{
 				AddressField_t srcAddr;
+                bool retVal = false;
 
 				/* Build command frame due to implicit poll
 				 * request */
@@ -545,7 +557,7 @@ void MAC_ProcessDataFrame(buffer_t *bufPtr)
 							srcAddr.shortAddress,
 							macParseData.srcAddr.shortAddress);
 
-					MAC_BuildAndTxDataReq(false,
+					retVal = MAC_BuildAndTxDataReq(false,
 							false,
 							FCF_SHORT_ADDR,
 							(AddressField_t *)&(
@@ -557,16 +569,17 @@ void MAC_ProcessDataFrame(buffer_t *bufPtr)
 							srcAddr.longAddress,
 							macParseData.srcAddr.longAddress);
 
-					MAC_BuildAndTxDataReq(false,
+					retVal = MAC_BuildAndTxDataReq(false,
 							false,
 							FCF_LONG_ADDR,
 							(AddressField_t *)&(
 								srcAddr),
 							macParseData.srcPanid);
 				} else {
-					MAC_BuildAndTxDataReq(false, false,
+					retVal = MAC_BuildAndTxDataReq(false, false,
 							0, NULL, 0);
 				}
+                (void)retVal;
 			}
 		} else
 #endif /* (MAC_INDIRECT_DATA_BASIC == 1) */
@@ -598,10 +611,10 @@ static MAC_Retval_t BuildDataFrame(MCPS_DataReq_t *pmdr,
 	uint8_t *framePtr;
 	uint16_t fcf = 0;
     PibValue_t pib_value;
-
+    PHY_Retval_t pibStatus = PHY_FAILURE;
 	frameLen = pmdr->msduLength +
-			2 + /* Add 2 octets for FCS */
-			3; /* 3 octets DSN and FCF */
+			2U + /* Add 2 octets for FCS */
+			3U; /* 3 octets DSN and FCF */
 
 	/*
 	 * Payload pointer points to data, which was already been copied
@@ -618,7 +631,7 @@ static MAC_Retval_t BuildDataFrame(MCPS_DataReq_t *pmdr,
 	 * Note: The value of the payload_length parameter will be updated
 	 *       if security needs to be applied.
 	 */
-	if (pmdr->SecurityLevel > 0) {
+	if (pmdr->SecurityLevel > 0U) {
 		MAC_Retval_t buildSec = MAC_BuildAuxSecHeader(&framePtr, pmdr,
 				&frameLen);
 
@@ -633,20 +646,26 @@ static MAC_Retval_t BuildDataFrame(MCPS_DataReq_t *pmdr,
 	 */
 	if (FCF_SHORT_ADDR == pmdr->SrcAddrMode) {
 		framePtr -= 2;
-		frameLen += 2;
-        PHY_PibGet(macShortAddress, (uint8_t *)&pib_value);
+		frameLen += 2U;
+        pibStatus = PHY_PibGet(macShortAddress, (uint8_t *)&pib_value);
+
         convert_16_bit_to_byte_array(pib_value.pib_value_16bit, framePtr);
         
 	} else if (FCF_LONG_ADDR == pmdr->SrcAddrMode) {
 		framePtr -= 8;
-		frameLen += 8;
-        PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
+		frameLen += 8U;
+        pibStatus = PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
+
         convert_64_bit_to_byte_array(pib_value.pib_value_64bit, framePtr);
         
 	}
+    else
+    {
+        // do nothing
+    }
 
 	/* Shall the Intra-PAN bit set? */
-    PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+    pibStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_value);
 	if ((pib_value.pib_value_16bit == pmdr->DstPANId) &&
 			(FCF_NO_ADDR != pmdr->SrcAddrMode) &&
 			(FCF_NO_ADDR != pmdr->DstAddrMode)) {
@@ -658,26 +677,28 @@ static MAC_Retval_t BuildDataFrame(MCPS_DataReq_t *pmdr,
 	} else if (FCF_NO_ADDR != pmdr->SrcAddrMode) {
 		/* Set Source PAN-Id. */
 		framePtr -= 2;
-		frameLen += 2;
+		frameLen += 2U;
         convert_16_bit_to_byte_array(pib_value.pib_value_16bit, framePtr);
         
 	}
+    else{
+        //do nothing
+    }
 
 	/* Set the Destination Addressing fields. */
 	if (FCF_NO_ADDR != pmdr->DstAddrMode) {
 		if (FCF_SHORT_ADDR == pmdr->DstAddrMode) {
 			framePtr -= 2;
-			frameLen += 2;
-			convert_16_bit_to_byte_address(pmdr->DstAddr,
-					framePtr);
+			frameLen += 2U;
+			convert_16_bit_to_byte_address(((uint16_t)(pmdr->DstAddr)), framePtr);
 		} else {
 			framePtr -= 8;
-			frameLen += 8;
+			frameLen += 8U;
 			convert_64_bit_to_byte_array(pmdr->DstAddr, framePtr);
 		}
 
 		framePtr -= 2;
-		frameLen += 2;
+		frameLen += 2U;
 		convert_16_bit_to_byte_array(pmdr->DstPANId, framePtr);
 	}
 
@@ -704,12 +725,12 @@ static MAC_Retval_t BuildDataFrame(MCPS_DataReq_t *pmdr,
 	}
 
 #if ((defined MAC_SECURITY_ZIP)  || (defined MAC_SECURITY_2006))
-	if (pmdr->SecurityLevel > 0) {
+	if (pmdr->SecurityLevel > 0U) {
 		fcf |= FCF_SECURITY_ENABLED | FCF_FRAME_VERSION_2006;
 	}
 #endif
 
-	if (pmdr->TxOptions & WPAN_TXOPT_ACK) {
+	if ((pmdr->TxOptions & WPAN_TXOPT_ACK) == WPAN_TXOPT_ACK) {
 		fcf |= FCF_ACK_REQUEST;
 	}
 
@@ -748,6 +769,7 @@ static MAC_Retval_t BuildDataFrame(MCPS_DataReq_t *pmdr,
 #if ((defined MAC_SECURITY_ZIP)  || (defined MAC_SECURITY_2006))
 	frame->macPayload = macPayloadPtr;
 #endif  /* (MAC_SECURITY_ZIP || MAC_SECURITY_2006) */
+    (void)pibStatus;
 
 	return MAC_SUCCESS;
 } /* BuildDataFrame() */
@@ -762,7 +784,7 @@ static MAC_Retval_t BuildDataFrame(MCPS_DataReq_t *pmdr,
  */
 void MAC_StartPersistenceTimer(void)
 {
-	MAC_Retval_t status = FAILURE;
+	PAL_Status_t status = PAL_FAILURE;
 	/* Interval of indirect data persistence timer */
 	uint32_t persistence_int_us;
 
@@ -782,7 +804,7 @@ void MAC_StartPersistenceTimer(void)
 			&MAC_Timer_PersistenceCb,
 			NULL,CALLBACK_SINGLE);
 
-	if (MAC_SUCCESS != status) {
+	if (PAL_SUCCESS != status) {
 		/* Got to the persistence timer callback function immediately.
 		**/
 		MAC_Timer_PersistenceCb(NULL);
@@ -806,12 +828,10 @@ static void MAC_Timer_PersistenceCb(void *callbackParameter)
 	/* Decrement the persistence time for indirect data. */
 	HandlePersistenceTimeDecrement();
 
-	if (indirectDataQueue.size > 0) {
+	if (indirectDataQueue.size > 0U) {
 		/* Restart persistence timer. */
 		MAC_StartPersistenceTimer();
 	}
-
-	//callbackParameter = callbackParameter; /* Keep compiler happy. */
 }
 
 #endif /* (MAC_INDIRECT_DATA_FFD == 1) */
@@ -831,18 +851,20 @@ static void MAC_Timer_PersistenceCb(void *callbackParameter)
 static void HandlePersistenceTimeDecrement(void)
 {
 	search_t findBuf;
+    buffer_t *buf;
 
 	/*
 	 * This callback function traverses through the indirect queue and
 	 * decrements the persistence time for each data frame.
 	 */
 	findBuf.criteria_func = DecrementPersistenceTime;
+    findBuf.handle = NULL;
 
 	/*
 	 * At the end of this function call (qmm_queue_read), the indirect data
 	 * will be updated with the decremented persistence time.
 	 */
-	qmm_queue_read(&indirectDataQueue, &findBuf);
+	buf = qmm_queue_read(&indirectDataQueue, &findBuf);
 
 	/*
 	 * Once we have updated the persistence timer, any frame with a
@@ -865,6 +887,7 @@ static void HandlePersistenceTimeDecrement(void)
 			HandleExpPersistenceTimer(buffer_persistent_zero);
 		}
 	} while (NULL != buffer_persistent_zero);
+    (void)buf;
 }
 
 #endif /* (MAC_INDIRECT_DATA_FFD == 1) */
@@ -924,7 +947,7 @@ static uint8_t CheckPersistenceTimeZero(void *bufPtr, void *handle)
 
 	/* Frame shall not be in transmission. */
 	if (!frame->indirectInTransit) {
-		if (frame->persistenceTime== 0) {
+		if (frame->persistenceTime== 0U) {
 			return 1;
 		}
 	}
@@ -949,19 +972,18 @@ static uint8_t CheckPersistenceTimeZero(void *bufPtr, void *handle)
  */
 static void HandleExpPersistenceTimer(buffer_t *bufPtr)
 {
-	MAC_FrameInfo_t *trans_frame = (MAC_FrameInfo_t *)BMM_BUFFER_POINTER(bufPtr);
+	MAC_FrameInfo_t *trans_frame = (MAC_FrameInfo_t *)MAC_BUFFER_POINTER(bufPtr);
 
 	/*
 	 * The frame should never be in transmission while this function
 	 * is called.
 	 */
-//	Assert(trans_frame->indirectInTransit == false);
 
 	switch (trans_frame->msgType) {
 #if (MAC_ASSOCIATION_INDICATION_RESPONSE == 1)
 	case ASSOCIATIONRESPONSE:
 	{
-		MAC_MLME_CommStatus(MAC_TRANSACTION_EXPIRED,
+		MAC_MLME_CommStatus((uint8_t)MAC_TRANSACTION_EXPIRED,
 				bufPtr);
 	}
 	break;
@@ -975,7 +997,7 @@ static void HandleExpPersistenceTimer(buffer_t *bufPtr)
 		 * the disassociation notification frame.
 		 */
 		MAC_PrepDisassocConf((buffer_t *)bufPtr,
-				MAC_TRANSACTION_EXPIRED);
+				(uint8_t)MAC_TRANSACTION_EXPIRED);
 		break;
 #endif  /* (MAC_DISASSOCIATION_BASIC_SUPPORT == 1) */
 
@@ -1060,12 +1082,13 @@ static bool MAC_BufferPurge(uint8_t msdu_handle)
  *
  * @param msg Pointer to the MCPS-PURGE.request parameter
  */
-void MAC_MCPS_PurgeRequest(uint8_t *msg)
+void MAC_MCPS_PurgeRequest(void *msg)
 {
+    qmm_status_t qmmStatus = QMM_QUEUE_FULL;
 	MCPS_PurgeReq_t *mpr
-		= (MCPS_PurgeReq_t *)BMM_BUFFER_POINTER(((buffer_t *)msg));
+		= (MCPS_PurgeReq_t *)MAC_BUFFER_POINTER(((buffer_t *)msg));
 
-	MCPS_PurgeConf_t *mpc = (MCPS_PurgeConf_t *)mpr;
+	MCPS_PurgeConf_t *mpc = (MCPS_PurgeConf_t *)((void *)mpr);
 
 	uint8_t purge_handle = mpr->msduHandle;
 
@@ -1074,13 +1097,14 @@ void MAC_MCPS_PurgeRequest(uint8_t *msg)
 	mpc->msduHandle = purge_handle;
 
 	if (MAC_BufferPurge(purge_handle)) {
-		mpc->status = MAC_SUCCESS;
+		mpc->status = (uint8_t)MAC_SUCCESS;
 	} else {
-		mpc->status = MAC_INVALID_HANDLE;
+		mpc->status = (uint8_t)MAC_INVALID_HANDLE;
 	}
 
-	qmm_queue_append(&macNhleQueue, (buffer_t *)msg);
+	qmmStatus = qmm_queue_append(&macNhleQueue, (buffer_t *)msg);
     WPAN_PostTask();
+    (void)qmmStatus;
 }
 
 /*

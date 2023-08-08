@@ -56,13 +56,13 @@
 /* === Macros =============================================================== */
 
 /* === Globals ============================================================= */
-extern MAC_FrameInfo_t *macFrameInfo;
+
 /* === Prototypes ========================================================== */
 
 static void MAC_ProcessPhyTxStatus(MAC_Retval_t txStatus, MAC_FrameInfo_t *frame);
 
 #if (MAC_INDIRECT_DATA_FFD == 1)
-static uint8_t FindBufferCb(void *buf, void *address);
+static uint8_t FindBufferCb(void *buf, void *buffer);
 
 #endif /* (MAC_INDIRECT_DATA_FFD == 1) */
 #if (MAC_INDIRECT_DATA_FFD == 1)
@@ -156,7 +156,7 @@ static void MAC_ProcessPhyTxStatus(MAC_Retval_t txStatus, MAC_FrameInfo_t *frame
 				 * the disassociation notification frame.
 				 */
 				MAC_PrepDisassocConf(frame->buffer_header,
-						txStatus);
+						(uint8_t)txStatus);
 			}
 		} else /* Not indirect */
 #endif  /* (MAC_DISASSOCIATION_FFD_SUPPORT == 1) */
@@ -170,7 +170,7 @@ static void MAC_ProcessPhyTxStatus(MAC_Retval_t txStatus, MAC_FrameInfo_t *frame
 			 * the disassociation notification frame.
 			 */
 			MAC_PrepDisassocConf(frame->buffer_header,
-					txStatus);
+					(uint8_t)txStatus);
 		}
 
 		/*
@@ -206,7 +206,7 @@ static void MAC_ProcessPhyTxStatus(MAC_Retval_t txStatus, MAC_FrameInfo_t *frame
 			 * data request obtained from the coordinator.
 			 */
 			MAC_GenMLMEAssociateConf(frame->buffer_header,
-					txStatus, BROADCAST);
+					(uint8_t)txStatus, BROADCAST);
 
 			/* Set radio to sleep if allowed */
 			MAC_SleepTrans();
@@ -230,7 +230,7 @@ static void MAC_ProcessPhyTxStatus(MAC_Retval_t txStatus, MAC_FrameInfo_t *frame
 			macPollState = MAC_AWAIT_ASSOC_RESPONSE;
 
 			{
-				uint8_t status;
+				PAL_Status_t status;
 				uint32_t responseTimer;
 
 				/* Start the response wait timer */
@@ -243,7 +243,7 @@ static void MAC_ProcessPhyTxStatus(MAC_Retval_t txStatus, MAC_FrameInfo_t *frame
 						TIMEOUT_RELATIVE,
 						&MAC_Timer_ResponseWaitCb,
 						NULL,CALLBACK_SINGLE);
-				if (MAC_SUCCESS != status) {
+				if (PAL_SUCCESS != status) {
 					MAC_Timer_ResponseWaitCb(NULL);
 				}
 			}
@@ -273,20 +273,17 @@ static void MAC_ProcessPhyTxStatus(MAC_Retval_t txStatus, MAC_FrameInfo_t *frame
 					/* Reuse the poll request buffer for
 					 * poll confirmation */
 					MLME_PollConf_t *mpc
-						= (MLME_PollConf_t
-							*)
-							BMM_BUFFER_POINTER
-							(
-							(buffer_t *)macConfBufPtr);
+						= (MLME_PollConf_t *) MAC_BUFFER_POINTER ((buffer_t *)((void*)macConfBufPtr));
+                    qmm_status_t  qmmStatus;
 
 					mpc->cmdcode = MLME_POLL_CONFIRM;
-					mpc->status = txStatus;
-					qmm_queue_append(&macNhleQueue,
-							(buffer_t *)macConfBufPtr);
+					mpc->status = (uint8_t)txStatus;
+					qmmStatus = qmm_queue_append(&macNhleQueue, (buffer_t *)((void*)macConfBufPtr));
 
 					/* Set radio to sleep if allowed */
 					MAC_SleepTrans();
                     WPAN_PostTask();
+                    (void)qmmStatus;
 					return;
 				}
 
@@ -313,7 +310,7 @@ static void MAC_ProcessPhyTxStatus(MAC_Retval_t txStatus, MAC_FrameInfo_t *frame
 			}
 
 			{
-				uint8_t status;
+				PAL_Status_t status;
 				uint32_t responseTimer;
 
 				/*
@@ -338,7 +335,7 @@ static void MAC_ProcessPhyTxStatus(MAC_Retval_t txStatus, MAC_FrameInfo_t *frame
 				 */
 				MAKE_MAC_BUSY();
 
-				if (MAC_SUCCESS != status) {
+				if (PAL_SUCCESS != status) {
 					MAC_Timer_PollWaitTimeCb(NULL);
 				}
 			}
@@ -373,7 +370,7 @@ static void MAC_ProcessPhyTxStatus(MAC_Retval_t txStatus, MAC_FrameInfo_t *frame
 			 */
 			RemoveFrameFromIndirectQueue(frame);
 
-			MAC_MLME_CommStatus(txStatus, frame->buffer_header);
+			MAC_MLME_CommStatus((uint8_t)txStatus, frame->buffer_header);
 		}
 
 		/* Set radio to sleep if allowed */
@@ -383,7 +380,7 @@ static void MAC_ProcessPhyTxStatus(MAC_Retval_t txStatus, MAC_FrameInfo_t *frame
 
 #if (MAC_ORPHAN_INDICATION_RESPONSE == 1)
 	case ORPHANREALIGNMENT:
-		MAC_MLME_CommStatus(txStatus,
+		MAC_MLME_CommStatus((uint8_t)txStatus,
 				frame->buffer_header);
 
 		/* Set radio to sleep if allowed */
@@ -399,7 +396,7 @@ static void MAC_ProcessPhyTxStatus(MAC_Retval_t txStatus, MAC_FrameInfo_t *frame
 		bmm_buffer_free(frame->buffer_header);
 
 		/* Generate a sync loss to the higher layer. */
-		MAC_SyncLoss(MAC_PAN_ID_CONFLICT);
+		MAC_SyncLoss((uint8_t)MAC_PAN_ID_CONFLICT);
 
 		/* Set radio to sleep if allowed */
 		MAC_SleepTrans();
@@ -415,7 +412,7 @@ static void MAC_ProcessPhyTxStatus(MAC_Retval_t txStatus, MAC_FrameInfo_t *frame
 		 * parameters given in the MLME.START_request with
 		 * coordinator realignment command
 		 */
-		MAC_CoordRealignmentCommandTxSuccess(txStatus,
+		MAC_CoordRealignmentCommandTxSuccess((uint8_t)txStatus,
 				frame->buffer_header);
 
 		/* Set radio to sleep if allowed */
@@ -442,7 +439,7 @@ static void MAC_ProcessPhyTxStatus(MAC_Retval_t txStatus, MAC_FrameInfo_t *frame
 	default:
 		/* Set radio to sleep if allowed */
 		MAC_SleepTrans();
-		return;
+		break;
 	}
 } /* MAC_ProcessPhyTxStatus() */
 
@@ -526,13 +523,15 @@ void PHY_TxDoneCallback(PHY_Retval_t status, PHY_FrameInfo_t *frame)
 static void RemoveFrameFromIndirectQueue(MAC_FrameInfo_t *f_ptr)
 {
 	search_t findBuf;
+    buffer_t *buf;
 
 	findBuf.criteria_func = FindBufferCb;
 
 	/* Update the address to be searched */
 	findBuf.handle = (void *)f_ptr->buffer_header;
 
-	qmm_queue_remove(&indirectDataQueue, &findBuf);
+	buf = qmm_queue_remove(&indirectDataQueue, &findBuf);
+    (void)buf;
 }
 
 #endif /* (MAC_INDIRECT_DATA_FFD == 1) */
@@ -551,7 +550,7 @@ static void RemoveFrameFromIndirectQueue(MAC_FrameInfo_t *f_ptr)
 
 static uint8_t FindBufferCb(void *buf, void *buffer)
 {
-	uint8_t *bufBody = (uint8_t *)BMM_BUFFER_POINTER((buffer_t *)buffer);
+	uint8_t *bufBody = (uint8_t *)MAC_BUFFER_POINTER((buffer_t *)buffer);
 	if (buf == bufBody) {
 		return 1;
 	}

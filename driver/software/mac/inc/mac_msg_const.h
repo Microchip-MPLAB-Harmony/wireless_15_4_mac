@@ -77,7 +77,7 @@
  */
         
 enum msg_code {
-	TAL_DATA_INDICATION                 = (0x00),
+	PHY_DATA_INDICATION                 = (0x00),
 
 	MLME_ASSOCIATE_REQUEST              = (0x01),
 	MLME_ASSOCIATE_RESPONSE             = (0x02),
@@ -119,8 +119,7 @@ enum msg_code {
 	MLME_START_CONFIRM                  = (0x22),
 	MLME_POLL_CONFIRM                   = (0x23),
 	MAC_INC_FRAME                       = (0x24)
-}
-SHORTENUM;
+};
 
 // *****************************************************************************
 // *****************************************************************************
@@ -142,40 +141,233 @@ SHORTENUM;
 
 /** The following defines describe the minimum length of a primitive message. */
 #ifdef ENABLE_TSTAMP
+// *****************************************************************************
+/* MCPS_DATA_CON_LEN & MCPS_DATA_CON_LEN
+ 
+   Summary:
+    the minimum length of a MCPS data confirm & indication primitive message
+   Description:
+    None
+   Remarks:
+    None 
+ */
 #define MCPS_DATA_CON_LEN               (7)
 #define MCPS_DATA_IND_LEN               (31)
 #else   /* ENABLE_TSTAMP not enabled */
 #define MCPS_DATA_CON_LEN               (7 - 4)
 #define MCPS_DATA_IND_LEN               (31 - 4)
 #endif  /* ENABLE_TSTAMP */
+
+// *****************************************************************************
+/* MCPS_PURGE_CONF_LEN
+ 
+   Summary:
+    the minimum length of a MCPS purge confirm primitive message
+   Description:
+    None
+   Remarks:
+    None 
+ */
 #define MCPS_PURGE_CONF_LEN             (3)
 
+// *****************************************************************************
+/* MLME_ASSOCIATE_CONF_LEN
+ 
+   Summary:
+    the minimum length of a MCPS Associate confirm primitive message
+   Description:
+    None
+   Remarks:
+    None 
+ */
 #define MLME_ASSOCIATE_CONF_LEN         (4)
+
+// *****************************************************************************
+/* MLME_ASSOCIATE_IND_LEN
+ 
+   Summary:
+    the minimum length of a MCPS Associate indication primitive message
+   Description:
+    None
+   Remarks:
+    None 
+ */
 #define MLME_ASSOCIATE_IND_LEN          (10)
+
+// *****************************************************************************
+/* MLME_BEACON_NOTIFY_IND_LEN
+ 
+   Summary:
+    the minimum length of a MCPS beacon notify indication primitive message
+   Description:
+    None
+   Remarks:
+    None 
+ */
 #define MLME_BEACON_NOTIFY_IND_LEN      (2)
+
+// *****************************************************************************
+/* MLME_COMM_STATUS_IND_LEN
+ 
+   Summary:
+    the minimum length of a MLME comm status indication primitive message
+   Description:
+    None
+   Remarks:
+    None 
+ */
 #define MLME_COMM_STATUS_IND_LEN        (22)
+
+// *****************************************************************************
+/* MLME_DISASSOCIATE_CONF_LEN
+ 
+   Summary:
+    the minimum length of a MLME disassociate confirm primitive message
+   Description:
+    None
+   Remarks:
+    None 
+ */
 #define MLME_DISASSOCIATE_CONF_LEN      (13)
+
+// *****************************************************************************
+/* MLME_DISASSOCIATE_IND_LEN
+ 
+   Summary:
+    the minimum length of a MLME disassociate indication primitive message
+   Description:
+    None
+   Remarks:
+    None 
+ */
 #define MLME_DISASSOCIATE_IND_LEN       (10)
+
+// *****************************************************************************
+/* MLME_GET_CONF_LEN
+ 
+   Summary:
+    the minimum length of a MLME get confirm primitive message
+   Description:
+    None
+   Remarks:
+    None 
+ */
 #if ((defined MAC_SECURITY_ZIP)  || (defined MAC_SECURITY_2006))
 #define MLME_GET_CONF_LEN               (5)
 #else
 #define MLME_GET_CONF_LEN               (4)
 #endif  /* (MAC_SECURITY_ZIP || MAC_SECURITY_2006) */
+
+// *****************************************************************************
+/* MLME_ORPHAN_IND_LEN
+ 
+   Summary:
+    the minimum length of a MLME orphan indication primitive message
+   Description:
+    None
+   Remarks:
+    None 
+ */
 #define MLME_ORPHAN_IND_LEN             (9)
+
+// *****************************************************************************
+/* MLME_POLL_CONF_LEN
+ 
+   Summary:
+    the minimum length of a MLME poll confirm primitive message
+   Description:
+    None
+   Remarks:
+    None 
+ */
 #define MLME_POLL_CONF_LEN              (2)
+
+// *****************************************************************************
+/* MLME_RESET_CONF_LEN
+ 
+   Summary:
+    the minimum length of a MLME reset confirm primitive message
+   Description:
+    None
+   Remarks:
+    None 
+ */
 #define MLME_RESET_CONF_LEN             (2)
+
+// *****************************************************************************
+/* MLME_RX_ENABLE_CONF_LEN
+ 
+   Summary:
+    the minimum length of a MLME RX enable confirm primitive message
+   Description:
+    None
+   Remarks:
+    None 
+ */
 #define MLME_RX_ENABLE_CONF_LEN         (2)
+
+// *****************************************************************************
+/* MLME_SCAN_CONF_LEN
+ 
+   Summary:
+    the minimum length of a MLME scan confirm primitive message
+   Description:
+    None
+   Remarks:
+    None 
+ */
 #define MLME_SCAN_CONF_LEN              (10)
+
+// *****************************************************************************
+/* MLME_SET_CONF_LEN
+ 
+   Summary:
+    the minimum length of a MLME set confirm primitive message
+   Description:
+    None
+   Remarks:
+    None 
+ */
 #if ((defined MAC_SECURITY_ZIP) || (defined MAC_SECURITY_2006))
 #define MLME_SET_CONF_LEN               (4)
 #else
 #define MLME_SET_CONF_LEN               (3)
 #endif  /* (MAC_SECURITY_ZIP || MAC_SECURITY_2006) */
-#define MLME_START_CONF_LEN             (2)
-#define MLME_SYNC_LOSS_IND_LEN          (6)
-#define MLME_GTS_CONF_LEN               (3)
-#define MLME_GTS_IND_LEN                (4)
 
+// *****************************************************************************
+/* MLME_START_CONF_LEN
+ 
+   Summary:
+    the minimum length of a MLME start confirm primitive message
+   Description:
+    None
+   Remarks:
+    None 
+ */
+#define MLME_START_CONF_LEN             (2)
+
+// *****************************************************************************
+/* MLME_SYNC_LOSS_IND_LEN
+ 
+   Summary:
+    the minimum length of a MLME sync loss indication primitive message
+   Description:
+    None
+   Remarks:
+    None 
+ */
+#define MLME_SYNC_LOSS_IND_LEN          (6)
+
+// *****************************************************************************
+/* WPAN_DESCRIPTOR_LEN
+ 
+   Summary:
+    the minimum length of a WPAN Descriptor primitive message
+   Description:
+    None
+   Remarks:
+    None 
+ */
 #ifdef ENABLE_TSTAMP
 #define WPAN_DESCRIPTOR_LEN             (21)
 #else   /* ENABLE_TSTAMP not enabled */

@@ -3,9 +3,9 @@
 /* Handle for the MAC_Tasks. */
 TaskHandle_t xWPAN_Tasks;
 
-void _WPAN_Tasks(  void *pvParameters  )
+static void _WPAN_Tasks(  void *pvParameters  )
 {     
-    while(1)
+    while(true)
     {
         WPAN_Tasks();
     }

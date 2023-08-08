@@ -104,7 +104,7 @@ bool MAC_TxCoordRealignmentCommand(FrameMsgtype_t cmdType,
 		uint8_t newChannel,
 		uint8_t newPage)
 {
-	MAC_Retval_t talTxStatus;
+	PHY_Retval_t phyStatus = PHY_FAILURE;
 	uint8_t frameLen;
 	uint8_t *framePtr;
 	uint8_t *tempFramePtr;
@@ -117,13 +117,13 @@ bool MAC_TxCoordRealignmentCommand(FrameMsgtype_t cmdType,
 	 * command frame and finally to send comm-status-indication
 	 */
 	MLME_OrphanResp_t orphan_resp;
-	memcpy(&orphan_resp,
-			(MLME_OrphanResp_t *)BMM_BUFFER_POINTER((buffer_t *)
+	(void)memcpy(&orphan_resp,
+			(MLME_OrphanResp_t *)MAC_BUFFER_POINTER((buffer_t *)
 			bufPtr),
 			sizeof(MLME_OrphanResp_t));
 
 	MAC_FrameInfo_t *coord_realignment_frame
-		= (MAC_FrameInfo_t *)BMM_BUFFER_POINTER((buffer_t *)bufPtr);
+		= (MAC_FrameInfo_t *)MAC_BUFFER_POINTER((buffer_t *)bufPtr);
 
 	coord_realignment_frame->msgType = cmdType;
 	coord_realignment_frame->buffer_header = bufPtr;
@@ -139,18 +139,20 @@ bool MAC_TxCoordRealignmentCommand(FrameMsgtype_t cmdType,
 	                                                                **/
 
 	/* Update the payload field. */
-	*framePtr++ = COORDINATORREALIGNMENT;
+	*framePtr++ = (uint8_t)((FrameMsgtype_t)COORDINATORREALIGNMENT);
 
 	/*
 	 * The payload of the frame has the parameters of the new PAN
 	 * configuration
 	 */
-	*framePtr++ = newPanid;
-	*framePtr++ = (newPanid >> 8);
+	*framePtr++ = (uint8_t)newPanid;
+	*framePtr++ = (uint8_t)(newPanid >> 8U);
 
-    PHY_PibGet(macShortAddress, (uint8_t *)&pib_value);
-	*framePtr++ = pib_value.pib_value_16bit;
-	*framePtr++ = (pib_value.pib_value_16bit >> 8);
+    phyStatus = PHY_PibGet(macShortAddress, (uint8_t *)&pib_value);
+
+    
+	*framePtr++ = (uint8_t)(pib_value.pib_value_16bit);
+	*framePtr++ = (uint8_t)(pib_value.pib_value_16bit >> 8);
 	*framePtr++ = newChannel;
 
 	/*
@@ -158,11 +160,11 @@ bool MAC_TxCoordRealignmentCommand(FrameMsgtype_t cmdType,
 	 * gratuitous realigment.
 	 */
 	if (ORPHANREALIGNMENT == cmdType) {
-		*framePtr++ = orphan_resp.ShortAddress;
-		*framePtr++ = (orphan_resp.ShortAddress >> 8);
+		*framePtr++ = (uint8_t)(orphan_resp.ShortAddress);
+		*framePtr++ = (uint8_t)(orphan_resp.ShortAddress >> 8U);
 	} else {
 		*framePtr++ = (uint8_t)BROADCAST;
-		*framePtr++ = (BROADCAST >> 8);
+		*framePtr++ = (BROADCAST >> 8U);
 	}
 
 	/* Add channel page no matter if it changes or not. */
@@ -183,12 +185,12 @@ bool MAC_TxCoordRealignmentCommand(FrameMsgtype_t cmdType,
 	/* Source address */
 	framePtr -= 8;
     
-    PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
+    phyStatus = PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
     convert_64_bit_to_byte_array(pib_value.pib_value_64bit, framePtr);
 
 	/* Source PAN-Id */
 	framePtr -= 2;
-    PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+    phyStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_value);
     convert_16_bit_to_byte_array(pib_value.pib_value_16bit, framePtr);
 
 	/* Destination Address and FCF */
@@ -206,7 +208,7 @@ bool MAC_TxCoordRealignmentCommand(FrameMsgtype_t cmdType,
 				FCF_ACK_REQUEST | FCF_FRAME_VERSION_2006;
 
 		framePtr -= 8;
-		frameLen += 6; /* Add further 6 octets for long Destination
+		frameLen += 6U; /* Add further 6 octets for long Destination
 		                 * Address */
 		convert_64_bit_to_byte_array(orphan_resp.OrphanAddress,
 				framePtr);
@@ -253,14 +255,15 @@ bool MAC_TxCoordRealignmentCommand(FrameMsgtype_t cmdType,
 
 	/* Finished building of frame. */
 	coord_realignment_frame->mpdu = framePtr;
+    (void)phyStatus;
 
 	/* The frame is given to the TAL for transmission */
 	/* In build without beacon support the frame is sent with unslotted
 	 * CSMA-CA. */
-	talTxStatus = sendFrame(coord_realignment_frame, CSMA_UNSLOTTED,
+	phyStatus = sendFrame(coord_realignment_frame, CSMA_UNSLOTTED,
 			true);
 
-	if (MAC_SUCCESS == talTxStatus) {
+	if (PHY_SUCCESS == phyStatus) {
 		/*
 		 * A positive confirmation is given since the TAL has
 		 * successfuly accepted

@@ -62,6 +62,8 @@ static struct Aes aes;
  */
 void SAL_Init(void)
 {
+	int status = 0;
+	(void)status;
 }
 
 /**
@@ -78,7 +80,7 @@ SAL_AesStatus_t SAL_AesSetKey(uint8_t *key, uint8_t key_len)
     int status = 0;
     SAL_AesStatus_t aesStatus = AES_FAILURE;
     
-	if (key != NULL && key_len > 0) {
+	if (key != NULL && key_len > 0U) {
 		/* Setup key. */
 		status = wc_AesCcmSetKey(&aes, key, key_len);
     }
@@ -120,7 +122,7 @@ SAL_AesStatus_t SAL_AesCcmSecure(uint8_t *buffer,
     int status = 0;
     SAL_AesStatus_t aesCcmStatus = AES_FAILURE;
     
-    if(enc_flag)
+    if(enc_flag > 0U)
     {
         plain_text = buffer + hdr_len;
         plainTextLen = pld_len;

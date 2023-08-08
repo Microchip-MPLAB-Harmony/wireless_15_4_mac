@@ -57,7 +57,7 @@ def instantiateComponent(ieee802154mac):
     # === Radio menu
     execfile(Module.getPath() + "/driver/config/drv_ieee802154_mac_config.py")
     
-    # === Header Files
+    # === MAC Header Files
     
     includeMac = [
         ["mac/inc/ieee_mac_const.h", conditionAlwaysInclude],
@@ -73,10 +73,15 @@ def instantiateComponent(ieee802154mac):
         ["mac/inc/mac_tasks.h", conditionAlwaysInclude],
     ]
     
+    # === STB Header Files
+    
     includeStb = [
         ["stb/inc/stb.h", condSecurity],
         ["stb/inc/stb_generic.h", condSecurity],
     ]
+    
+    # === SAL services Header Files
+    
     includeServices = [
         ["services/sal/inc/sal.h", condSecurity],
         ["services/sal/inc/sal_generic.h", condSecurity],
@@ -140,9 +145,14 @@ def instantiateComponent(ieee802154mac):
         ["mac/src/usr_mlme_sync_loss_ind.c", conditionAlwaysInclude],         
         
     ]
+    
+    # === STB Source Files
+     
     srcStb = [
         ["stb/src/stb.c", condSecurity]
     ]
+    
+    # === SAL services Source Files
 
     srcServices = [
         ["services/sal/pic32cx_bz2/src/sal.c", condSecurity]
@@ -344,8 +354,8 @@ def DeviceTypeConfiguration(symbol,event):
         preprocessorCompiler.setValue(preprocessorMacro)
         preprocessorCompiler.setEnabled(True)
         macIndirectIntegerBmmLargeBuffers.setVisible(True)       
-        EnableSleep.setVisible(False)
-        EnableSleep.setValue(False)
+        DeepSleepEnable.setVisible(False)
+        DeepSleepEnable.setValue(False)
         HandleSleep(False)
         
         
@@ -355,8 +365,8 @@ def DeviceTypeConfiguration(symbol,event):
         preprocessorCompiler.setValue(preprocessorMacro)
         preprocessorCompiler.setEnabled(True)  
         macIndirectIntegerBmmLargeBuffers.setVisible(False)
-        EnableSleep.setVisible(True)
-        EnableSleep.setValue(False)  
+        DeepSleepEnable.setVisible(True)
+        DeepSleepEnable.setValue(False)  
        
 def SleepConfiguration(symbol,event):
     sleepEnable = event['value']
@@ -365,7 +375,7 @@ def SleepConfiguration(symbol,event):
 def HandleSleep(sleepEnable):
     if sleepEnable == True:
         preprocessorSleepMacro = preprocessorCompiler.getValue()
-        preprocessorSleepMacro = preprocessorSleepMacro + ";ENABLE_SLEEP"
+        preprocessorSleepMacro = preprocessorSleepMacro + ";ENABLE_DEVICE_DEEP_SLEEP"
         preprocessorCompiler.setValue(preprocessorSleepMacro)
         preprocessorCompiler.setEnabled(True)
         Database.setSymbolValue("pic32cx_bz2_devsupport", "ENABLE_DEEP_SLEEP", True)
@@ -373,7 +383,7 @@ def HandleSleep(sleepEnable):
         
     if sleepEnable == False:
         preprocessorSleepMacro = preprocessorCompiler.getValue()
-        preprocessorSleepMacro = preprocessorSleepMacro.replace(";ENABLE_SLEEP","")
+        preprocessorSleepMacro = preprocessorSleepMacro.replace(";ENABLE_DEVICE_DEEP_SLEEP","")
         preprocessorCompiler.setValue(preprocessorSleepMacro)
         preprocessorCompiler.setEnabled(True) 
         Database.setSymbolValue("pic32cx_bz2_devsupport", "ENABLE_DEEP_SLEEP", False)

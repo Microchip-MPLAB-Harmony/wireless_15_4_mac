@@ -48,11 +48,7 @@
 /* === Prototypes ========================================================== */
 
 /* === Implementation ====================================================== */
-#if (defined __GNUC__)
 void __attribute__((weak)) USR_MLME_ResetConf(uint8_t status)
-#else
-void USR_MLME_ResetConf(uint8_t status)
-#endif
 {
 	status = status; /* Keep compiler happy. */
 }

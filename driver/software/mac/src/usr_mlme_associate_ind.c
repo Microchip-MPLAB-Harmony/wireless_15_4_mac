@@ -48,13 +48,8 @@
 /* === Prototypes ========================================================== */
 
 /* === Implementation ====================================================== */
-#if (defined __GNUC__)
 void __attribute__((weak)) USR_MLME_AssociateInd(uint64_t DeviceAddress,
 		uint8_t CapabilityInformation)
-#else
-void USR_MLME_AssociateInd(uint64_t DeviceAddress,
-		uint8_t CapabilityInformation)
-#endif
 {
 	/* Keep compiler happy. */
 	DeviceAddress = DeviceAddress;

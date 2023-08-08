@@ -71,7 +71,8 @@
  */
 static void Gen_MLME_PollConf(buffer_t *bufPtr, uint8_t status)
 {
-	MLME_PollConf_t *mpc = (MLME_PollConf_t *)BMM_BUFFER_POINTER(bufPtr);
+    qmm_status_t  qmmStatus;
+	MLME_PollConf_t *mpc = (MLME_PollConf_t *)MAC_BUFFER_POINTER(bufPtr);
 
 	mpc->cmdcode = MLME_POLL_CONFIRM;
 	mpc->status = status;
@@ -80,13 +81,14 @@ static void Gen_MLME_PollConf(buffer_t *bufPtr, uint8_t status)
 	 * Only go to sleep if poll is not successful,
 	 * otherwise stay awake until subsequent evaluation of data frame
 	 */
-	if (MAC_SUCCESS != status) {
+	if ((uint8_t)MAC_SUCCESS != status) {
 		/* Set radio to sleep if allowed */
 		MAC_SleepTrans();
 	}
 
-	qmm_queue_append(&macNhleQueue, bufPtr);
+	qmmStatus = qmm_queue_append(&macNhleQueue, bufPtr);
     WPAN_PostTask();
+    (void)qmmStatus;
 }
 
 /**
@@ -99,7 +101,7 @@ static void Gen_MLME_PollConf(buffer_t *bufPtr, uint8_t status)
  *
  * @param m Pointer to the message
  */
-void MAC_MLME_PollRequest(uint8_t *m)
+void MAC_MLME_PollRequest(void *m)
 {
 	/*
 	 * Polling for data is only allowed, if the node
@@ -128,7 +130,7 @@ void MAC_MLME_PollRequest(uint8_t *m)
 		 * information in the data request frame.
 		 */
 		MLME_PollReq_t *msg
-			= (MLME_PollReq_t *)BMM_BUFFER_POINTER((buffer_t
+			= (MLME_PollReq_t *)MAC_BUFFER_POINTER((buffer_t
 				*)m);
 
 		{
@@ -137,7 +139,7 @@ void MAC_MLME_PollRequest(uint8_t *m)
 			if (msg->CoordAddrMode == FCF_SHORT_ADDR) {
 				dataReqAddrMode = FCF_SHORT_ADDR;
 				ADDR_COPY_DST_SRC_16(coordAddr.shortAddress,
-						msg->CoordAddress);
+						((uint16_t)(msg->CoordAddress)));
 			} else {
 				dataReqAddrMode = FCF_LONG_ADDR;
 				ADDR_COPY_DST_SRC_64(coordAddr.longAddress,
@@ -158,10 +160,10 @@ void MAC_MLME_PollRequest(uint8_t *m)
 			macConfBufPtr = m;
 		} else {
 			Gen_MLME_PollConf((buffer_t *)m,
-					MAC_CHANNEL_ACCESS_FAILURE);
+					(uint8_t)MAC_CHANNEL_ACCESS_FAILURE);
 		}
 	} else {
-		Gen_MLME_PollConf((buffer_t *)m, MAC_CHANNEL_ACCESS_FAILURE);
+		Gen_MLME_PollConf((buffer_t *)m, (uint8_t)MAC_CHANNEL_ACCESS_FAILURE);
 	}
 }
 
@@ -183,7 +185,7 @@ void MAC_Timer_PollWaitTimeCb(void *callbackParameter)
 		 * stored in
 		 * mac_conf_buf_ptr.
 		 */
-		Gen_MLME_PollConf((buffer_t *)macConfBufPtr, MAC_NO_DATA);
+		Gen_MLME_PollConf((buffer_t *)((void *)macConfBufPtr), (uint8_t)MAC_NO_DATA);
 	}
 
 	macPollState = MAC_POLL_IDLE;
@@ -205,6 +207,7 @@ void MAC_Timer_PollWaitTimeCb(void *callbackParameter)
 void MAC_ProcessDataResponse(void)
 {
 	uint8_t status;
+    PAL_Status_t palStatus;
 
 	if (FCF_FRAMETYPE_BEACON == macParseData.frameType) {
 		/*
@@ -219,7 +222,7 @@ void MAC_ProcessDataResponse(void)
 		return;
 	} else {
 		/* Stop the MaxFrameResponseTime timer */
-		PAL_TimerStop(Timer_PollWaitTime);
+		palStatus = PAL_TimerStop(Timer_PollWaitTime);
 
 		/*
 		 * For received command frames (Association response or
@@ -228,17 +231,17 @@ void MAC_ProcessDataResponse(void)
 		 * message
 		 * is supposed to be "No data".
 		 */
-		status = MAC_NO_DATA;
+		status = (uint8_t)MAC_NO_DATA;
 
 		if ((FCF_FRAMETYPE_DATA == macParseData.frameType) &&
-				(macParseData.macPayloadLength > 0)
+				(macParseData.macPayloadLength > 0U)
 				) {
 			/*
 			 * For received data frames with non-zero payload length
 			 * the potential status for the poll.confirm message is
 			 * supposed to be "Success".
 			 */
-			status = MAC_SUCCESS;
+			status = (uint8_t)MAC_SUCCESS;
 		}
 	}
 
@@ -248,13 +251,14 @@ void MAC_ProcessDataResponse(void)
 		 * poll confirm using
 		 * the buffer which was stored in mac_conf_buf_ptr.
 		 */
-		Gen_MLME_PollConf((buffer_t *)macConfBufPtr, status);
+		Gen_MLME_PollConf((buffer_t *)((void *)macConfBufPtr), status);
 	}
 
 	/* MAC was busy during poll. */
 	MAKE_MAC_NOT_BUSY();
 
 	macPollState = MAC_POLL_IDLE;
+    (void)palStatus;
 } /* MAC_ProcessDataResponse() */
 
 #endif /* (MAC_INDIRECT_DATA_BASIC == 1) */

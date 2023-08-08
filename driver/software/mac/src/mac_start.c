@@ -75,16 +75,18 @@ static MLME_StartReq_t msrParams;    /* Intermediate start parameters */
 static void Gen_MLME_StartConf(buffer_t *startBufPtr,
 		uint8_t startReqStatus)
 {
+    qmm_status_t  status;
 	/* Use the same start request buffer for start confirm */
-	MLME_StartConf_t *msc = (MLME_StartConf_t*)BMM_BUFFER_POINTER(
+	MLME_StartConf_t *msc = (MLME_StartConf_t*)MAC_BUFFER_POINTER(
 			startBufPtr);
 
 	msc->cmdcode = MLME_START_CONFIRM;
 	msc->status = startReqStatus;
 
 	/* The confirmation message is appended to the MAC-NHLE queue */
-	qmm_queue_append(&macNhleQueue, startBufPtr);
+	status = qmm_queue_append(&macNhleQueue, startBufPtr);
     WPAN_PostTask();
+    (void)status;
 }
 
 /*
@@ -128,7 +130,7 @@ static bool checkStartParameter(MLME_StartReq_t *msg)
 		 * PAN coordinator or cordinator (which is associated to a
 		 * PAN coordinator).
 		 */
-		if ((msg->CoordRealignment) &&
+		if (((msg->CoordRealignment) == 1U) &&
 				((MAC_ASSOCIATED == macState) ||
 				(MAC_IDLE == macState))
 				) {
@@ -154,26 +156,28 @@ static bool checkStartParameter(MLME_StartReq_t *msg)
  *
  * @param m Pointer to MLME_START.request message issued by the NHLE
  */
-void MAC_MLME_StartRequest(uint8_t *m)
+void MAC_MLME_StartRequest(void *m)
 {
+    PHY_Retval_t channelSetStatus, channelPageSetStatus;
+    PHY_Retval_t pibStatus = PHY_FAILURE;
+    PibValue_t pib_value;
 	MLME_StartReq_t *msg
-		= (MLME_StartReq_t *)BMM_BUFFER_POINTER((buffer_t *)m);
+		= (MLME_StartReq_t *)MAC_BUFFER_POINTER((buffer_t *)m);
 
 	/*
 	 * The MLME_START.request parameters are copied into a global variable
 	 * structure, which is used by checkStartParameter() function.
 	 */
-	memcpy(&msrParams, msg, sizeof(msrParams));
-    PibValue_t pib_value;
+	(void)memcpy(&msrParams, msg, sizeof(msrParams));
 
-	PHY_PibGet(macShortAddress, (uint8_t *)&pib_value);
+	pibStatus = PHY_PibGet(macShortAddress, (uint8_t *)&pib_value);
     if (BROADCAST == pib_value.pib_value_16bit) {
 		/*
 		 * The device is void of short address. This device cannot start
 		 * a
 		 * network, hence a confirmation is given back.
 		 */
-		Gen_MLME_StartConf((buffer_t *)m, MAC_NO_SHORT_ADDRESS);
+		Gen_MLME_StartConf((buffer_t *)m, (uint8_t)MAC_NO_SHORT_ADDRESS);
 		return;
 	}
 	if (!checkStartParameter(msg)) {
@@ -182,7 +186,7 @@ void MAC_MLME_StartRequest(uint8_t *m)
 		 * confirmation
 		 * is given to NHLE.
 		 */
-		Gen_MLME_StartConf((buffer_t *)m, MAC_INVALID_PARAMETER);
+		Gen_MLME_StartConf((buffer_t *)m, (uint8_t)MAC_INVALID_PARAMETER);
 	} else
 	{
 		/*
@@ -190,10 +194,10 @@ void MAC_MLME_StartRequest(uint8_t *m)
 		 * can
 		 * proceed.
 		 */
-		SetTalPibInternal(mac_i_pan_coordinator,
+		pibStatus = SetPhyPibInternal(mac_i_pan_coordinator,
 				(void *)&(msg->PANCoordinator));
 
-		if (msrParams.CoordRealignment) {
+		if ((msrParams.CoordRealignment) == 1U) {
 			/* First inform our devices of the configuration change
 			**/
 			if (!MAC_TxCoordRealignmentCommand(
@@ -208,14 +212,13 @@ void MAC_MLME_StartRequest(uint8_t *m)
 				 * hence the confiramtion is given to NHLE.
 				 */
 				Gen_MLME_StartConf((buffer_t *)m,
-						MAC_INVALID_PARAMETER);
+						(uint8_t)MAC_INVALID_PARAMETER);
 			}
 		} else {
 			/* This is a normal MLME_START.request. */
-			MAC_Retval_t channelSetStatus, channelPageSetStatus;
 
 			/* The new PIBs are set at the TAL. */
-			SetTalPibInternal(macBeaconOrder,
+			pibStatus = SetPhyPibInternal(macBeaconOrder,
 					(void *)&(msg->BeaconOrder));
 
 			/* If macBeaconOrder is equal to 15, set also
@@ -224,7 +227,7 @@ void MAC_MLME_StartRequest(uint8_t *m)
 				msg->SuperframeOrder = NON_BEACON_NWK;
 			}
 
-			SetTalPibInternal(macSuperframeOrder,
+			pibStatus = SetPhyPibInternal(macSuperframeOrder,
 					(void *)&(msg->SuperframeOrder));
 
 			/* Wake up radio first */
@@ -232,42 +235,42 @@ void MAC_MLME_StartRequest(uint8_t *m)
 
 			/* MLME_START.request parameters other than BO and SO
 			 * are set at TAL */
-			SetTalPibInternal(macPANId,
+			pibStatus = SetPhyPibInternal(macPANId,
 					(void *)&(msrParams.PANId));
-
 			channelPageSetStatus
-				= SetTalPibInternal(phyCurrentPage,
+				= SetPhyPibInternal(phyCurrentPage,
 					(void *)&(msrParams.ChannelPage));
 
 			channelSetStatus
-				= SetTalPibInternal(phyCurrentChannel,
+				= SetPhyPibInternal(phyCurrentChannel,
 					(void *)&(msrParams.LogicalChannel));
 
-			SetTalPibInternal(mac_i_pan_coordinator,
+			pibStatus = SetPhyPibInternal(mac_i_pan_coordinator,
 					(void *)&(msrParams.PANCoordinator));
 
-			if ((MAC_SUCCESS == channelPageSetStatus) &&
-					(MAC_SUCCESS == channelSetStatus) &&
+			if ((PHY_SUCCESS == channelPageSetStatus) &&
+					(PHY_SUCCESS == channelSetStatus) &&
 					(PHY_RX_ON == PHY_RxEnable(PHY_STATE_RX_ON))
 					) {
-				if (msrParams.PANCoordinator) {
+				if ((msrParams.PANCoordinator) == 1U) {
 					macState = MAC_PAN_COORD_STARTED;
 				} else {
 					macState = MAC_COORDINATOR;
 				}
 
-				Gen_MLME_StartConf((buffer_t *)m, MAC_SUCCESS);
+				Gen_MLME_StartConf((buffer_t *)m, (uint8_t)MAC_SUCCESS);
 
 			} else {
 				/* Start of network failed. */
 				Gen_MLME_StartConf((buffer_t *)m,
-						MAC_INVALID_PARAMETER);
+						(uint8_t)MAC_INVALID_PARAMETER);
 			}
 
 			/* Set radio to sleep if allowed */
 			MAC_SleepTrans();
 		}
 	}
+    (void)pibStatus;
 }
 
 /**
@@ -284,22 +287,23 @@ void MAC_MLME_StartRequest(uint8_t *m)
 void MAC_CoordRealignmentCommandTxSuccess(uint8_t txStatus,
 		buffer_t *bufPtr)
 {
-	uint8_t conf_status = MAC_INVALID_PARAMETER;
-	MAC_Retval_t channelSetStatus, channelPageSetStatus;
+	uint8_t conf_status = (uint8_t)MAC_INVALID_PARAMETER;
+	PHY_Retval_t channelSetStatus, channelPageSetStatus;
+    PHY_Retval_t pibSetStatus = PHY_FAILURE;
 
-	if (MAC_SUCCESS == txStatus) {
+	if (txStatus == ((uint8_t)MAC_SUCCESS)) {
 		/* The parameters of the existing PAN are updated. */
 		channelPageSetStatus
-			= SetTalPibInternal(phyCurrentPage,
+			= SetPhyPibInternal(phyCurrentPage,
 				(void *)&(msrParams.ChannelPage));
 		channelSetStatus
-			= SetTalPibInternal(phyCurrentChannel,
+			= SetPhyPibInternal(phyCurrentChannel,
 				(void *)&msrParams.LogicalChannel);
-		if ((MAC_SUCCESS == channelSetStatus) &&
-				(MAC_SUCCESS == channelPageSetStatus)) {
-			conf_status = MAC_SUCCESS;
+		if ((PHY_SUCCESS == channelSetStatus) &&
+				(PHY_SUCCESS == channelPageSetStatus)) {
+			conf_status = (uint8_t)MAC_SUCCESS;
 
-			SetTalPibInternal(macPANId,
+			pibSetStatus = SetPhyPibInternal(macPANId,
 					(void *)&(msrParams.PANId));
 		}
 	}
@@ -308,6 +312,7 @@ void MAC_CoordRealignmentCommandTxSuccess(uint8_t txStatus,
 
 	/* Set radio to sleep if allowed */
 	MAC_SleepTrans();
+    (void)pibSetStatus;
 } /* MAC_CoordRealignmentCommandTxSuccess() */
 
 #endif /* (MAC_START_REQUEST_CONFIRM == 1) || defined(__DOXYGEN__) */

@@ -5,7 +5,7 @@
 <#if HarmonyCore.SELECT_RTOS == "FreeRTOS">
 
     /* Create FreeRTOS task for IEEE_802154_MAC */
-	 xTaskCreate((TaskFunction_t) _WPAN_Tasks,
+	 (void)xTaskCreate((TaskFunction_t) _WPAN_Tasks,
                 "WPAN_Tasks",
                 1024,
                 NULL,

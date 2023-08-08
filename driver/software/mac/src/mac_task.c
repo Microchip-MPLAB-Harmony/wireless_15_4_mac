@@ -56,7 +56,7 @@
 /* ************************************************************************** */
 /* ************************************************************************** */
 
-OSAL_SEM_HANDLE_TYPE semMacInternalHandler;
+static OSAL_SEM_HANDLE_TYPE semMacInternalHandler;
 extern OSAL_SEM_HANDLE_TYPE semPhyInternalHandler;
 static QueueSetHandle_t xQueueSet;
 static QueueSetMemberHandle_t xActivatedMember;
@@ -81,22 +81,23 @@ static QueueSetMemberHandle_t xActivatedMember;
 /* ************************************************************************** */
     
 void WPAN_Tasks(void)
-{  
+{
+    OSAL_RESULT result = OSAL_RESULT_TRUE;
     /* Create Semaphore for IEEE_802154_MAC */
-    OSAL_SEM_Create(&semMacInternalHandler, OSAL_SEM_TYPE_COUNTING, MAC_INTERNAL_SEM_LENGTH, NO_BLOCK_WAIT);
+    result = OSAL_SEM_Create(&semMacInternalHandler, OSAL_SEM_TYPE_COUNTING, MAC_INTERNAL_SEM_LENGTH, NO_BLOCK_WAIT);
     /* Create the queue set large enough to hold an event for every space in
     every queue and semaphore that is to be added to the set. */
-    OSAL_QUEUE_CreateSet(&xQueueSet, PHY_INTERNAL_SEM_LENGTH + MAC_INTERNAL_SEM_LENGTH);
+    result = OSAL_QUEUE_CreateSet(&xQueueSet, PHY_INTERNAL_SEM_LENGTH + MAC_INTERNAL_SEM_LENGTH);
     /* Add the queues and semaphores to the set.  Reading from these queues and
   semaphore can only be performed after a call to xQueueSelectFromSet() has
   returned the queue or semaphore handle from this point on. */
-    OSAL_QUEUE_AddToSet( &semMacInternalHandler, &xQueueSet );
-    OSAL_QUEUE_AddToSet( &semPhyInternalHandler, &xQueueSet );
-    while (1)
+    result = OSAL_QUEUE_AddToSet( &semMacInternalHandler, &xQueueSet );
+    result = OSAL_QUEUE_AddToSet( &semPhyInternalHandler, &xQueueSet );
+    while (true)
     {
     /* Block to wait for something to be available from the queues or
      semaphore that have been added to the set.*/
-     OSAL_QUEUE_SelectFromSet(&xActivatedMember, &xQueueSet, OSAL_WAIT_FOREVER );
+     result = OSAL_QUEUE_SelectFromSet(&xActivatedMember, &xQueueSet, OSAL_WAIT_FOREVER );
 
     /* Which set member was selected?  Receives/takes can use a block time
     of zero as they are guaranteed to pass because xQueueSelectFromSet()
@@ -105,14 +106,18 @@ void WPAN_Tasks(void)
     if( xActivatedMember == semPhyInternalHandler )
     {
       /*Process Internal Stack Events*/
-      OSAL_SEM_Pend(&semPhyInternalHandler, NO_BLOCK_WAIT);
+      result = OSAL_SEM_Pend(&semPhyInternalHandler, NO_BLOCK_WAIT);
       PHY_TaskHandler();
     }
     else if( xActivatedMember == semMacInternalHandler )
     {
-      OSAL_SEM_Pend(&semMacInternalHandler, NO_BLOCK_WAIT);
+      result = OSAL_SEM_Pend(&semMacInternalHandler, NO_BLOCK_WAIT);
       WPAN_Task();
     }
+    else{
+        // do nothing
+    }
+    (void)result;
     }
 }
 

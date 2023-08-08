@@ -26,7 +26,7 @@
 # Interface
 #
 
-# === Device type Configuration for MAC
+# ========== Device type Configuration for MAC ====================
 
 
 global macDeviceConfig
@@ -45,16 +45,16 @@ macDeviceType.setDisplayMode("Description")
 macDeviceType.setDescription("MAC Device Type of the application")
 macDeviceType.setDependencies(DeviceTypeConfiguration,["MAC_DEVICE_TYPE"])
 
-# === Sleep Configuration
+# ========== Sleep Configuration =====================================
 
-global EnableSleep
-EnableSleep = ieee802154mac.createBooleanSymbol('ENABLE_SLEEP', macDeviceConfig)
-EnableSleep.setLabel('Enable Sleep')
-EnableSleep.setDefaultValue(False)
-EnableSleep.setVisible(False)
-EnableSleep.setDependencies(SleepConfiguration, ["ENABLE_SLEEP"])
+global DeepSleepEnable
+DeepSleepEnable = ieee802154mac.createBooleanSymbol('DEEP_SLEEP_ENABLE', macDeviceConfig)
+DeepSleepEnable.setLabel('Enable Deep Sleep')
+DeepSleepEnable.setDefaultValue(False)
+DeepSleepEnable.setVisible(False)
+DeepSleepEnable.setDependencies(SleepConfiguration, ["DEEP_SLEEP_ENABLE"])
 
-# === Security Configuration for MAC
+# ========== Security Configuration for MAC ===========================
 
 global macSecurityConfig
 macSecurityConfig = ieee802154mac.createMenuSymbol("MAC_SECURITY_CONFIG", None)
@@ -72,7 +72,7 @@ SecurityConfig.setDisplayMode("Description")
 SecurityConfig.setDescription("MAC Security option of the application")
 SecurityConfig.setDependencies(SecurityConfiguration,["MAC_SECURITY_OPTION"])
 
-# === Buffer Configuration for MAC
+# ========== Buffer Configuration for MAC ================================
 
 global macMenuBmm
 macMenuBmm = ieee802154mac.createMenuSymbol("MAC_MENU_BMM", None)

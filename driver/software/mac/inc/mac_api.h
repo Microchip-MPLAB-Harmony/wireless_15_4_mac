@@ -80,16 +80,12 @@
 /* MAC Address type
  
    Summary:
-    This contain MAC address type information
+    This union contain MAC address type information
  
    Description:
     None
    Remarks:
     None 
- */
-
-/**
- * MAC Address type
  */
 
 typedef union {
@@ -111,22 +107,15 @@ typedef union {
  */
 
 typedef struct wpan_addr_spec_tag {
-	/**
-	 * Address mode (@ref WPAN_ADDRMODE_NONE, @ref WPAN_ADDRMODE_SHORT, or
-	 *@ref WPAN_ADDRMODE_LONG)
-	 */
+	/** Address mode (@ref WPAN_ADDRMODE_NONE, @ref WPAN_ADDRMODE_SHORT, or
+     * @ref WPAN_ADDRMODE_LONG) */
 	uint8_t AddrMode;
 
-	/**
-	 * The 16 bit PAN identifier.
-	 */
+	/** The 16 bit PAN identifier. */
 	uint16_t PANId;
 
-	/**
-	 * Device address. If AddrMode is @ref WPAN_ADDRMODE_SHORT, it is
-	 * interpreted as a
-	 * 16 bit address.
-	 */
+	/** Device address. If AddrMode is @ref WPAN_ADDRMODE_SHORT, it is
+	 * interpreted as a 16 bit address. */
 	AddressField_t Addr;
 } WPAN_AddrSpec_t;
 
@@ -143,27 +132,24 @@ typedef struct wpan_addr_spec_tag {
  */
 
 typedef struct wpan_pandescriptor_tag {
-	/**Coordinator address specification in received beacon frame */
+	/** Coordinator address specification in received beacon frame */
 	WPAN_AddrSpec_t CoordAddrSpec;
-	/**The current logical channel used by the network */
+	/** The current logical channel used by the network */
 	uint8_t LogicalChannel;
-	/**The current channel page occupied by the network */
+	/** The current channel page occupied by the network */
 	uint8_t ChannelPage;
-	/**Superframe specification in received beacon frame */
+	/** Superframe specification in received beacon frame */
 	uint16_t SuperframeSpec;
-	/**Set to true if the beacon is from a PAN coordinator accepting GTS requests */
+	/** Set to true if the beacon is from a PAN coordinator accepting GTS requests */
 	bool GTSPermit;
-	/**LQI at which the beacon was received.Lower values represent poorer link quality. */
+	/** LQI at which the beacon was received.Lower values represent poorer link quality. */
 	uint8_t LinkQuality;
 
 #ifdef ENABLE_TSTAMP
 
-	/**
-	 * Time at which the beacon frame was received, in symbol counts.  This
-	 * quantity
-	 * shall be interpreted as only 24-bits, with the most significant
-	 * 8-bits entirely ignored.
-	 */
+	/** Time at which the beacon frame was received, in symbol counts.  This
+	 * quantity shall be interpreted as only 24-bits, with the most significant
+	 * 8-bits entirely ignored. */
 	uint32_t TimeStamp;
 #endif  /* ENABLE_TSTAMP */
 } WPAN_Pandescriptor_t;
@@ -183,35 +169,25 @@ typedef struct wpan_pandescriptor_tag {
  */
 
 typedef struct mac_device_desc_tag {
-	/** The 16-bit PAN identifier of the device in this DeviceDescriptor. */
+	/* The 16-bit PAN identifier of the device in this DeviceDescriptor. */
 	uint16_t PANId;
 
-	/**
-	 * The 16-bit short address of the device in this DeviceDescriptor.
-	 * A value of 0xfffe indicates that this device is using only its
-	 * extended address. A value of 0xffff indicates that this value is
-	 * unknown.
-	 */
+	/* The 16-bit short address of the device in this DeviceDescriptor.
+	   A value of 0xfffe indicates that this device is using only its
+	   extended address. A value of 0xffff indicates that this value is
+	   unknown. */
 	uint16_t ShortAddress;
 
-	/**
-	 * The 64-bit IEEE extended address of the device in this
-	 * DeviceDescriptor.
-	 * This element is also used in unsecuring operations on incoming
-	 * frames.
-	 */
+	/* The 64-bit IEEE extended address of the device in this DeviceDescriptor.
+	   This element is also used in unsecuring operations on incoming frames. */
 	uint64_t ExtAddress;
 
-	/**
-	 * The incoming frame counter of the device in this DeviceDescriptor.
-	 * This value is used to ensure sequential freshness of frames.
-	 */
+	/* The incoming frame counter of the device in this DeviceDescriptor.
+       This value is used to ensure sequential freshness of frames. */
 	uint32_t FrameCounter;
 
-	/**
-	 * Indication of whether the device may override the minimum security
-	 * level settings defined in Table 92.
-	 */
+	/* Indication of whether the device may override the minimum security
+       level settings. */
 	bool Exempt;
 } MAC_DeviceDesc_t;
 
@@ -228,10 +204,10 @@ typedef struct mac_device_desc_tag {
  */
 
 typedef struct mac_key_usage_tag {
-	/** See 7.2.1.1.1. */
+	/* FrameType element of the KeyUsageDescriptor */
 	uint8_t Frametype;
 
-	/** See Table 82. */
+	/* CommandFrameIdentifier of the KeyUsageDescriptor */
 	uint8_t CommandFrameIdentifier;
 } MAC_KeyUsage_t;
 
@@ -248,24 +224,19 @@ typedef struct mac_key_usage_tag {
  */
 
 typedef struct mac_key_device_desc_tag {
-	/** Handle to the DeviceDescriptor corresponding to the device. */
+	/* Handle to the DeviceDescriptor corresponding to the device. */
 	uint8_t DeviceDescriptorHandle;
 
-	/**
-	 * Indication of whether the device indicated by DeviceDescriptorHandle
-	 * is uniquely associated with the KeyDescriptor, i.e., it is a link
-	 * key as opposed to a group key.
-	 */
+	/* Indication of whether the device indicated by DeviceDescriptorHandle
+	   is uniquely associated with the KeyDescriptor, i.e., it is a link
+	   key as opposed to a group key. */
 	bool UniqueDevice;
 
-	/**
-	 * Indication of whether the device indicated by DeviceDescriptorHandle
-	 * previously communicated with this key prior to the exhaustion of the
-	 * frame counter. If TRUE, this indicates that the device shall not use
-	 * this key further because it exhausted its use of the frame counter
-	 * used
-	 * with this key.
-	 */
+	/* Indication of whether the device indicated by DeviceDescriptorHandle
+       previously communicated with this key prior to the exhaustion of the
+	   frame counter. If TRUE, this indicates that the device shall not use
+	   this key further because it exhausted its use of the frame counter
+	   used with this key. */
 	bool BlackListed;
 } MAC_KeyDeviceDesc_t;
 
@@ -282,14 +253,11 @@ typedef struct mac_key_device_desc_tag {
  */
 
 typedef struct mac_key_id_lookup_desc_tag {
-	/** Data used to identify the key. */
+	/* Data used to identify the key. */
 	uint8_t LookupData[9];
 
-	/**
-	 * A value of 0x00 indicates a set of 5 octets, a value of 0x01
-	 * indicates
-	 * a set of 9 octets.
-	 */
+	/* A value of 0x00 indicates a set of 5 octets, a value of 0x01 indicates
+	   a set of 9 octets. */
 	uint8_t LookupDataSize;
 } MAC_KeyIdLookupDesc_t;
 
@@ -306,23 +274,23 @@ typedef struct mac_key_id_lookup_desc_tag {
  */
 
 typedef struct mac_key_table_tag {
-	/** List of KeyIdLookupDescriptor entries. */
+	/* List of KeyIdLookupDescriptor entries. */
 	MAC_KeyIdLookupDesc_t KeyIdLookupList[
 		MAC_ZIP_MAX_KEY_ID_LOOKUP_LIST_ENTRIES];
-	/** The number of entries in KeyIdLookupList. */
+	/* The number of entries in KeyIdLookupList. */
 	uint8_t KeyIdLookupListEntries;
 
-	/** List of KeyDeviceDescriptor entries. */
+	/* List of KeyDeviceDescriptor entries. */
 	MAC_KeyDeviceDesc_t KeyDeviceList[MAC_ZIP_MAX_KEY_DEV_LIST_ENTRIES];
-	/** The number of entries in KeyDeviceList. */
+	/* The number of entries in KeyDeviceList. */
 	uint8_t KeyDeviceListEntries;
 
-	/** List of KeyUsageDescriptor entries. */
+	/* List of KeyUsageDescriptor entries. */
 	MAC_KeyUsage_t KeyUsageList[MAC_ZIP_MAX_KEY_USAGE_LIST_ENTRIES];
-	/** The number of entries in KeyUsageList. */
+	/* The number of entries in KeyUsageList. */
 	uint8_t KeyUsageListEntries;
 
-	/** Set of 16 octets - the actual value of the key. */
+	/* Set of 16 octets - the actual value of the key. */
 	uint8_t Key[16];
 } MAC_KeyTable_t;
 
@@ -339,29 +307,24 @@ typedef struct mac_key_table_tag {
  */
 
 typedef struct mac_sec_lvl_table_tag {
-	/** See 7.2.1.1.1. */
+	/* FrameType element of the KeyUsageDescriptor */
 	uint8_t FrameType;
 
-	/** See Table 82. */
+	/* CommandFrameIdentifier of the KeyUsageDescriptor */
 	uint8_t CommandFrameIdentifier;
 
-	/**
-	 * The minimal required/expected security level for incoming
-	 * MAC frames with the indicated frame type and, if present,
-	 * command frame type (see Table 95 in 7.6.2.2.1).
-	 */
+	/*  The minimal required/expected security level for incoming
+	    MAC frames with the indicated frame type and, if present,
+	    command frame type. */
 	uint8_t SecurityMinimum;
 
-	/**
-	 * Indication of whether originating devices for which the Exempt flag
-	 * is set may override the minimum security level indicated by the
-	 * SecurityMinimum element.
-	 * If TRUE, this indicates that for originating devices with Exempt
-	 * status,
-	 * the incoming security level zero is acceptable, in addition to the
-	 * incoming security levels meeting the minimum expected security level
-	 * indicated by the SecurityMinimum element.
-	 */
+	/* Indication of whether originating devices for which the Exempt flag
+	   is set may override the minimum security level indicated by the
+	   SecurityMinimum element.
+	   If TRUE, this indicates that for originating devices with Exempt
+	   status, the incoming security level zero is acceptable, in addition to 
+       the incoming security levels meeting the minimum expected security level
+	   indicated by the SecurityMinimum element. */
 	bool DeviceOverrideSecurityMinimum;
 } MAC_SecLvlTable_t;
 
@@ -393,64 +356,40 @@ typedef struct mac_dev_table_tag {
     None 
  */
 typedef struct mac_sec_pib_tag {
-	/**
-	 * Holds a table of KeyDescriptor entries, each containing keys and
-	 * related
-	 * information required for secured communications.
-	 */
+	/* Holds a table of KeyDescriptor entries, each containing keys and
+	   related information required for secured communications. */
 	MAC_KeyTable_t KeyTable[MAC_ZIP_MAX_KEY_TABLE_ENTRIES];
 
-	/**
-	 * Holds the number of entries in macKeyTable.
-	 */
+	/* Holds the number of entries in macKeyTable. */
 	uint8_t KeyTableEntries;
 
-	/**
-	 * Holds a table of DeviceDescriptor entries, each indicating a remote
-	 * device
-	 * with which this device securely communicates.
-	 */
+	/* Holds a table of DeviceDescriptor entries, each indicating a remote 
+       device with which this device securely communicates. */
 	MAC_DevTable_t DeviceTable[MAC_ZIP_MAX_DEV_TABLE_ENTRIES];
 
-	/**
-	 * Holds the number of entries in macDeviceTable.
-	 */
+	/* Holds the number of entries in macDeviceTable. */
 	uint16_t DeviceTableEntries;
 
-	/**
-	 * Holds a table of SecurityLevelDescriptor entries, each with
-	 * information
-	 * about the minimum security level expected depending on incoming frame
-	 * type
-	 * and subtype.
-	 */
+	/* Holds a table of SecurityLevelDescriptor entries, each with
+	   information about the minimum security level expected depending 
+       on incoming frame type and subtype. */
 	MAC_SecLvlTable_t SecurityLevelTable[MAC_ZIP_MAX_SEC_LVL_TABLE_ENTRIES
 	];
 
-	/**
-	 * Holds the number of entries in macSecurityLevelTable.
-	 */
+	/* Holds the number of entries in macSecurityLevelTable. */
 	uint8_t SecurityLevelTableEntries;
 
-	/**
-	 * Holds the outgoing frame counter for this device.
-	 */
+	/* Holds the outgoing frame counter for this device. */
 	uint32_t FrameCounter;
 
-	/**
-	 * Holds the originator of the default key used for key identifier mode
-	 * 0x01.
-	 */
+	/* Holds the originator of the default key used for key identifier mode
+       0x01. */
 	uint8_t DefaultKeySource[8];
 
-	/**
-	 * Holds the 64-bit extended address of the PAN coordinator
-	 */
+	/* Holds the 64-bit extended address of the PAN coordinator */
 	uint8_t PANCoordExtendedAddress[8];
 
-	/**
-	 * Holds the 16-bit short address of the PAN coordinator
-	 */
+	/* Holds the 16-bit short address of the PAN coordinator */
 	uint16_t PANCoordShortAddress;
 } MAC_SecPib_t;
 #endif  /* (MAC_SECURITY_ZIP || MAC_SECURITY_2006) */
@@ -504,7 +443,7 @@ typedef struct mac_sec_pib_tag {
     None 
  */
 
-#define WPAN_ADDRMODE_SHORT             (0x02)
+#define WPAN_ADDRMODE_SHORT             (0x02U)
 
 // *****************************************************************************
 /* WPAN_ADDRMODE_LONG
@@ -517,7 +456,7 @@ typedef struct mac_sec_pib_tag {
     None 
  */
 
-#define WPAN_ADDRMODE_LONG              (0x03)
+#define WPAN_ADDRMODE_LONG              (0x03U)
 
 // *****************************************************************************
 /* WPAN_CAP_ALTPANCOORD
@@ -661,61 +600,128 @@ typedef struct mac_sec_pib_tag {
 // *****************************************************************************
 // *****************************************************************************
 
-/**
- * @brief The stack initialization function.
- *
- * This function initializes all resources, which are used from the stack.
- * It has to be called before any other function of the stack is called.
- *
- * @ingroup group_mac_gen
- */
+// *****************************************************************************
+/*
+  Function:
+    MAC_Retval_t WPAN_Init(void);
+
+  Summary:
+    Initialization of MAC Layer
+
+  Description:
+    This function initializes the MAC Layer.
+    This is function is called to Initializes all stack resources including 
+    the microcontroller and transceiver using functions provided by the PHY 
+    and the PAL.
+
+  Precondition:
+    PHY_Init() should have been called before calling this function. 
+
+  Parameters:
+    None.
+
+  Returns:
+    MAC_SUCCESS - if MAC initialized successfully
+    FAILURE     - otherwise
+
+  Example:
+    <code>
+    MAC_Retval_t WPAN_Init = PHY_FAILURE;
+ 
+    retVal = MAC_Init();
+    if (MAC_SUCCESS =! retVal)
+    {
+        while(1);
+    }
+    </code>
+
+  Remarks:
+    This routine must be called before any of the MAC-WPAN function is called
+*/
+
 MAC_Retval_t WPAN_Init(void);
 
-/**
- * @brief The stack task function called by the application.
- *
- * This function should be called as frequently as possible by the application
- * in order to provide a permanent execution of the protocol stack.
- *
- * @return Boolean true if an event was processed otherwise false.
- * @ingroup group_mac_gen
- */
+// *****************************************************************************
+/*
+  Function:
+    bool WPAN_Task(void);
+
+  Summary:
+    Runs the WPAN Task scheduler
+
+  Description:
+    This function invokes the corresponding task functions of the MCL, PHY, and PAL 
+    Using the MAC software package it is required to call this function frequently 
+    supporting a round robin approach ensures that the different layers state machines 
+    are served, and their queues are processed.
+    This routine must be called from the RTOS Task function in case of any RTOS is used.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    None.
+
+  Returns:
+    Boolean true if an event was processed otherwise false.
+
+  Example:
+    <code>
+    WPAN_Task();
+    </code>
+
+  Remarks:
+    This routine must be called before any of the MAC-WPAN function is called
+*/
+
 bool WPAN_Task(void);
 
-/*--------------------------------------------------------------------*/
-
+// *****************************************************************************
 /*
- * These functions have to be called from the application
- * in order to initiate an action in the communication
- * stack at the MAC level
- */
+  Function:
+    WPAN_MCPS_Datareq(uint8_t SrcAddrMode, WPAN_AddrSpec_t 
+    *DstAddrSpec, uint8_t msduLength, uint8_t *msdu, uint8_t 
+     msduHandle, uint8_t TxOptions,uint8_t SecurityLevel, 
+     uint8_t *KeySource, uint8_t KeyIdMode, uint8_t KeyIndex)
 
-/**
- * Initiate MCPS-DATA.request service and have it placed in the MCPS-SAP queue.
- *
- * @param SrcAddrMode   Address Mode of the source address.
- * @param DstAddrSpec   Pointer to WPAN_AddrSpec_t structure for destination.
- * @param msduHandle    Handle (identification) of the MSDU.
- * @param TxOptions     Bitmap for transmission options. Valid values:
- *                      - @ref WPAN_TXOPT_OFF,
- *                      - @ref WPAN_TXOPT_ACK,
- *                      - @ref WPAN_TXOPT_INDIRECT,
- *                      - @ref WPAN_TXOPT_INDIRECT_ACK.
- *                      - @ref WPAN_TXOPT_GTS.
- *                      - @ref WPAN_TXOPT_GTS_ACK.
- * @param msdu          Pointer to the data to be transmitted.
- * @param msduLength    Length of the data to be transmitted.
- *
- * @param SecurityLevel Used security level; this parameter is only available
- *                      if MAC security is enabled via MAC_SECURITY_ZIP
- * @param KeyIdMode     Used mode to identify the key; this parameter is only
- * available
- *                      if MAC security is enabled via MAC_SECURITY_ZIP
- * @param KeyIndex      Used index of the key; this parameter is only available
- *                      if MAC security is enabled via MAC_SECURITY_ZIP
- *
- * @return true - success; false - buffer not available or queue full.
- */
+  Summary:
+    Initiate MCPS-DATA.request service and have it placed in the MCPS-SAP queue.
+
+  Description:
+    This function is used to send the data packets from one node to another.
+    It Initiate MCPS-DATA.request service and have it placed in the MCPS-SAP queue.
+    The MCPS-DATA.request primitive requests the transfer of a data SPDU (i.e., 
+    MSDU) from a local entity to a single peer entity.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    SrcAddrMode     - Address Mode of the source address.
+    DstAddrSpec     - Pointer to WPAN_AddrSpec_t structure for destination.
+    msduHandle      - Handle (identification) of the MSDU.
+    DstAddrSpec     - Bitmap for transmission options. Valid values:
+                      - @ref WPAN_TXOPT_OFF,
+                      - @ref WPAN_TXOPT_ACK,
+                      - @ref WPAN_TXOPT_INDIRECT,
+                      - @ref WPAN_TXOPT_INDIRECT_ACK.
+    msdu            - Pointer to the data to be transmitted.
+    msduLength      - Length of the data to be transmitted.
+    SecurityLevel   - Used security level; this parameter is only available
+                      if MAC security is enabled via MAC_SECURITY_ZIP
+    KeyIdMode       - Used mode to identify the key; this parameter is only 
+                      available if MAC security is enabled via MAC_SECURITY_ZIP
+    KeyIndex        - Used index of the key; this parameter is only available
+                      if MAC security is enabled via MAC_SECURITY_ZIP
+
+  Returns:
+    true - success; false - buffer not available or queue full.
+
+  Remarks:
+    On the receipt of WPAN_MCPS_Datareq, MAC layer will perform respective operation 
+    and asynchronously invokes USR_MCPS_DataConf with proper status
+*/
+
 #if (defined(MAC_SECURITY_ZIP) || defined(MAC_SECURITY_2006))
 bool WPAN_MCPS_Datareq(uint8_t SrcAddrMode,
 		WPAN_AddrSpec_t *DstAddrSpec,
@@ -740,41 +746,83 @@ bool WPAN_MCPS_Datareq(uint8_t SrcAddrMode,
 
 #if ((MAC_PURGE_REQUEST_CONFIRM == 1) && (MAC_INDIRECT_DATA_BASIC == 1))
 
-/**
- * Initiate MCPS-PURGE.request service and have it placed in the MCPS-SAP queue.
- *
- * @param msduHandle    Handle of MSDU to be purged.
- *
- * @return true - success; false - buffer not available or queue full.
- * @ingroup group_mac_req
+// *****************************************************************************
+/*
+  Function:
+    bool WPAN_MCPS_PurgeReq(const uint8_t msduHandle)
+
+  Summary:
+     Initiates MCPS-PURGE.request service and have it placed in the MCPS-SAP 
+     queue.
+
+  Description:
+    This function is used to purge(remove) the data packets from MAC?s internal 
+    queue. It initiates MCPS-PURGE.request service and have it placed in the 
+    MCPS-SAP queue.
+    The MCPS-PURGE.request primitive allows the next higher layer to purge an 
+    MSDU from the transaction queue
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    msduHandle     -  Handle of MSDU to be purged.
+
+  Returns:
+    true - success; false - buffer not available or queue full.
+
+  Remarks:
+    On the receipt of WPAN_MCPS_PurgeReq, MAC layer will perform respective 
+    operation and asynchronously invokes USR_MCPS_PurgeConf with proper status.
+
  */
-bool WPAN_MCPS_PurgeReq(const uint8_t msduHandle);
+
+bool WPAN_MCPS_PurgeReq(uint8_t msduHandle);
 
 #endif  /* ((MAC_PURGE_REQUEST_CONFIRM == 1) && (MAC_INDIRECT_DATA_BASIC == 1))
         **/
 
 #if (MAC_ASSOCIATION_REQUEST_CONFIRM == 1) 
 
-/**
- * Initiate MLME-ASSOCIATE.request service and have it placed in the MLME-SAP
- * queue.
- *
- * @param LogicalChannel        The logical channel on which to attempt
- * association.
- * @param ChannelPage           The channel page on which to attempt
- * association.
- * @param CoordAddrSpec         Pointer to WPAN_AddrSpec_t structure for
- * coordinator.
- * @param CapabilityInformation Bitmap that describes the nodes capabilities.
- *                              (@ref WPAN_CAP_ALTPANCOORD |
- *                               @ref WPAN_CAP_FFD |
- *                               @ref WPAN_CAP_PWRSOURCE |
- *                               @ref WPAN_CAP_RXONWHENIDLE |
- *                               @ref WPAN_CAP_ALLOCADDRESS)
- *
- * @return true - success; false - buffer not available or queue full.
- * @ingroup group_mac_req
- */
+// *****************************************************************************
+/*
+  Function:
+    bool WPAN_MLME_AssociateReq(uint8_t LogicalChannel, uint8_t ChannelPage,
+    WPAN_AddrSpec_t *CoordAddrSpec, uint8_t CapabilityInformation)
+
+  Summary:
+     Initiate MLME-ASSOCIATE.request service and have it placed in the MLME-SAP
+     queue.
+
+  Description:
+    This function allows the device to request an association with coordinator.
+    Initiate MLME-ASSOCIATE.request service and have it placed in the MLME-SAP 
+    queue. The MLME-ASSOCIATE.request primitive allows a device to request an 
+    association with a coordinator.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    LogicalChannel        -  The logical channel on which to attempt association.
+    ChannelPage           -  The channel page on which to attempt association.
+    CoordAddrSpec         -  Pointer to WPAN_AddrSpec_t structure for coordinator.
+    CapabilityInformation -  Bitmap that describes the nodes capabilities.
+                             (@ref WPAN_CAP_ALTPANCOORD |
+                             @ref WPAN_CAP_FFD |
+                             @ref WPAN_CAP_PWRSOURCE |
+                             @ref WPAN_CAP_RXONWHENIDLE |
+                             @ref WPAN_CAP_ALLOCADDRESS)
+
+  Returns:
+    true - success; false - buffer not available or queue full.
+
+  Remarks:
+    On the receipt of WPAN_MLME_AssociationReq, MAC layer will perform respective 
+    operation and asynchronously invokes USR_MLME_AssociateConf with proper 
+    status.
+*/
+
 bool WPAN_MLME_AssociateReq(uint8_t LogicalChannel,
 		uint8_t ChannelPage,
 		WPAN_AddrSpec_t *CoordAddrSpec,
@@ -784,20 +832,43 @@ bool WPAN_MLME_AssociateReq(uint8_t LogicalChannel,
 
 #if (MAC_ASSOCIATION_INDICATION_RESPONSE == 1)
 
-/**
- * Initiate MLME-ASSOCIATE.response service and place it in the MLME-SAP queue.
- *
- * @param DeviceAddress      Extended address for device requesting association.
- * @param AssocShortAddress  Short address allocated on successful association.
- * @param status             Status of the association attempt. Valid values:
- *                           - @ref ASSOCIATION_SUCCESSFUL,
- *                           - @ref PAN_AT_CAPACITY,
- *                           - @ref PAN_ACCESS_DENIED,
- *                           - @ref ASSOCIATION_RESERVED.
- *
- * @return true - success; false - buffer not available or queue full.
- * @ingroup group_mac_resp
- */
+// *****************************************************************************
+/*
+  Function:
+    bool WPAN_MLME_AssociateResp(uint64_t DeviceAddress, uint16_t 
+    AssocShortAddress,uint8_t status)
+
+  Summary:
+     Initiate MLME-ASSOCIATE.response service and place it in the MLME-SAP queue.
+
+  Description:
+    This function is used to send the associate response on the receipt of Associate 
+    Indication from MAC layer.
+    It initiates MLME-ASSOCIATE.response service and place it in the MLME-SAP
+    queue. The MLME-ASSOCIATE.response primitive is used to initiate a response to 
+    an MLMEASSOCIATE.indication primitive.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    DeviceAddress         -  Extended address for device requesting association.
+    AssocShortAddress     -  Short address allocated on successful association.
+    status                -  Status of the association attempt. Valid values:
+                             - @ref ASSOCIATION_SUCCESSFUL,
+                             - @ref PAN_AT_CAPACITY,
+                             - @ref PAN_ACCESS_DENIED,
+                             - @ref ASSOCIATION_RESERVED.
+
+  Returns:
+    true - success; false - buffer not available or queue full.
+
+  Remarks:
+    On the receipt of WPAN_MLME_AssociationRes, MAC layer will perform respective 
+    operation and asynchronously invokes USR_MLME_COMM_STATUS_Ind with proper 
+    status.
+*/
+
 bool WPAN_MLME_AssociateResp(uint64_t DeviceAddress,
 		uint16_t AssocShortAddress,
 		uint8_t status);
@@ -806,22 +877,47 @@ bool WPAN_MLME_AssociateResp(uint64_t DeviceAddress,
 
 #if (MAC_DISASSOCIATION_BASIC_SUPPORT == 1) 
 
-/**
- * Inititate MLME-DISASSOCIATE.request service and have it placed in the
- * MLME-SAP queue.
- *
- * @param DeviceAddrSpec     Pointer to WPAN_AddrSpec_t structure for device
- *                           to which to send the disassociation notification
- *                           command.
- * @param DisassociateReason Reason for disassociation. Valid values:
- *                           - @ref WPAN_DISASSOC_BYPARENT,
- *                           - @ref WPAN_DISASSOC_BYCHILD.
- * @param TxIndirect         TRUE if the disassociation notification command
- *                           is to be sent indirectly
- *
- * @return true - success; false - buffer not available or queue full.
- * @ingroup group_mac_req
- */
+// *****************************************************************************
+/*
+  Function:
+    bool WPAN_MLME_DisassociateReq(WPAN_AddrSpec_t *DeviceAddrSpec,
+    uint8_t DisassociateReason, bool TxIndirect)
+
+
+  Summary:
+     Inititate MLME-DISASSOCIATE.request service and have it placed in the
+     MLME-SAP queue
+
+  Description:
+    This function is used by the associated device to notify the coordinator of its 
+    intent to leave the PAN. It is also used by the coordinator to instruct an associated 
+    device to leave the PAN.
+    The MLME-DISASSOCIATE.request primitive is used by an associated device to 
+    notify the coordinator of its intent to leave the PAN. It is also used by the 
+    coordinator to instruct an associated device to leave the PAN.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    DeviceAddrSpec        -  Pointer to WPAN_AddrSpec_t structure for device
+                             to which to send the disassociation notification
+                             command.
+    DisassociateReason    -  Reason for disassociation. Valid values:
+                             - @ref WPAN_DISASSOC_BYPARENT,
+                             - @ref WPAN_DISASSOC_BYCHILD.
+    TxIndirect            -  TRUE if the disassociation notification command
+                             is to be sent indirectly
+
+  Returns:
+    true - success; false - buffer not available or queue full.
+
+  Remarks:
+    On the receipt of WPAN_MLME_DisassociateReq, MAC layer will perform 
+    respective operation and asynchronously invokes USR_MLME_DisassociateConf
+    with proper status
+*/
+
 bool WPAN_MLME_DisassociateReq(WPAN_AddrSpec_t *DeviceAddrSpec,
 		uint8_t DisassociateReason,
 		bool TxIndirect);
@@ -830,15 +926,36 @@ bool WPAN_MLME_DisassociateReq(WPAN_AddrSpec_t *DeviceAddrSpec,
 
 #if (MAC_GET_SUPPORT == 1) 
 
-/**
- * Initiate MLME-GET.request service and have it placed in the MLME-SAP queue.
- *
- * @param PIBAttribute     PIB attribute to be retrieved.
- * @param PIBAttributeIndex Index of the PIB attribute to be read.
- *
- * @return true - success; false - buffer not availability or queue full.
- * @ingroup group_mac_req
- */
+// *****************************************************************************
+/*
+  Function:
+    bool WPAN_MLME_GetReq(uint8_t PIBAttribute, uint8_t PIBAttributeIndex)
+
+  Summary:
+    It Initiates MLME-GET.request service and have it placed in the MLME-SAP queue.
+
+  Description:
+    This function is used to request the information about the given PIB attribute.
+    It Initiates MLME-GET.request service and have it placed in the MLME-SAP queue.
+    The MLME-GET.request primitive requests information about a given PIB 
+    attribute.
+
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    PIBAttribute          -  PIB attribute to be retrieved.
+    PIBAttributeIndex     -  Index of the PIB attribute to be read
+
+  Returns:
+    true - success; false - buffer not available or queue full.
+
+  Remarks:
+    On the receipt of WPAN_MLME_GetReq, MAC layer will perform respective operation 
+    and asynchronously invokes USR_MLME_GetConf with proper status.
+*/
+
 #if ((defined MAC_SECURITY_ZIP)  || (defined MAC_SECURITY_2006))
 bool WPAN_MLME_GetReq(uint8_t PIBAttribute, uint8_t PIBAttributeIndex);
 
@@ -850,16 +967,41 @@ bool WPAN_MLME_GetReq(uint8_t PIBAttribute);
 
 #if (MAC_ORPHAN_INDICATION_RESPONSE == 1)
 
-/**
- * Initiate MLME-ORPHAN.response service and have it placed in MLME_SAP queue.
- *
- * @param OrphanAddress    Address of orphaned device.
- * @param ShortAddress     Short address allocated to orphaned device.
- * @param AssociatedMember Boolean true if the orphaned device is associated.
- *
- * @return true - success; false - buffer not availability or queue full.
- * @ingroup group_mac_resp
- */
+// *****************************************************************************
+/*
+  Function:
+    bool WPAN_MLME_OrphanResp(uint64_t OrphanAddress, uint16_t ShortAddress,
+	bool AssociatedMember);
+
+  Summary:
+    Initiate MLME-ORPHAN.response service and have it placed in MLME_SAP queue.
+
+  Description:
+    This function is used to allow the next higher layer of a coordinator to respond to 
+    the MLME-ORPHAN.indication primitive.
+    It initiates MLME-ORPHAN.response service and have it placed in MLME_SAP 
+    queue.
+    The MLME-ORPHAN.indication primitive allows the MLME of a coordinator to 
+    notify the next higher layer of the presence of an orphaned device.
+
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    OrphanAddress         -  Address of orphaned device.
+    ShortAddress          -  Short address allocated to orphaned device.
+    AssociatedMember      -  Boolean true if the orphaned device is associated.
+
+  Returns:
+    true - success; false - buffer not available or queue full.
+
+  Remarks:
+    On the receipt of WPAN_MLME_OrphanResp, MAC layer will perform respective 
+    operation and asynchronously invokes USR_MLME_CommStatusInd()with proper 
+    status.
+*/
+
 bool WPAN_MLME_OrphanResp(uint64_t OrphanAddress,
 		uint16_t ShortAddress,
 		bool AssociatedMember);
@@ -868,40 +1010,102 @@ bool WPAN_MLME_OrphanResp(uint64_t OrphanAddress,
 
 #if (MAC_INDIRECT_DATA_BASIC == 1)
 
-/**
- * Initiate MLME-POLL.request service and have it placed in the MLME-SAP queue.
- *
- * @param CoordAddrSpec   Pointer to WPAN_AddrSpec_t structure for the
- * coordinator.
- *
- * @return true - success; false - buffer not availability or queue full.
- * @ingroup group_mac_req
- */
+// *****************************************************************************
+/*
+  Function:
+    bool WPAN_MLME_PollReq(WPAN_AddrSpec_t *CoordAddrSpec);
+
+  Summary:
+    Initiate MLME-POLL.request service and have it placed in the MLME-SAP queue.
+
+  Description:
+    This function is used by device to request data from coordinator.
+    It initiates MLME-POLL.request service and have it placed in the MLME-SAP 
+    queue.
+    The MLME-POLL.request primitive prompts the device to request data from the 
+    coordinator.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    CoordAddrSpec         -  Pointer to WPAN_AddrSpec_t structure for the coordinator.
+
+  Returns:
+    true - success; false - buffer not available or queue full.
+
+  Remarks:
+    On the receipt of WPAN_MLME_PollReq, MAC layer will perform respective operation 
+    and asynchronously invokes USR_MLME_PollConf()with proper status.
+*/
+
 bool WPAN_MLME_PollReq(WPAN_AddrSpec_t *CoordAddrSpec);
 
 #endif  /* (MAC_INDIRECT_DATA_BASIC == 1) */
 
-/**
- * Initiate MLME-RESET.request service and have it placed in the MLME-SAP queue.
- *
- * @param SetDefaultPib  Boolean to set all PIB values to their respective
- * defaults.
- *
- * @return true - success; false - buffer not available or queue full.
- * @ingroup group_mac_req
- */
+// *****************************************************************************
+/*
+  Function:
+    Bool WPAN_MLME_ResetReq(bool SetDefaultPib)
+
+  Summary:
+    Initiate MLME-RESET.request service and have it placed in the MLME-SAP queue.
+
+  Description:
+    This function is used by the next higher layer entity to request that the MLME 
+    performs a reset operation.
+    It initiates MLME-RESET.request service and have it placed in the MLME-SAP 
+    queue, SetDefaultPib to set all PIB values to their respective defaults.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    SetDefaultPib         -  Defines whether PIB values need to be set to its default 
+                             values.
+
+  Returns:
+    true - success; false - buffer not available or queue full.
+
+  Remarks:
+    On the receipt of WPAN_MLME_ResetReq, MAC layer will perform respective 
+    operation and asynchronously invokes USR_MLME_ResetConf()with proper status.
+
+*/
+
 bool WPAN_MLME_ResetReq(bool SetDefaultPib);
 
-/**
- * Initiate MLME-SET.request service and have it placed in MLME_SAP queue.
- *
- * @param PIBAttribute      PIB attribute to be set.
- * @param PIBAttributeIndex Index of the PIB attribute to be set.
- * @param PIBAttributeValue Pointer to new PIB attribute value.
- *
- * @return true - success; false - buffer not available or queue full.
- * @ingroup group_mac_req
- */
+// *****************************************************************************
+/*
+  Function:
+    bool WPAN_MLME_SetReq(uint8_t PIBAttribute, uint8_t PIBAttributeIndex,
+		void *PIBAttributeValue)
+
+  Summary:
+    Initiate MLME-SET.request service and have it placed in MLME_SAP queue.
+
+  Description:
+    This function is used to write the given value to the indicated PIB attribute
+    Initiate MLME-SET.request service and have it placed in MLME_SAP queue.
+    MLME-SAP set primitives define how PIB attributes may be written.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    PIBAttribute         -  PIB attribute to be set.
+    PIBAttributeIndex    -  Index of the PIB attribute to be set
+    PIBAttributeValue    -  Pointer to new PIB attribute value.
+
+  Returns:
+    true - success; false - buffer not available or queue full.
+
+  Remarks:
+    On the receipt of WPAN_MLME_SetReq, MAC layer will perform respective operation 
+    and asynchronously invokes USR_MLME_SetConf()with proper status.
+
+*/
+
 #if (defined MAC_SECURITY_ZIP) || (defined MAC_SECURITY_2006)
 bool WPAN_MLME_SetReq(uint8_t PIBAttribute,
 		uint8_t PIBAttributeIndex,
@@ -915,21 +1119,42 @@ bool WPAN_MLME_SetReq(uint8_t PIBAttribute,
 
 #if (MAC_RX_ENABLE_SUPPORT == 1) 
 
-/**
- * Initiate MLME-RX-ENABLE.request service and have it placed in the MLME-SAP
- * queue.
- *
- * @param DeferPermit     Set to true if receiver enable can be deferred until
- * next
- *                        superframe if requested time has already passed.
- * @param RxOnTime        Number of symbols from start of superframe before
- * receiver
- *                        is enabled.
- * @param RxOnDuration    Number of symbols for which the receiver is enabled,
- *
- * @return true - success; false - buffer not available or queue full.
- * @ingroup group_mac_req
- */
+// *****************************************************************************
+/*
+  Function:
+    bool WPAN_MLME_RxEnableReq(bool DeferPermit, uint32_t RxOnTime,
+		uint32_t RxOnDuration)
+
+  Summary:
+    Initiate MLME-RX-ENABLE.request service and have it placed in the MLME-SAP 
+    queue.
+
+  Description:
+    This function is used by the NHLE layer to request that the receiver is either 
+    enabled for a finite period of time or disabled.
+    It initiates MLME-RX-ENABLE.request service and have it placed in the MLME-SAP 
+    queue.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    DeferPermit         - Set to true if receiver enable can be deferred until
+                          next super frame if requested time has already passed.
+    RxOnTime            - Number of symbols from start of superframe before
+                          receiver
+    RxOnDuration        - Number of symbols for which the receiver is enabled.
+
+  Returns:
+    true - success; false - buffer not available or queue full.
+
+  Remarks:
+    On the receipt of WPAN_MLME_RxEnableReq, MAC layer will perform respective 
+    operation and asynchronously invokes USR_MLME_RxEnableConf()with proper 
+    status.
+
+*/
+
 bool WPAN_MLME_RxEnableReq(bool DeferPermit,
 		uint32_t RxOnTime,
 		uint32_t RxOnDuration);
@@ -941,21 +1166,51 @@ bool WPAN_MLME_RxEnableReq(bool DeferPermit,
 	(MAC_SCAN_PASSIVE_REQUEST_CONFIRM == 1) || \
 	(MAC_SCAN_ORPHAN_REQUEST_CONFIRM == 1)) 
 
-/**
- * Initiate MLME-SCAN.request service and have it placed in the MLME-SAP queue.
- *
- * @param ScanType      Type of scan to perform. Valid values:
- *                      - @ref MLME_SCAN_TYPE_ED,
- *                      - @ref MLME_SCAN_TYPE_ACTIVE,
- *                      - @ref MLME_SCAN_TYPE_PASSIVE,
- *                      - @ref MLME_SCAN_TYPE_ORPHAN.
- * @param ScanChannels  Channels to be scanned.
- * @param ScanDuration  Duration of each scan.
- * @param ChannelPage   The channel page on which to perform the scan.
- *
- * @return true - success; false - buffer not available or queue full.
- * @ingroup group_mac_req
- */
+// *****************************************************************************
+/*
+  Function:
+    bool WPAN_MLME_ScanReq(uint8_t ScanType, uint32_t ScanChannels,
+		uint8_t ScanDuration, uint8_t ChannelPage)
+
+  Summary:
+    It initiates MLME-SCAN.request service and have it placed in the MLME-SAP 
+    queue.
+
+  Description:
+    This function is used to initiate a channel scan over a given list of channels. A 
+    device can use a channel scan to measure the energy on the channel, search for 
+    the coordinator with which it associated, or search for all coordinators 
+    transmitting beacon frames within the POS of the scanning device.
+    It initiates MLME-SCAN.request service and have it placed in the MLME-SAP 
+    queue.
+    The MLME-SCAN.request primitive is used to initiate a channel scan over a given 
+    list of channels. A device can use a channel scan to measure the energy on 
+    the channel, search for the coordinator with which it associated, or search
+    for all coordinators transmitting beacon frames within the POS of the
+    scanning device.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    ScanType            - Type of scan to perform. Valid values:
+                          - @ref MLME_SCAN_TYPE_ED,
+                          - @ref MLME_SCAN_TYPE_ACTIVE,
+                          - @ref MLME_SCAN_TYPE_PASSIVE,
+                          - @ref MLME_SCAN_TYPE_ORPHAN.
+    ScanChannels        - Channels to be scanned.
+    ScanDuration        - Duration of each scan.
+    ChannelPage         - The channel page on which to perform the scan.
+
+  Returns:
+    true - success; false - buffer not available or queue full.
+
+  Remarks:
+    On the receipt of WPAN_MLME_ScanReq, MAC layer will perform respective operation 
+    and asynchronously invokes USR_MLME_ScanConf()with proper status
+
+*/
+
 bool WPAN_MLME_ScanReq(uint8_t ScanType,
 		uint32_t ScanChannels,
 		uint8_t ScanDuration,
@@ -965,30 +1220,49 @@ bool WPAN_MLME_ScanReq(uint8_t ScanType,
 
 #if (MAC_START_REQUEST_CONFIRM == 1)
 
-/**
- * Initiate MLME-START service and have it placed in the MLME-SAP queue.
- *
- * @param PANId                 PAN identifier to be used by device.
- * @param LogicalChannel        The logical channel on which to start
- *                              using the new superframe configuration.
- * @param ChannelPage           The channel page on which to begin
- *                              using the new superframe configuration.
- * @param BeaconOrder           Beacon transmission interval.
- * @param SuperframeOrder       Duration of active portion of superframe.
- * @param PANCoordinator        Indicates whether node is PAN coordinator of
- * PAN.
- * @param BatteryLifeExtension  Boolean true disables receiver of beaconing
- * device
- *                              for a period after interframe spacing of beacon
- * frame.
- * @param CoordRealignment      Boolean to transmit Coordinator Realignment
- * command
- *                              prior to changing to new superframe
- * configuration.
- *
- * @return true - success; false - buffer not available or queue full.
- * @ingroup group_mac_req
- */
+// *****************************************************************************
+/*
+  Function:
+    bool WPAN_MLME_StartReq(uint16_t PANId, uint8_t LogicalChannel,
+    uint8_t ChannelPage, uint8_t BeaconOrder, uint8_t SuperframeOrder, 
+    bool PANCoordinator, bool BatteryLifeExtension, bool CoordRealignment)
+
+
+  Summary:
+    Initiate MLME-START service and have it placed in the MLME-SAP queue.
+
+  Description:
+    This function is used by the PAN coordinator to initiate a new PAN.
+    It initiates MLME-START service and have it placed in the MLME-SAP queue.
+    The MLME-START.request primitive allows the PAN coordinator to initiate a new 
+    PAN or to begin using a new super frame configuration. This primitive may also be 
+    used by a device already associated with an existing PAN to begin using a new 
+    super frame configuration.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    PANId               - PAN identifier to be used by device.
+    LogicalChannel      - The logical channel on which to start using the 
+                          new super frame configuration.
+    ChannelPage         - The channel page on which to begin using 
+                          the new super frame configuration.
+    SuperframeOrder     - Duration of active portion of super frame.
+    PANCoordinator      - Indicates whether node is PAN coordinator of PAN.
+    BatteryLifeExtension- Boolean true disables receiver of beaconing device.
+    CoordRealignment    - Boolean to transmit Coordinator Realignment command
+                          prior to changing to new super frame configuration.
+
+  Returns:
+    true - success; false - buffer not available or queue full.
+
+  Remarks:
+    On the receipt of WPAN_MLME_StartReq, MAC layer will perform respective 
+    operation and asynchronously invokes USR_MLME_StartConf()with proper status.
+
+*/
+
 bool WPAN_MLME_StartReq(uint16_t PANId,
 		uint8_t LogicalChannel,
 		uint8_t ChannelPage,
@@ -1001,24 +1275,42 @@ bool WPAN_MLME_StartReq(uint16_t PANId,
 
 #endif  /* (MAC_START_REQUEST_CONFIRM == 1) */
 
-/*@}*//* apiMacReq */
 
-/**
- * Callback function that must be implemented by application (NHLE) for MAC
- * service
- * MCPS-DATA.confirm.
- *
- * @param msduHandle  Handle of MSDU handed over to MAC earlier.
- * @param status      Result for requested data transmission request.
- * @param Timestamp   The time, in symbols, at which the data were transmitted;
- *                    this parameter is only available if timestamping is
- * enabled
- *                    via compile switch ENABLE_TSTAMP.
- *
- * @return void
- *
- * @ingroup group_mac_conf
- */
+// *****************************************************************************
+// Section: callback Prototypes
+// *****************************************************************************
+
+// *****************************************************************************
+/*
+  Function:
+    void USR_MCPS_DataConf(uint8_t msduHandle, uint8_t status, uint32_t Timestamp)
+
+  Summary:
+    Callback function that must be implemented by application (NHLE) for MAC
+    service MCPS-DATA.confirm.
+
+  Description:
+    This function implemented by application (NHLE) for MAC
+    service MCPS-DATA.confirm.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    msduHandle          - Handle of MSDU handed over to MAC earlier.
+    status              - Result for requested data transmission request.
+    Timestamp           - The time, in symbols, at which the data were transmitted;
+                          this parameter is only available if timestamping is
+                          enabled via compile switch ENABLE_TSTAMP.
+
+  Returns:
+    None.
+
+  Remarks:
+    None.
+
+*/
+
 #if defined(ENABLE_TSTAMP)
 void USR_MCPS_DataConf(uint8_t msduHandle,
 		uint8_t status,
@@ -1030,36 +1322,49 @@ void USR_MCPS_DataConf(uint8_t msduHandle,
 
 #endif  /* ENABLE_TSTAMP */
 
-/**
- * Callback function that must be implemented by application (NHLE) for MAC
- * service
- * MCPS-DATA.indication.
- *
- * @param SrcAddrSpec      Pointer to source address specification.
- * @param DstAddrSpec      Pointer to destination address specification.
- * @param msduLength       Number of octets contained in MSDU.
- * @param msdu             Pointer to MSDU.
- * @param mpduLinkQuality  LQI measured during reception of the MPDU.
- * @param DSN              The DSN of the received data frame.
- * @param Timestamp        The time, in symbols, at which the data were
- * received;
- *                         this parameter is only available if timestamping is
- * enabled
- *                         via compile switch ENABLE_TSTAMP.
- *
- * @param SecurityLevel    Used security level; this parameter is only available
- *                         if MAC security is enabled via MAC_SECURITY_ZIP
- * @param KeyIdMode        Used mode to identify the key; this parameter is only
- * available
- *                         if MAC security is enabled via MAC_SECURITY_ZIP
- * @param KeyIndex         Used index of the key; this parameter is only
- * available
- *                         if MAC security is enabled via MAC_SECURITY_ZIP
- *
- * @return void
- *
- * @ingroup group_mac_ind
- */
+// *****************************************************************************
+/*
+  Function:
+    USR_MCPS_DataInd(WPAN_AddrSpec_t * SrcAddrSpec, 
+    WPAN_AddrSpec_t * DstAddrSpec,uint8_t msduLength,uint8_t * msdu, 
+    uint8_t mpduLinkQuality,uint8_t DSN, uint32_t Timestamp, 
+    uint8_t SecurityLevel, uint8_t KeyIdMode, uint8_t KeyIndex)
+
+  Summary:
+    Callback function that must be implemented by application (NHLE) for MAC
+    service MCPS-DATA.indication.
+
+  Description:
+    This function implemented by application (NHLE) for MAC
+    service MCPS-DATA.indication.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    SrcAddrSpec          - Pointer to source address specification.
+    DstAddrSpec          - Pointer to destination address specification.
+    msduLength           - Number of octets contained in MSDU.
+    DSN                 - Pointer to MSDU.
+    mpduLinkQuality      - LQI measured during reception of the MPDU.
+    mpduLinkQuality      - The DSN of the received data frame.
+    Timestamp            - The time, in symbols, at which the data were received;
+                           this parameter is only available if timestamping is 
+                           enabled via compile switch ENABLE_TSTAMP.
+    SecurityLevel        - Used security level; this parameter is only available
+                           if MAC security is enabled via MAC_SECURITY_ZIP
+    KeyIdMode            - Used mode to identify the key; this parameter is only
+                           available if MAC security is enabled via MAC_SECURITY_ZIP
+    KeyIndex             - Used index of the key; this parameter is only available
+                           if MAC security is enabled via MAC_SECURITY_ZIP
+  Returns:
+    None.
+
+  Remarks:
+    None.
+
+*/
+
 #if (defined(MAC_SECURITY_ZIP) || defined(MAC_SECURITY_2006))
 void USR_MCPS_DataInd(WPAN_AddrSpec_t * SrcAddrSpec,
 WPAN_AddrSpec_t * DstAddrSpec,
@@ -1089,18 +1394,33 @@ uint8_t DSN);
 
 #if ((MAC_PURGE_REQUEST_CONFIRM == 1) && (MAC_INDIRECT_DATA_BASIC == 1))
 
-/**
- * Callback function that must be implemented by application (NHLE) for MAC
- * service
- * MCPS-PURGE.confirm.
- *
- * @param msduHandle           Handle (id) of MSDU to be purged.
- * @param status               Result of requested purge operation.
- *
- * @return void
- *
- * @ingroup group_mac_conf
- */
+// *****************************************************************************
+/*
+  Function:
+    void USR_MCPS_PurgeConf(uint8_t msduHandle, uint8_t status);
+
+  Summary:
+    Callback function that must be implemented by application (NHLE) for MAC
+    service MCPS-PURGE.confirm.
+  Description:
+    This function implemented by application (NHLE) for MAC
+    service MCPS-PURGE.confirm.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    msduHandle          - Handle (id) of MSDU to be purged.
+    status              - Result of requested purge operation.
+
+  Returns:
+    None.
+
+  Remarks:
+    None.
+
+*/
+
 void USR_MCPS_PurgeConf(uint8_t msduHandle,
 		uint8_t status);
 
@@ -1109,18 +1429,33 @@ void USR_MCPS_PurgeConf(uint8_t msduHandle,
 
 #if (MAC_ASSOCIATION_REQUEST_CONFIRM == 1)
 
-/**
- * Callback function that must be implemented by application (NHLE) for MAC
- * service
- * MLME-ASSOCIATE.confirm.
- *
- * @param AssocShortAddress    Short address allocated by the coordinator.
- * @param status               Result of requested association operation.
- *
- * @return void
- *
- * @ingroup group_mac_conf
- */
+// *****************************************************************************
+/*
+  Function:
+    void USR_MLME_AssociateConf(uint16_t AssocShortAddress, uint8_t status);
+
+  Summary:
+    Callback function that must be implemented by application (NHLE) for MAC
+    service MLME-ASSOCIATE.confirm.
+  Description:
+    This function implemented by application (NHLE) for MAC
+    service MLME-ASSOCIATE.confirm.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    AssocShortAddress   - Short address allocated by the coordinator.
+    status              - Result of requested association operation.
+
+  Returns:
+    None.
+
+  Remarks:
+    None.
+
+*/
+
 void USR_MLME_AssociateConf(uint16_t AssocShortAddress,
 		uint8_t status);
 
@@ -1128,24 +1463,39 @@ void USR_MLME_AssociateConf(uint16_t AssocShortAddress,
 
 #if (MAC_ASSOCIATION_INDICATION_RESPONSE == 1)
 
-/**
- * Callback function that must be implemented by application (NHLE) for MAC
- * service
- * MLME-ASSOCIATE.indication.
- *
- * @param DeviceAddress         Extended address of device requesting
- * association.
- * @param CapabilityInformation Capabilities of device requesting association.
- *                              (@ref WPAN_CAP_ALTPANCOORD |
- *                               @ref WPAN_CAP_FFD |
- *                               @ref WPAN_CAP_PWRSOURCE |
- *                               @ref WPAN_CAP_RXONWHENIDLE |
- *                               @ref WPAN_CAP_ALLOCADDRESS)
- *
- * @return void
- *
- * @ingroup group_mac_ind
- */
+// *****************************************************************************
+/*
+  Function:
+    void USR_MLME_AssociateInd(uint64_t DeviceAddress,
+		uint8_t CapabilityInformation);
+
+  Summary:
+    Callback function that must be implemented by application (NHLE) for MAC
+    service MLME-ASSOCIATE.indication.
+  Description:
+    This function implemented by application (NHLE) for MAC
+    service MLME-ASSOCIATE.indication.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    DeviceAddress         - Extended address of device requesting association.
+    CapabilityInformation - Capabilities of device requesting association.
+                            (@ref WPAN_CAP_ALTPANCOORD |
+                             @ref WPAN_CAP_FFD |
+                             @ref WPAN_CAP_PWRSOURCE |
+                             @ref WPAN_CAP_RXONWHENIDLE |
+                             @ref WPAN_CAP_ALLOCADDRESS)
+
+  Returns:
+    None.
+
+  Remarks:
+    None.
+
+*/
+
 void USR_MLME_AssociateInd(uint64_t DeviceAddress,
 		uint8_t CapabilityInformation);
 
@@ -1153,23 +1503,38 @@ void USR_MLME_AssociateInd(uint64_t DeviceAddress,
 
 #if (MAC_BEACON_NOTIFY_INDICATION == 1)
 
-/**
- * Callback function that must be implemented by application (NHLE) for MAC
- * service
- * MLME-BEACON-NOTIFY.indication.
- *
- * @param BSN            Beacon sequence number.
- * @param PANDescriptor  Pointer to PAN descriptor for received beacon.
- * @param PendAddrSpec   Pending address specification in received beacon.
- * @param AddrList       List of addresses of devices the coordinator has
- * pending data.
- * @param sduLength      Length of beacon payload.
- * @param sdu            Pointer to beacon payload.
- *
- * @return void
- *
- * @ingroup group_mac_ind
- */
+// *****************************************************************************
+/*
+  Function:
+    void USR_MLME_BeaconNotifyInd(uint8_t BSN, WPAN_Pandescriptor_t *PANDescriptor,
+		uint8_t PendAddrSpec, uint8_t *AddrList, uint8_t sduLength, uint8_t *sdu);
+
+  Summary:
+    Callback function that must be implemented by application (NHLE) for MAC
+    service MLME-BEACON-NOTIFY.indication.
+  Description:
+    This function implemented by application (NHLE) for MAC
+    service MLME-BEACON-NOTIFY.indication.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    BSN            - Beacon sequence number.
+    PANDescriptor  - Pointer to PAN descriptor for received beacon.
+    PendAddrSpec   - Pending address specification in received beacon.
+    AddrList       - List of addresses of devices the coordinator has pending data.
+    sduLength      - Length of beacon payload.
+    sdu            - Pointer to beacon payload.
+
+  Returns:
+    None.
+
+  Remarks:
+    None.
+
+*/
+
 void USR_MLME_BeaconNotifyInd(uint8_t BSN,
 		WPAN_Pandescriptor_t *PANDescriptor,
 		uint8_t PendAddrSpec,
@@ -1182,19 +1547,35 @@ void USR_MLME_BeaconNotifyInd(uint8_t BSN,
 #if ((MAC_ORPHAN_INDICATION_RESPONSE == 1) || \
 	(MAC_ASSOCIATION_INDICATION_RESPONSE == 1))
 
-/**
- * Callback function that must be implemented by application (NHLE) for MAC
- * service
- * MLME-COMM-STATUS.indication.
- *
- * @param SrcAddrSpec      Pointer to source address specification.
- * @param DstAddrSpec      Pointer to destination address specification.
- * @param status           Result for related response operation.
- *
- * @return void
- *
- * @ingroup group_mac_ind
- */
+// *****************************************************************************
+/*
+  Function:
+    void USR_MLME_BeaconNotifyInd(uint8_t BSN, WPAN_Pandescriptor_t *PANDescriptor,
+		uint8_t PendAddrSpec, uint8_t *AddrList, uint8_t sduLength, uint8_t *sdu);
+
+  Summary:
+    Callback function that must be implemented by application (NHLE) for MAC
+    service MLME-COMM-STATUS.indication.
+  Description:
+    This function implemented by application (NHLE) for MAC
+    service MLME-COMM-STATUS.indication.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    SrcAddrSpec  - Pointer to source address specification.
+    DstAddrSpec  - Pointer to destination address specification.
+    status       - Result for related response operation.
+
+  Returns:
+    None.
+
+  Remarks:
+    None.
+
+*/
+
 void USR_MLME_CommStatusInd(WPAN_AddrSpec_t *SrcAddrSpec,
 		WPAN_AddrSpec_t *DstAddrSpec,
 		uint8_t status);
@@ -1204,20 +1585,35 @@ void USR_MLME_CommStatusInd(WPAN_AddrSpec_t *SrcAddrSpec,
 
 #if (MAC_DISASSOCIATION_BASIC_SUPPORT == 1)
 
-/**
- * Callback function that must be implemented by application (NHLE) for MAC
- * service
- * MLME-DISASSOCIATE.confirm.
- *
- * @param status             Result of requested disassociate operation.
- * @param DeviceAddrSpec     Pointer to WPAN_AddrSpec_t structure for device
- *                           that has either requested disassociation or been
- *                           instructed to disassociate by its coordinator.
- *
- * @return void
- *
- * @ingroup group_mac_conf
- */
+// *****************************************************************************
+/*
+  Function:
+    void USR_MLME_DisassociateConf(uint8_t status, WPAN_AddrSpec_t *DeviceAddrSpec);
+
+  Summary:
+    Callback function that must be implemented by application (NHLE) for MAC
+    service MLME-DISASSOCIATE.confirm.
+  Description:
+    This function implemented by application (NHLE) for MAC
+    service MLME-DISASSOCIATE.confirm.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    status          - Result of requested disassociate operation.
+    DeviceAddrSpec  - Pointer to WPAN_AddrSpec_t structure for device
+                      that has either requested disassociation or been
+                      instructed to disassociate by its coordinator.
+
+  Returns:
+    None.
+
+  Remarks:
+    None.
+
+*/
+
 void USR_MLME_DisassociateConf(uint8_t status,
 		WPAN_AddrSpec_t *DeviceAddrSpec);
 
@@ -1225,21 +1621,37 @@ void USR_MLME_DisassociateConf(uint8_t status,
 
 #if (MAC_DISASSOCIATION_BASIC_SUPPORT == 1)
 
-/**
- * Callback function that must be implemented by application (NHLE) for MAC
- * service
- * MLME-DISASSOCIATE.indication.
- *
- * @param DeviceAddress        Extended address of device which initiated the
- *                             disassociation request.
- * @param DisassociateReason   Reason for the disassociation. Valid values:
- *                           - @ref WPAN_DISASSOC_BYPARENT,
- *                           - @ref WPAN_DISASSOC_BYCHILD.
- *
- * @return void
- *
- * @ingroup group_mac_ind
- */
+// *****************************************************************************
+/*
+  Function:
+    void USR_MLME_DisassociateInd(uint64_t DeviceAddress,
+		uint8_t DisassociateReason);
+
+  Summary:
+    Callback function that must be implemented by application (NHLE) for MAC
+    service MLME-DISASSOCIATE.indication.
+  Description:
+    This function implemented by application (NHLE) for MAC
+    service MLME-DISASSOCIATE.indication.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    DeviceAddress       - Extended address of device which initiated the
+                          disassociation request.
+    DisassociateReason  - Reason for the disassociation. Valid values:
+                        - @ref WPAN_DISASSOC_BYPARENT,
+                        - @ref WPAN_DISASSOC_BYCHILD.
+
+  Returns:
+    None.
+
+  Remarks:
+    None.
+
+*/
+
 void USR_MLME_DisassociateInd(uint64_t DeviceAddress,
 		uint8_t DisassociateReason);
 
@@ -1247,20 +1659,36 @@ void USR_MLME_DisassociateInd(uint64_t DeviceAddress,
 
 #if (MAC_GET_SUPPORT == 1)
 
-/**
- * Callback function that must be implemented by application (NHLE) for MAC
- * service
- * MLME-GET.confirm.
- *
- * @param status            Result of requested PIB attribute get operation.
- * @param PIBAttribute      Retrieved PIB attribute.
- * @param PIBAttributeIndex Index of the PIB attribute to be read.
- * @param PIBAttributeValue Pointer to data containing retrieved PIB attribute,
- *
- * @return void
- *
- * @ingroup group_mac_conf
- */
+// *****************************************************************************
+/*
+  Function:
+    void USR_MLME_GetConf(uint8_t status,uint8_t PIBAttribute,
+          uint8_t PIBAttributeIndex, void *PIBAttributeValue)
+
+  Summary:
+    Callback function that must be implemented by application (NHLE) for MAC
+    service MLME-GET.confirm.
+  Description:
+    This function implemented by application (NHLE) for MAC
+    service MLME-GET.confirm.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    status            - Result of requested PIB attribute get operation.
+    PIBAttribute      - Retrieved PIB attribute.
+    PIBAttributeIndex - Index of the PIB attribute to be read.
+    PIBAttributeValue - Pointer to data containing retrieved PIB attribute                    
+
+  Returns:
+    None.
+
+  Remarks:
+    None.
+
+*/
+
 void USR_MLME_GetConf(uint8_t status,
 uint8_t PIBAttribute,
 #if ((defined MAC_SECURITY_ZIP)  || (defined MAC_SECURITY_2006))
@@ -1271,64 +1699,124 @@ void *PIBAttributeValue);
 
 #if (MAC_ORPHAN_INDICATION_RESPONSE == 1)
 
-/**
- * Callback function that must be implemented by application (NHLE) for MAC
- * service
- * MLME-ORPHAN.indication.
- *
- * @param OrphanAddress     Address of orphaned device.
- *
- * @return void
- *
- * @ingroup group_mac_ind
- */
+// *****************************************************************************
+/*
+  Function:
+    void USR_MLME_OrphanInd(uint64_t OrphanAddress)
+
+  Summary:
+    Callback function that must be implemented by application (NHLE) for MAC
+    service MLME-ORPHAN.indication.
+  Description:
+    This function implemented by application (NHLE) for MAC
+    service MLME-ORPHAN.indication.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    OrphanAddress            - Address of orphaned device.                 
+
+  Returns:
+    None.
+
+  Remarks:
+    None.
+
+*/
+
 void USR_MLME_OrphanInd(uint64_t OrphanAddress);
 
 #endif  /* (MAC_ORPHAN_INDICATION_RESPONSE == 1) */
 
 #if (MAC_INDIRECT_DATA_BASIC == 1)
 
-/**
- * Callback function that must be implemented by application (NHLE) for MAC
- * service
- * MLME-POLL.confirm.
- *
- * @param status           Result of requested poll operation.
- *
- * @return void
- *
- * @ingroup group_mac_conf
- */
+// *****************************************************************************
+/*
+  Function:
+    void USR_MLME_PollConf(uint8_t status)
+
+  Summary:
+    Callback function that must be implemented by application (NHLE) for MAC
+    service MLME-POLL.confirm.
+  Description:
+    This function implemented by application (NHLE) for MAC
+    service MLME-POLL.confirm.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    status            - Result of requested poll operation.                
+
+  Returns:
+    None.
+
+  Remarks:
+    None.
+
+*/
+
 void USR_MLME_PollConf(uint8_t status);
 
 #endif  /* (MAC_INDIRECT_DATA_BASIC == 1) */
 
-/**
- * Callback function that must be implemented by application (NHLE) for MAC
- * service
- * MLME-RESET.confirm.
- *
- * @param status           Result of requested reset operation.
- *
- * @return void
- *
- * @ingroup group_mac_conf
- */
+// *****************************************************************************
+/*
+  Function:
+    void USR_MLME_ResetConf(uint8_t status)
+
+  Summary:
+    Callback function that must be implemented by application (NHLE) for MAC
+    service MLME-RESET.confirm.
+  Description:
+    This function implemented by application (NHLE) for MAC
+    service MLME-RESET.confirm.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    status            - Result of requested reset operation.               
+
+  Returns:
+    None.
+
+  Remarks:
+    None.
+
+*/
+
 void USR_MLME_ResetConf(uint8_t status);
 
 #if (MAC_RX_ENABLE_SUPPORT == 1)
 
-/**
- * Callback function that must be implemented by application (NHLE) for MAC
- * service
- * MLME-RX-ENABLE.confirm.
- *
- * @param status           Result of requested receiver enable operation.
- *
- * @return void
- *
- * @ingroup group_mac_conf
- */
+// *****************************************************************************
+/*
+  Function:
+    USR_MLME_RxEnableConf(uint8_t status)
+
+  Summary:
+    Callback function that must be implemented by application (NHLE) for MAC
+    service MLME-RX-ENABLE.confirm.
+  Description:
+    This function implemented by application (NHLE) for MAC
+    service MLME-RX-ENABLE.confirm.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    status            - Result of requested receiver enable operation.               
+
+  Returns:
+    None.
+
+  Remarks:
+    None.
+
+*/
+
 void USR_MLME_RxEnableConf(uint8_t status);
 
 #endif  /* (MAC_RX_ENABLE_SUPPORT == 1) */
@@ -1338,22 +1826,38 @@ void USR_MLME_RxEnableConf(uint8_t status);
 	(MAC_SCAN_PASSIVE_REQUEST_CONFIRM == 1) || \
 	(MAC_SCAN_ORPHAN_REQUEST_CONFIRM == 1))
 
-/**
- * Callback function that must be implemented by application (NHLE) for MAC
- * service
- * MLME-SCAN.confirm.
- *
- * @param status            Result of requested scan operation.
- * @param ScanType          Type of scan performed.
- * @param ChannelPage       The channel page on which the scan was performed.
- * @param UnscannedChannels Bitmap of unscanned channels
- * @param ResultListSize    Number of elements in ResultList.
- * @param ResultList        Pointer to array of scan results .
- *
- * @return void
- *
- * @ingroup group_mac_conf
- */
+// *****************************************************************************
+/*
+  Function:
+    void USR_MLME_ScanConf(uint8_t status, uint8_t ScanType,uint8_t ChannelPage,
+		uint32_t UnscannedChannels, uint8_t ResultListSize, void *ResultList)
+
+  Summary:
+    Callback function that must be implemented by application (NHLE) for MAC
+    service MLME-SCAN.confirm.
+  Description:
+    This function implemented by application (NHLE) for MAC
+    service MLME-SCAN.confirm.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    status            - Result of requested scan operation.  
+    ScanType          - Type of scan performed.   
+    ChannelPage       - The channel page on which the scan was performed.
+    UnscannedChannels - Bitmap of unscanned channels
+    ResultListSize    - Number of elements in ResultList.
+    ResultList        - Pointer to array of scan results .          
+
+  Returns:
+    None.
+
+  Remarks:
+    None.
+
+*/
+
 void USR_MLME_ScanConf(uint8_t status,
 		uint8_t ScanType,
 		uint8_t ChannelPage,
@@ -1363,19 +1867,35 @@ void USR_MLME_ScanConf(uint8_t status,
 
 #endif
 
-/**
- * Callback function that must be implemented by application (NHLE) for MAC
- * service
- * MLME-SET.confirm.
- *
- * @param status        Result of requested PIB attribute set operation.
- * @param PIBAttribute  Updated PIB attribute.
- * @param PIBAttributeIndex  Index of updated PIB attribute.
- *
- * @return void
- *
- * @ingroup group_mac_conf
- */
+// *****************************************************************************
+/*
+  Function:
+    void USR_MLME_SetConf(uint8_t status, uint8_t PIBAttribute,
+		uint8_t PIBAttributeIndex)
+
+  Summary:
+    Callback function that must be implemented by application (NHLE) for MAC
+    service MLME-SET.confirm.
+  Description:
+    This function implemented by application (NHLE) for MAC
+    service MLME-SET.confirm.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    status            - Result of requested PIB attribute set operation.  
+    PIBAttribute      - Updated PIB attribute.   
+    PIBAttributeIndex - Index of updated PIB attribute.        
+
+  Returns:
+    None.
+
+  Remarks:
+    None.
+
+*/
+
 #if ((defined MAC_SECURITY_ZIP)  || (defined MAC_SECURITY_2006))
 void USR_MLME_SetConf(uint8_t status,
 		uint8_t PIBAttribute,
@@ -1389,60 +1909,155 @@ void USR_MLME_SetConf(uint8_t status,
 
 #if (MAC_START_REQUEST_CONFIRM == 1)
 
-/**
- * Callback function that must be implemented by application (NHLE) for MAC
- * service
- * MLME-START.confirm.
- *
- * @param status        Result of requested start operation.
- *
- * @return void
- *
- * @ingroup group_mac_conf
- */
+// *****************************************************************************
+/*
+  Function:
+    void USR_MLME_StartConf(uint8_t status)
+
+  Summary:
+    Callback function that must be implemented by application (NHLE) for MAC
+    service MLME-START.confirm.
+  Description:
+    This function implemented by application (NHLE) for MAC
+    service MLME-START.confirm.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    status            - Result of requested start operation.       
+
+  Returns:
+    None.
+
+  Remarks:
+    None.
+
+*/
+
 void USR_MLME_StartConf(uint8_t status);
 
 #endif  /* (MAC_START_REQUEST_CONFIRM == 1) */
 
-/**
- * Callback function that must be implemented by application (NHLE) for MAC
- * service
- * MLME-SYNC-LOSS.indication.
- *
- * @param LossReason     Reason for synchronization loss.
- * @param PANId          The PAN identifier with which the device lost
- *                       synchronization or to which it was realigned.
- * @param LogicalChannel The logical channel on which the device lost
- *                       synchronization or to which it was realigned.
- * @param ChannelPage    The channel page on which the device lost
- *                       synchronization or to which it was realigned.
- *
- * @return void
- *
- * @ingroup group_mac_ind
- */
+// *****************************************************************************
+/*
+  Function:
+    void USR_MLME_SyncLossInd(uint8_t LossReason, uint16_t PANId,
+		uint8_t LogicalChannel, uint8_t ChannelPage)
+
+  Summary:
+    Callback function that must be implemented by application (NHLE) for MAC
+    service MLME-SYNC-LOSS.indication.
+  Description:
+    This function implemented by application (NHLE) for MAC
+    service MLME-SYNC-LOSS.indication.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    LossReason           - Result of requested start operation.     
+    PANId                - The PAN identifier with which the device lost
+                           synchronization or to which it was realigned.
+    LogicalChannel       - The logical channel on which the device lost
+                           synchronization or to which it was realigned.
+    ChannelPage          - The channel page on which the device lost
+                           synchronization or to which it was realigned.  
+
+  Returns:
+    None.
+
+  Remarks:
+    None.
+
+*/
+
 void USR_MLME_SyncLossInd(uint8_t LossReason,
 		uint16_t PANId,
 		uint8_t LogicalChannel,
 		uint8_t ChannelPage);
 
+// *****************************************************************************
+/*
+  Function:
+    uint8_t MAC_GetPibAttributeSize(uint8_t pibAttributeId)
+
+  Summary:
+    Gets the size of a PIB attribute.
+  Description:
+    This function gets the size of a PIB attribute.
+
+  Precondition:
+    None. 
+
+  Parameters:
+    pibAttributeId   - PIB attribute.     
+
+  Returns:
+    Size (number of bytes) of the PIB attribute.
+
+  Remarks:
+    None.
+
+*/
+
 uint8_t MAC_GetPibAttributeSize(uint8_t pibAttributeId);
 
-/**
- * @brief Checks if the mac stack is ready to sleep
- * \ingroup group_mac_gen_int
- */
+// *****************************************************************************
+/*
+  Function:
+    uint32_t MAC_ReadyToSleep(void);
+
+  Summary:
+    Checks if the mac stack is ready to sleep.
+  Description:
+    Checks if the mac stack is in inactive state for beacon support
+    or idle in case of no beacon support.
+
+  Precondition:
+    None. 
+
+  Parameters:
+    None.     
+
+  Returns:
+    32bit time duration in microseconds for which the mac is ready to sleep.
+    Uint32_t ? 0- If MAC is busy, 1 ? If MAC is not busy, ready to sleep.
+
+  Remarks:
+    None.
+
+*/
+
 uint32_t MAC_ReadyToSleep(void);
 
+#if  (defined ENABLE_DEVICE_DEEP_SLEEP)
+// *****************************************************************************
 /*
- * @brief MAC Wakeup Callback Function from application for Synchronizing beacon
- * timing after Wakeup
- *
- * This function Handles the residual time for Beacon Synchronization after
- * Wakeup
- * @param res_time remaining time to be synchronized with next beacon timing.
- */
-#if  (defined ENABLE_SLEEP)
+  Function:
+    void MAC_Wakeup(void);
+
+  Summary:
+    MAC Wakeup Callback Function from application
+  Description:
+    This function implements the post sleep functionalities. If device is going to 
+    Deep sleep, then this function must be called after device wakeup routine to 
+    retrieve the Retention RAM parameters to system RAM.
+
+
+  Precondition:
+    None. 
+
+  Parameters:
+    None.     
+
+  Returns:
+    None.
+
+  Remarks:
+    None.
+
+*/
 void MAC_Wakeup(void);
 
 #endif

@@ -62,45 +62,109 @@
 // *****************************************************************************
 // *****************************************************************************
 
-/**
- * Default value for PIB macKeyTableEntries
+// *****************************************************************************
+/* 
+
+   Summary:
+    This macro holds Default value for PIB macKeyTableEntries
+   Description:
+	None
+   Remarks:
+    None 
  */
+        
 #define macKeyTableEntriesDef              (0)
 
-/**
- * Default value for PIB macDeviceTableEntries
+// *****************************************************************************
+/* 
+
+   Summary:
+    This macro holds Default value for PIB macDeviceTableEntries
+   Description:
+	None
+   Remarks:
+    None 
  */
+
 #define macDeviceTableDef                  (0)
 
-/**
- * Default value for PIB macSecurityLevelTableEntries
+// *****************************************************************************
+/* 
+
+   Summary:
+    This macro holds Default value for PIB macSecurityLevelTableEntries
+   Description:
+	None
+   Remarks:
+    None 
  */
+
 #define macSecurityLevelTableDef           (0)
 
-/**
- * Default value for PIB macFrameCounter
- */
+// *****************************************************************************
+/* 
+
+   Summary:
+    This macro holds Default value for PIB macFrameCounter
+   Description:
+	None
+   Remarks:
+    None 
+ */        
+
 #define macFrameCounterDef                 (0x00000000)
 
-/**
- * Default value for PIB macDefaultKeySource
- */
+// *****************************************************************************
+/* 
+
+   Summary:
+    This macro holds Default value for PIB macDefaultKeySource
+   Description:
+	None
+   Remarks:
+    None 
+ */  
+        
 #define macDefaultKeySourceDef             {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, \
 					     0xFF, 0xFF}
 
-/**
- * Default value for KeyIdLookupListEntries
- */
+// *****************************************************************************
+/* 
+
+   Summary:
+    This macro holds Default value for PIB KeyIdLookupListEntries
+   Description:
+	None
+   Remarks:
+    None 
+ */  
+
 #define KeyIdLookupListEntriesDef          (0)
 
-/**
- * Default value for KeyDeviceListEntries
- */
+// *****************************************************************************
+/* 
+
+   Summary:
+    This macro holds Default value for PIB KeyDeviceListEntries
+   Description:
+	None
+   Remarks:
+    None 
+ */  
+
 #define KeyDeviceListEntriesDef            (0)
 
-/**
- * Default value for KeyUsageListEntries
+// *****************************************************************************
+/* 
+
+   Summary:
+    This macro holds Default value for PIB KeyUsageListEntries
+   Description:
+	None
+   Remarks:
+    None 
  */
+
 #define KeyUsageListEntriesDef             (0)
 
 // *****************************************************************************
@@ -108,6 +172,16 @@
 // Section: Externals
 // *****************************************************************************
 // *****************************************************************************
+
+// *****************************************************************************
+/* externals
+   Summary:
+    Holds the values of all security related PIB attributes
+   Description:
+    None
+   Remarks:
+    None 
+ */
         
 extern MAC_SecPib_t macSecPib;
 
@@ -117,9 +191,59 @@ extern MAC_SecPib_t macSecPib;
 // *****************************************************************************
 // *****************************************************************************
 
-/* Finding the Key Identifier Length field */
+// *****************************************************************************
+/*
+  Function:
+    uint8_t GetKeyIdFieldLen(uint8_t keyIdMode);
+
+  Summary:
+    Gets the length of the Key Identifier field
+
+  Description:
+    This function returns the length of the Key Identifier field
+    within the Auxiliary Security Header of a secured frame based
+    on the Key Identifier Mode.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    keyIdMode    -   Key Identifier mode used to identify the key to be used                  
+
+  Returns:
+    Returns Length of Key Identifier field in octets
+
+  Remarks:
+    None 
+*/
+
 uint8_t GetKeyIdFieldLen(uint8_t keyIdMode);
 
+// *****************************************************************************
+/*
+  Function:
+    bool BuildSecMcpsDataFrame(MCPS_DataReq_t *mpdr, MAC_FrameInfo_t *mframe);
+
+  Summary:
+   Build the Security MCPS Data Request frame from the mpdu data
+
+  Description:
+    This function will extract the MAC Frame into individual mac parameters.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    mpdr    -   mac payload pointer used to identify the payload location
+    mframe  -   phy frame info used to get the mac frame info                 
+
+  Returns:
+    Return true if build the Security MCPS Data Request frame from the mpdu data
+    otherwise false
+
+  Remarks:
+    None 
+*/
 bool BuildSecMcpsDataFrame(MCPS_DataReq_t *mpdr, MAC_FrameInfo_t *mframe);
 
 //DOM-IGNORE-BEGIN

@@ -50,12 +50,8 @@
 /* === Prototypes ========================================================== */
 
 /* === Implementation ====================================================== */
-#if (defined __GNUC__)
 void __attribute__((weak)) USR_MCPS_PurgeConf(uint8_t msduHandle,
 		uint8_t status)
-#else
-void USR_MCPS_PurgeConf(uint8_t msduHandle, uint8_t status)
-#endif
 {
 	/* Keep compiler happy. */
 	msduHandle = msduHandle;

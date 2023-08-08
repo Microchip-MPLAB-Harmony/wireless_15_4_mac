@@ -213,9 +213,9 @@ typedef union {
  */
 
 typedef struct sec_ctrl_tag {
-	uint8_t secLevel : 3;
-	uint8_t keyIdMode : 2;
-	uint8_t /* reserved */ : 3;
+	unsigned int secLevel : 3;
+	unsigned int keyIdMode : 2;
+	unsigned int /* reserved */ : 3;
 } SecCtrl_t;
 
 typedef struct parse_tag {
@@ -239,10 +239,8 @@ typedef struct parse_tag {
 	uint8_t ppduLinkQuality;
 #if (defined ENABLE_TSTAMP)
 
-	/*
-	 * The timestamping is only required for beaconing networks
-	 * or if timestamping is explicitly enabled.
-	 */
+	/* The timestamping is only required for beaconing networks
+	 * or if timestamping is explicitly enabled. */
 	uint32_t timeStamp;
 #endif  /*  (defined ENABLE_TSTAMP) */
 	uint8_t macPayloadLength; /* Length of the MAC payload without FCS */

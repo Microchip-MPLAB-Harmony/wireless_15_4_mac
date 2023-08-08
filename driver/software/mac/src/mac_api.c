@@ -145,7 +145,7 @@ bool WPAN_MCPS_Datareq(uint8_t SrcAddrMode,
 
 	/* Get the buffer body from buffer header */
 
-	mcpsDataReq =  (MCPS_DataReq_t *)BMM_BUFFER_POINTER(buffer_header);
+	mcpsDataReq =  (MCPS_DataReq_t *)MAC_BUFFER_POINTER(buffer_header);
 
 	/* Construct MCPS_DataReq_t message */
 	mcpsDataReq->cmdcode = MCPS_DATA_REQUEST;
@@ -164,7 +164,6 @@ bool WPAN_MCPS_Datareq(uint8_t SrcAddrMode,
 		 * In case a short address is indicated, but the address is not
 		 * properly set, the entire address is first cleared.
 		 */
-		mcpsDataReq->DstAddr = 0;
 		ADDR_COPY_DST_SRC_64(mcpsDataReq->DstAddr,
 				DstAddrSpec->Addr.longAddress);
 	}
@@ -186,7 +185,7 @@ bool WPAN_MCPS_Datareq(uint8_t SrcAddrMode,
 			(LARGE_BUFFER_SIZE - FCS_LEN - msduLength);
 
 	/* Copy the payload to the end of buffer */
-	memcpy(payloadPos, msdu, msduLength);
+	(void)memcpy(payloadPos, msdu, msduLength);
 
 #ifdef ENABLE_QUEUE_CAPACITY
 	if (QMM_SUCCESS != qmm_queue_append(&nhleMacQueue, buffer_header)) {
@@ -221,7 +220,7 @@ bool WPAN_MCPS_PurgeReq(uint8_t msduHandle)
 	}
 
 	/* Get the buffer body from buffer header */
-	mcpsPurgeReq = (MCPS_PurgeReq_t *)BMM_BUFFER_POINTER(buffer_header);
+	mcpsPurgeReq = (MCPS_PurgeReq_t *)MAC_BUFFER_POINTER(buffer_header);
 
 	/* Update the purge request structure */
 	mcpsPurgeReq->cmdcode = MCPS_PURGE_REQUEST;
@@ -266,7 +265,7 @@ bool WPAN_MLME_AssociateReq(uint8_t LogicalChannel,
 	}
 
 	/* Get the buffer body from buffer header */
-	mlmeAssociateReq = (MLME_AssociateReq_t *)BMM_BUFFER_POINTER(
+	mlmeAssociateReq = (MLME_AssociateReq_t *)MAC_BUFFER_POINTER(
 			buffer_header);
 
 	/* Construct MLME_AssociateReq_t message */
@@ -326,7 +325,7 @@ bool WPAN_MLME_AssociateResp(uint64_t DeviceAddress,
 	}
 
 	/* Get the buffer body from buffer header */
-	mlmeAssociateResp = (MLME_AssociateResp_t *)BMM_BUFFER_POINTER(
+	mlmeAssociateResp = (MLME_AssociateResp_t *)MAC_BUFFER_POINTER(
 			buffer_header);
 
 	/* Construct MLME_AssociateResp_t message */
@@ -375,7 +374,7 @@ bool WPAN_MLME_DisassociateReq(WPAN_AddrSpec_t *DeviceAddrSpec,
 	}
 
 	/* Get the buffer body from buffer header */
-	mlmeDisassociateReq = (MLME_DisassociateReq_t *)BMM_BUFFER_POINTER(
+	mlmeDisassociateReq = (MLME_DisassociateReq_t *)MAC_BUFFER_POINTER(
 			buffer_header);
 
 	/* Update the disassociate request structure */
@@ -424,14 +423,14 @@ bool WPAN_MLME_OrphanResp(uint64_t OrphanAddress,
 	}
 
 	/* Get the buffer body from buffer header */
-	mlmeOrphanResp = (MLME_OrphanResp_t *)BMM_BUFFER_POINTER(
+	mlmeOrphanResp = (MLME_OrphanResp_t *)MAC_BUFFER_POINTER(
 			buffer_header);
 
 	/* Update the orphan response structure */
 	mlmeOrphanResp->cmdcode = MLME_ORPHAN_RESPONSE;
 	mlmeOrphanResp->OrphanAddress = OrphanAddress;
 	mlmeOrphanResp->ShortAddress  = ShortAddress;
-	mlmeOrphanResp->AssociatedMember = AssociatedMember;
+	mlmeOrphanResp->AssociatedMember = (uint8_t)AssociatedMember;
 
 #ifdef ENABLE_QUEUE_CAPACITY
 	if (QMM_SUCCESS != qmm_queue_append(&nhleMacQueue, buffer_header)) {
@@ -467,11 +466,11 @@ bool WPAN_MLME_ResetReq(bool SetDefaultPib)
 	}
 
 	/* Get the buffer body from buffer header */
-	mlmeResetReq = (MLME_ResetReq_t *)BMM_BUFFER_POINTER(buffer_header);
+	mlmeResetReq = (MLME_ResetReq_t *)MAC_BUFFER_POINTER(buffer_header);
 
 	/* Update the reset request structure */
 	mlmeResetReq->cmdcode = MLME_RESET_REQUEST;
-	mlmeResetReq->SetDefaultPIB = SetDefaultPib;
+	mlmeResetReq->SetDefaultPIB = (uint8_t)SetDefaultPib;
 
 #ifdef ENABLE_QUEUE_CAPACITY
 	if (QMM_SUCCESS != qmm_queue_append(&nhleMacQueue, buffer_header)) {
@@ -511,7 +510,7 @@ bool WPAN_MLME_GetReq(uint8_t PIBAttribute)
 	}
 
 	/* Get the buffer body from buffer header */
-	mlmeGetReq = (MLME_GetReq_t *)BMM_BUFFER_POINTER(buffer_header);
+	mlmeGetReq = (MLME_GetReq_t *)MAC_BUFFER_POINTER(buffer_header);
 
 	/* Update the get request structure */
 	mlmeGetReq->cmdcode = MLME_GET_REQUEST;
@@ -568,7 +567,7 @@ bool WPAN_MLME_SetReq(uint8_t PIBAttribute,
 	pibAttributeOctetNo = MAC_GetPibAttributeSize(PIBAttribute);
 
 	/* Get the buffer body from buffer header */
-	mlmeSetReq = (MLME_SetReq_t *)BMM_BUFFER_POINTER(buffer_header);
+	mlmeSetReq = (MLME_SetReq_t *)MAC_BUFFER_POINTER(buffer_header);
 
 	/* Construct MLME_SetReq_t message */
 	mlmeSetReq->cmdcode = MLME_SET_REQUEST;
@@ -581,9 +580,11 @@ bool WPAN_MLME_SetReq(uint8_t PIBAttribute,
 
 	/* Attribute value */
 
-	memcpy((void *)&(mlmeSetReq->PIBAttributeValue),
+    if (pibAttributeOctetNo > 0U) {
+        (void)memcpy(((void *)&(mlmeSetReq->PIBAttributeValue)),
 			(void *)PIBAttributeValue,
 			(size_t)pibAttributeOctetNo);
+    }
 
 	/* Insert message into NHLE MAC queue */
 #ifdef ENABLE_QUEUE_CAPACITY
@@ -621,12 +622,12 @@ bool WPAN_MLME_RxEnableReq(bool DeferPermit,
 	}
 
 	/* Get the buffer body from buffer header */
-	mlmeRxEnableReq = (MLME_RxEnableReq_t *)BMM_BUFFER_POINTER(
+	mlmeRxEnableReq = (MLME_RxEnableReq_t *)MAC_BUFFER_POINTER(
 			buffer_header);
 
 	/* Update the rx enable request structure */
 	mlmeRxEnableReq->cmdcode = MLME_RX_ENABLE_REQUEST;
-	mlmeRxEnableReq->DeferPermit = DeferPermit;
+	mlmeRxEnableReq->DeferPermit = (uint8_t)DeferPermit;
 	mlmeRxEnableReq->RxOnTime = RxOnTime;
 	mlmeRxEnableReq->RxOnDuration = RxOnDuration;
 
@@ -668,7 +669,7 @@ bool WPAN_MLME_ScanReq(uint8_t ScanType,
 	}
 
 	/* Get the buffer body from buffer header */
-	mlmeScanReq = (MLME_ScanReq_t *)BMM_BUFFER_POINTER(buffer_header);
+	mlmeScanReq = (MLME_ScanReq_t *)MAC_BUFFER_POINTER(buffer_header);
 
 	/* Update the scan request structure */
 	mlmeScanReq->cmdcode = MLME_SCAN_REQUEST;
@@ -720,7 +721,7 @@ bool WPAN_MLME_StartReq(uint16_t PANId,
 	}
 
 	/* Get the buffer body from buffer header */
-	mlmeStartReq = (MLME_StartReq_t *)BMM_BUFFER_POINTER(buffer_header);
+	mlmeStartReq = (MLME_StartReq_t *)MAC_BUFFER_POINTER(buffer_header);
 
 	/* Update the start request structure */
 	mlmeStartReq->cmdcode = MLME_START_REQUEST;
@@ -729,9 +730,9 @@ bool WPAN_MLME_StartReq(uint16_t PANId,
 	mlmeStartReq->LogicalChannel = LogicalChannel;
 	mlmeStartReq->BeaconOrder = BeaconOrder;
 	mlmeStartReq->SuperframeOrder = SuperframeOrder;
-	mlmeStartReq->PANCoordinator = PANCoordinator;
-	mlmeStartReq->BatteryLifeExtension = BatteryLifeExtension;
-	mlmeStartReq->CoordRealignment = CoordRealignment;
+	mlmeStartReq->PANCoordinator = (uint8_t)PANCoordinator;
+	mlmeStartReq->BatteryLifeExtension = (uint8_t)BatteryLifeExtension;
+	mlmeStartReq->CoordRealignment = (uint8_t)CoordRealignment;
 	mlmeStartReq->ChannelPage = ChannelPage;
 
 #ifdef ENABLE_QUEUE_CAPACITY
@@ -769,7 +770,7 @@ bool WPAN_MLME_PollReq(WPAN_AddrSpec_t *CoordAddrSpec)
 	}
 
 	/* Get the buffer body from buffer header */
-	mlmePollReq = (MLME_PollReq_t *)BMM_BUFFER_POINTER(buffer_header);
+	mlmePollReq = (MLME_PollReq_t *)MAC_BUFFER_POINTER(buffer_header);
 
 	/* construct mlme_poll_req_t message */
 	mlmePollReq->cmdcode = MLME_POLL_REQUEST;

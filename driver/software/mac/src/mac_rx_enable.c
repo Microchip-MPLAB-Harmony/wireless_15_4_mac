@@ -66,7 +66,7 @@ static void MAC_Timer_RxOffCb(void *callbackParameter);
 static uint8_t MAC_RxEnable(void);
 static void GenRxEnableConf(buffer_t *buf, uint8_t status);
 
-static void HandleRxOn(uint32_t rxOnDurationSymbols, uint8_t *m);
+static void HandleRxOn(uint32_t rxOnDurationSymbols, void *m);
 
 /* === Implementation ====================================================== */
 
@@ -82,14 +82,14 @@ static void HandleRxOn(uint32_t rxOnDurationSymbols, uint8_t *m);
  *
  * @param m Pointer to the MLME-RX-ENABLE.request message
  */
-void MAC_MLME_RxEnableRequest(uint8_t *m)
+void MAC_MLME_RxEnableRequest(void *m)
 {
 	MLME_RxEnableReq_t *rxe;
 
-	rxe = (MLME_RxEnableReq_t *)BMM_BUFFER_POINTER((buffer_t *)m);
+	rxe = (MLME_RxEnableReq_t *)MAC_BUFFER_POINTER((buffer_t *)m);
 
 	/* If RxOnDuration is zero, the receiver shall be disabled */
-	if (0 == rxe->RxOnDuration) {
+	if (0U == rxe->RxOnDuration) {
 		/*
 		 * Turn the radio off. This is doney by calling the
 		 * same function as for the expiration of the Rx on timer.
@@ -122,7 +122,7 @@ void MAC_MLME_RxEnableRequest(uint8_t *m)
  * @param rxe_buff_ptr Pointer to the MLME-RX-ENABLE buffer allocated by the
  * NHLE.
  */
-static uint8_t MAC_RxEnable()
+static uint8_t MAC_RxEnable(void)
 {
 	uint8_t status;
 
@@ -130,7 +130,7 @@ static uint8_t MAC_RxEnable()
 	MAC_TrxWakeup();
 
 	/* Turn the receiver on immediately. */
-	status = PHY_RxEnable(PHY_STATE_RX_ON);
+	status = (uint8_t)(PHY_RxEnable(PHY_STATE_RX_ON));
 
 	/* Rx is enabled */
 	macRxEnabled = true;
@@ -149,6 +149,7 @@ static uint8_t MAC_RxEnable()
 static void MAC_Timer_RxOffCb(void *callbackParameter)
 {
 	uint8_t status;
+    PAL_Status_t timerStatus;
 
 	/*
 	 * Rx is disabled.
@@ -168,9 +169,9 @@ static void MAC_Timer_RxOffCb(void *callbackParameter)
 		 * In case the radio is awake, we need to switch RX off.
 		 */
 		if (RADIO_AWAKE == macRadioSleepState) {
-			status = PHY_RxEnable(PHY_STATE_TRX_OFF);
+			status = (uint8_t)(PHY_RxEnable(PHY_STATE_TRX_OFF));
 
-			if (status != PHY_TRX_OFF) {
+			if (status != (uint8_t)PHY_TRX_OFF) {
 				/*
 				 * The TAL is still busy and cannot set the TRX
 				 * to OFF.
@@ -186,7 +187,7 @@ static void MAC_Timer_RxOffCb(void *callbackParameter)
 				 * returning
 				 * here very soon.
 				 */
-				PAL_TimerStart(Timer_RxEnable,
+				timerStatus = PAL_TimerStart(Timer_RxEnable,
 						/*MIN_TIMEOUT*/100,
 						TIMEOUT_RELATIVE,
 						&MAC_Timer_RxOffCb,
@@ -197,6 +198,7 @@ static void MAC_Timer_RxOffCb(void *callbackParameter)
 				 * radio cannot go
 				 * to sleep for now.
 				 */
+                (void)timerStatus;
 				return;
 			} else {
 				/* Set radio to sleep if allowed */
@@ -217,9 +219,9 @@ static void MAC_Timer_RxOffCb(void *callbackParameter)
  * @param rx_on_duration_symbols Duration in symbols that the reciever is
  *                               switched on.
  */
-static void HandleRxOn(uint32_t rxOnDurationSymbols, uint8_t *m)
+static void HandleRxOn(uint32_t rxOnDurationSymbols, void *m)
 {
-	MAC_Retval_t timerStatus;
+	PAL_Status_t timerStatus;
 	uint8_t rx_enable_status = MAC_RxEnable();
 
 	/*
@@ -234,8 +236,9 @@ static void HandleRxOn(uint32_t rxOnDurationSymbols, uint8_t *m)
 		 * first
 		 * before it will be started.
 		 */
-		PAL_TimerStop(Timer_RxEnable);
+		timerStatus = PAL_TimerStop(Timer_RxEnable);
 	}
+    (void)timerStatus;
 
 	/*
 	 * Start timer for the Rx On duration of the radio being on
@@ -248,18 +251,16 @@ static void HandleRxOn(uint32_t rxOnDurationSymbols, uint8_t *m)
 			&MAC_Timer_RxOffCb,
 			NULL,CALLBACK_SINGLE);
 
-//	Assert(MAC_SUCCESS == timerStatus);
 
 	/*
 	 * Send the confirm immediately depending on the status of
 	 * the timer start and the Rx Status
 	 */
-	if (MAC_SUCCESS != timerStatus) {
-		GenRxEnableConf((buffer_t *)m,
-				(uint8_t)MAC_INVALID_PARAMETER);
+	if (PAL_SUCCESS != timerStatus) {
+		GenRxEnableConf((buffer_t *)m, (uint8_t)MAC_INVALID_PARAMETER);
 		/* Do house-keeeping and turn radio off. */
 		MAC_Timer_RxOffCb(NULL);
-	} else if (PHY_RX_ON != rx_enable_status) {
+	} else if ((uint8_t)PHY_RX_ON != rx_enable_status) {
 		GenRxEnableConf((buffer_t *)m, (uint8_t)MAC_TX_ACTIVE);
 	} else {
 		GenRxEnableConf((buffer_t *)m, (uint8_t)MAC_SUCCESS);
@@ -279,13 +280,15 @@ static void HandleRxOn(uint32_t rxOnDurationSymbols, uint8_t *m)
  */
 static void GenRxEnableConf(buffer_t *buf, uint8_t status)
 {
+    qmm_status_t  qmmStatus;
 	MLME_RxEnableConf_t *rec
-		= (MLME_RxEnableConf_t *)BMM_BUFFER_POINTER(buf);
+		= (MLME_RxEnableConf_t *)MAC_BUFFER_POINTER(buf);
 
 	rec->cmdcode = MLME_RX_ENABLE_CONFIRM;
 	rec->status = status;
-	qmm_queue_append(&macNhleQueue, buf);
+	qmmStatus = qmm_queue_append(&macNhleQueue, buf);
     WPAN_PostTask();
+    (void)qmmStatus;
 }
 
 #endif /* (MAC_RX_ENABLE_SUPPORT == 1) */

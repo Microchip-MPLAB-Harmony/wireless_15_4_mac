@@ -48,11 +48,7 @@
 /* === Prototypes ========================================================== */
 
 /* === Implementation ====================================================== */
-#if (defined __GNUC__)
 void __attribute__((weak)) USR_MLME_OrphanInd(uint64_t OrphanAddress)
-#else
-void USR_MLME_OrphanInd(uint64_t OrphanAddress)
-#endif
 {
 	/* Keep compiler happy. */
 	OrphanAddress = OrphanAddress;

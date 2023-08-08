@@ -102,7 +102,7 @@
  */
         
 #define MAX_PANDESCRIPTORS \
-	(MAX_ALLOWED_PAN_DESCRIPTORS > 5 ? 5 : MAX_ALLOWED_PAN_DESCRIPTORS)
+	(MAX_ALLOWED_PAN_DESCRIPTORS > 5U ? 5U : MAX_ALLOWED_PAN_DESCRIPTORS)
 #endif
 
 // *****************************************************************************
@@ -116,7 +116,7 @@
     None 
  */
         
-#define FCF_ADDR_MASK                   (3)
+#define FCF_ADDR_MASK                   (3U)
 
 // *****************************************************************************
 /* FCF source address mode
@@ -145,12 +145,6 @@
         
 #define FCF_GET_DEST_ADDR_MODE(x) \
 	(((x) >> FCF_DEST_ADDR_OFFSET) & FCF_ADDR_MASK)
-
-#define PGM_READ_BYTE(x) *(x)
-#define PGM_READ_WORD(x) *(x)
-#define PGM_READ_BLOCK(dst, src, len) memcpy((dst), (src), (len))
-#define ADDR_COPY_DST_SRC_16(dst, src) ((dst) = (src))
-#define ADDR_COPY_DST_SRC_64(dst, src) ((dst) = (src))
 
 
 // *****************************************************************************
@@ -258,6 +252,8 @@ typedef enum mac_return_value_tag {
  */
 
 typedef enum {
+    /* Command Frame Identifier for PHY Data Indication */
+    PHYDATAINDICATION        = (0x00),
 	/* MAC Command Frames (table 67) */
 	/* Command Frame Identifier for Association Request */
 	ASSOCIATIONREQUEST          = (0x01),
@@ -277,11 +273,8 @@ typedef enum {
 	COORDINATORREALIGNMENT,
     /* Command Frame Identifier for gts request */
 	GTSREQUEST,
-
-	/*
-	 * These are not MAC command frames but listed here as they are needed
-	 * in the msgtype field
-	 */
+	/* These are not MAC command frames but listed here as they are needed
+	 * in the msgtype field */
 	/* Message is a directed orphan realignment command */
 	ORPHANREALIGNMENT,
 	/* Message is a beacon frame (in response to a beacon request cmd) */
@@ -329,13 +322,13 @@ typedef struct mac_frame_info_tag
 
 	/** Timestamp information of frame
 	 * The time stamping is only required for beaconing networks
-	 * or if time stamping is explicitly enabled.
-	 */
+	 * or if time stamping is explicitly enabled. */
 	uint32_t timeStamp;
 #endif  /* ENABLE_TSTAMP */
 	/** Pointer to MPDU */
 	uint8_t *mpdu;
 } MAC_FrameInfo_t;
+
 // *****************************************************************************
 // *****************************************************************************
 // Externals
@@ -343,9 +336,9 @@ typedef struct mac_frame_info_tag
 // *****************************************************************************
 
 // *****************************************************************************
-/* externals
+/* macNhleQueue
    Summary:
-    Queue used by MAC for communication to next higher layer 
+    Queue used by MAC for communication MAC to next higher layer 
    Description:
     None
    Remarks:
@@ -353,576 +346,1136 @@ typedef struct mac_frame_info_tag
  */
 extern queue_t macNhleQueue;
 
+// *****************************************************************************
+/* nhleMacQueue
+   Summary:
+    Queue used by MAC for communication next higher layer to MAC layer
+   Description:
+    None
+   Remarks:
+    None 
+ */
+
 extern queue_t nhleMacQueue;
 
-/* === Prototypes =========================================================== */
+// *****************************************************************************
+// *****************************************************************************
+// Prototypes : 802.15.4 MAC layer entries
+// *****************************************************************************
+// *****************************************************************************
 
-/* 802.15.4 MAC layer entries */
+/*
+  Function:
+    MAC_Retval_t MAC_Init(void);
 
-/**
- * @brief Builds the data frame for transmission
- *
- * This function builds the data frame for transmission.
- * The NWK layer has supplied the parameters.
- * The MAC_FrameInfo_t data type is constructed and filled in.
- * Also the FCF is constructed based on the parameters passed.
- *
- * \ingroup group_mac_req_int
- * @param msg Pointer to the MCPS-DATA.request parameter
- */
+  Summary:
+    Initializes the MAC sublayer
 
-void MAC_MCPS_DataRequest(uint8_t *msg);
+  Description:
+    This function is called to initialize the MAC layer. 
+ 
+  Precondition:
+    PHY_Init() should have been called before calling this function
 
-/**
- * @brief Wrapper function for messages of type MCPS_DataConf_t
- *
- * This function is a callback for mcps data confirm.
- *
- * \ingroup group_mac_conf_int
- * @param m Pointer to message structure
- */
+  Parameters:
+    None.
+                      
 
-void MAC_MCPS_DataConf(uint8_t *m);
+  Returns:
+    MAC_SUCCESS - if MAC is initialized successfully 
+    FAILURE -  otherwise
 
-/**
- * @brief Wrapper function for messages of type MCPS_DataInd_t
- *
- * This function is a callback for mcps data indication
- *
- * \ingroup group_mac_ind_int
- * @param m Pointer to message structure
- */
+  Example:
+    <code>
+    MAC_Retval_t retVal = PHY_FAILURE;
+ 
+    retVal = MAC_Init();
+    if (MAC_SUCCESS =! retVal)
+    {
+        while(1);
+    }
+    </code>
 
-void MAC_MCPS_DataInd(uint8_t *m);
+  Remarks:
+    None 
+*/
+
+MAC_Retval_t MAC_Init(void);
+
+// *****************************************************************************
+
+/*
+  Function:
+    bool MAC_TaskHandler(void);
+
+  Summary:
+    Runs the MAC scheduler
+
+  Description:
+    This function
+   - Runs the MAC scheduler.
+   - MLME and MCPS queues are removed alternately, starting with MLME queue.
+ 
+  Precondition:
+    MAC_Init() should have been called before calling this function
+
+  Parameters:
+    None.
+                      
+
+  Returns:
+    true if event is dispatched
+    false if no event to dispatch
+
+  Example:
+    <code>
+    MAC_TaskHandler();
+    </code>
+
+  Remarks:
+    None 
+*/
+
+bool MAC_TaskHandler(void);
+
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MCPS_DataRequest(void *msg);
+
+  Summary:
+    Builds the data frame for transmission
+
+  Description:
+    This function builds the data frame for transmission. The NWK layer has 
+    supplied the parameters.
+    The MAC_FrameInfo_t data type is constructed and filled in.
+    Also the FCF is constructed based on the parameters passed
+ 
+  Precondition:
+    None
+
+  Parameters:
+    msg    -   Pointer to the MCPS-DATA.request parameter
+                      
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MCPS_DataRequest(void *msg);
+
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MCPS_DataConf(void *m);
+
+  Summary:
+    Wrapper function for messages of type MCPS_DataConf_t
+
+  Description:
+    This function is a callback for mcps data confirm.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to message structure
+                      
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MCPS_DataConf(void *m);
+
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MCPS_DataInd(void *m);
+
+  Summary:
+    Wrapper function for messages of type MCPS_DataInd_t
+
+  Description:
+    This function is a callback for mcps data confirm.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to message structure
+                      
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MCPS_DataInd(void *m);
 
 #if ((MAC_PURGE_REQUEST_CONFIRM == 1) && (MAC_INDIRECT_DATA_BASIC == 1))
 
-/**
- * @brief Processes a MCPS-PURGE.request primitive
- *
- * This functions processes a MCPS-PURGE.request from the NHLE.
- * The MCPS-PURGE.request primitive allows the next higher layer
- * to purge an MSDU from the transaction queue.
- * On receipt of the MCPS-PURGE.request primitive, the MAC sublayer
- * attempts to find in its transaction queue the MSDU indicated by the
- * msduHandle parameter. If an MSDU matching the given handle is found,
- * the MSDU is discarded from the transaction queue, and the MAC
- * sublayer issues the MCPSPURGE. confirm primitive with a status of
- * MAC_SUCCESS. If an MSDU matching the given handle is not found, the MAC
- * sublayer issues the MCPS-PURGE.confirm primitive with a status of
- * INVALID_HANDLE.
- *
- * \ingroup group_mac_req_int
- * @param msg Pointer to the MCPS-PURGE.request parameter
- */
-void MAC_MCPS_PurgeRequest(uint8_t *msg);
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MCPS_PurgeRequest(void *msg);
 
-/**
- * @brief Wrapper function for messages of type MCPS_PurgeConf_t
- *
- * This function is a callback for mcps purge confirm.
- *
- * \ingroup group_mac_conf_int
- * @param m Pointer to message structure
- */
-void MAC_MCPS_PurgeConf(uint8_t *m);
+  Summary:
+    Processes a MCPS-PURGE.request primitive
+
+  Description:
+    This functions processes a MCPS-PURGE.request from the NHLE. 
+    The MCPS-PURGE.request primitive allows the next higher layer to purge 
+    an MSDU from the transaction queue. On receipt of the MCPS-PURGE.request 
+    primitive, the MAC sublayer attempts to find in its transaction queue the 
+    MSDU indicated by the msduHandle parameter. If an MSDU matching the given 
+    handle is found, the MSDU is discarded from the transaction queue, and the
+    MAC sublayer issues the MCPSPURGE. confirm primitive with a status of
+    MAC_SUCCESS. If an MSDU matching the given handle is not found, the MAC
+    sublayer issues the MCPS-PURGE.confirm primitive with a status of
+    INVALID_HANDLE.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    msg    -   Pointer to the MCPS-PURGE.request parameter
+                      
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MCPS_PurgeRequest(void *msg);
+
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MCPS_PurgeConf(void *m);
+
+  Summary:
+    Wrapper function for messages of type MCPS_PurgeConf_t
+
+  Description:
+    This function is a callback for mcps purge confirm.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to message structure                     
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MCPS_PurgeConf(void *m);
 
 #endif  /* ((MAC_PURGE_REQUEST_CONFIRM == 1) && (MAC_INDIRECT_DATA_BASIC == 1))
         **/
 
 #if (MAC_GET_SUPPORT == 1)
 
-/**
- * @brief Handles an MLME-GET.request
- *
- * This function handles an MLME-GET.request.
- * The MLME-GET.request primitive requests information about a
- * given PIB attribute.
- *
- * \ingroup group_mac_req_int
- * @param m Pointer to the request structure
- */
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_GetRequest(void *m);
 
-void MAC_MLME_GetRequest(uint8_t *m);
+  Summary:
+    Handles an MLME-GET.request
 
-/**
- * @brief Wrapper function for messages of type MLME_GetConf_t
- *
- * This function is a callback for mlme get confirm.
- *
- * \ingroup group_mac_conf_int
- * @param m Pointer to message structure
- */
-void MAC_MLME_GetConf(uint8_t *m);
+  Description:
+    This function handles an MLME-GET.request.
+    The MLME-GET.request primitive requests information about a
+    given PIB attribute.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to the request structure                   
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_GetRequest(void *m);
+
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_GetConf(void *m);
+
+  Summary:
+    Wrapper function for messages of type MLME_GetConf_t
+
+  Description:
+    This function is a callback for mlme get confirm.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to message structure
+                      
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_GetConf(void *m);
 
 #endif  /* (MAC_GET_SUPPORT == 1) */
 
-/**
- * @brief Resets the MAC layer
- *
- * The MLME-RESET.request primitive allows the next higher layer to request
- * that the MLME performs a reset operation.
- *
- * \ingroup group_mac_req_int
- * @param m Pointer to the MLME_RESET.request given by the NHLE
- */
-void MAC_MLME_ResetRequest(uint8_t *m);
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_ResetRequest(void *m)
+
+  Summary:
+    Resets the MAC layer
+
+  Description:
+    The MLME-RESET.request primitive allows the next higher layer to request
+    that the MLME performs a reset operation
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to the MLME_RESET.request given by the NHLE
+                      
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_ResetRequest(void *m);
 
 #if ((MAC_SCAN_ED_REQUEST_CONFIRM == 1) || (MAC_SCAN_ACTIVE_REQUEST_CONFIRM == \
 	1)  || \
 	(MAC_SCAN_PASSIVE_REQUEST_CONFIRM == 1) || \
 	(MAC_SCAN_ORPHAN_REQUEST_CONFIRM == 1))
 
-/**
- * @brief The MLME-SCAN.request primitive makes a request for a node to
- * start a scan procedure.
- *
- * 802.15.4. Section 7.1.11.1.
- *
- * The MLME-SCAN.request primitive is used to initiate a channel scan over a
- * given list of channels. A device can use a channel scan to measure the
- * energy on the channel, search for the coordinator with which it associated,
- * or search for all coordinators transmitting beacon frames within the
- * POS of the scanning device.
- *
- * The MLME-SCAN.request primitive is generated by the next higher layer and
- * issued to its MLME to initiate a channel scan to search for activity within
- * the POS of the device. This primitive can be used to perform an ED scan to
- * determine channel usage, an active or passive scan to locate beacon frames
- * containing any PAN identifier, or an orphan scan to locate a PAN to which
- * the device is currently associated.
- *
- * ED or active scans can be performed before an FFD starts operation as a
- * PAN coordinator. Active or passive scans can be performed prior to selecting
- * a PAN for association. Orphan scans can be performed to attempt to locate a
- * specific coordinator with which communication has been lost.
- *
- * All devices shall be capable of performing passive scans and orphan scans;
- * ED scans and active scans are optional for an RFD.
- *
- * When the MLME receives the MLME-SCAN.request primitive, it initiates a scan
- * in all channels specified in the ScanChannels parameter. The MLME suspends
- * all beacon transmissions for the duration of the scan. During a scan, the
- * MAC sublayer only accepts frames received over the PHY data service that are
- * relevant to the scan being performed (see 7.5.2.1).
- *
- * An ED scan allows a device to obtain a measure of the peak energy in each
- * requested channel. The ED scan is performed on each channel by the MLMEs
- * repeatedly issuing the PLME-ED.request primitive to the PHY until
- * [aBaseSuperframeDuration * (2n + 1)] symbols, where n is the value of the
- * ScanDuration parameter, have elapsed. The MLME notes the maximum energy
- * measurement and moves on to the next channel in the channel list. A device
- * will be able to store between one and an implementation-specified maximum
- * number of channel ED measurements. The ED scan terminates when the number
- * of channel ED measurements stored equals this implementation-specified
- * maximum or when every channel specified in the channel list has been scanned.
- *
- * An active scan is used by an FFD to locate all coordinators transmitting
- * beacon frames within its POS. The active scan is performed on each channel
- * by the MLMEs first sending a beacon request command (see 7.3.2.4). The MLME
- * then enables the receiver and records the information contained in each
- * received beacon in a PAN descriptor structure (see Table 41 in 7.1.5.1.1).
- * A device will be able to store between one and an implementation-specified
- * maximum number of PAN descriptors. The active scan on a particular channel
- * terminates when the number of PAN descriptors stored equals this
- * implementation-specified maximum or when [aBaseSuperframeDuration*(2n + 1)]
- * symbols, where n is the value of the ScanDuration parameter, have elapsed.
- * If the latter condition has been satisfied, the channel is considered to
- * have been scanned. Where possible, the scan is repeated on each channel and
- * terminates when the number of PAN descriptors stored equals the
- * implementation-specified maximum or when every channel in the set of
- *  available channels has been scanned.
- *
- * A passive scan, like an active scan, is used to locate all coordinators
- * transmitting beacon frames within the POS of the scanning device; the
- * difference is that the passive scan is a receive-only operation and does not
- * transmit the beacon request command. The passive scan is performed on each
- * channel by the MLMEs enabling its receiver and recording the information
- * contained in each received beacon in a PAN descriptor structure
- * (see Table 41 in 7.1.5.1.1). A device will be able to store between one and
- * an implementation-specified maximum number of PAN descriptors. The passive
- * scan on a particular channel terminates when the number of PAN descriptors
- * stored equals this implementation-specified maximum or when
- * [aBaseSuperframeDuration * (2n + 1)] symbols, where n is the value of the
- * ScanDuration parameter, have elapsed. If the latter condition has been
- * satisfied, the channel is considered to have been scanned. Where possible,
- * the scan is repeated on each channel and terminates when the number of PAN
- * descriptors stored equals the implementation-specified maximum or when
- * every channel in the set of available channels has been scanned.
- *
- * An orphan scan is used to locate the coordinator with which the scanning
- * device had previously associated. The orphan scan is performed on each
- * channel by the MLME first sending an orphan notification command
- * (see 7.3.2.3). The MLME then enables its receiver for at most
- * aResponseWaitTime symbols. If the device receives a coordinator realignment
- * command within this time, the MLME will disable its receiver. Otherwise, the
- * scan is repeated on the next channel in the channel list. The scan
- * terminates when the device receives a coordinator realignment command
- * (see 7.3.2.5) or when every channel in the set of available channels has
- * been scanned.
- *
- * The results of an ED scan are recorded in a list of ED values and reported
- * to the next higher layer through the MLME-SCAN.confirm primitive with a
- * status of MAC_SUCCESS. The results of an active or passive scan are recorded
- * in a set of PAN descriptor values and reported to the next higher layer
- * through the MLME-SCAN.confirm primitive. If no beacons were found, the
- * MLME-SCAN.confirm primitive will contain a null set of PAN descriptor
- * values and a status of NO_BEACON. Otherwise, the MLME-SCAN.confirm primitive
- * will contain the set of PANDescriptor values found, a list of unscanned
- * channels, and a status of MAC_SUCCESS.
- *
- * The results of an orphan scan are reported to the next higher layer through
- * the MLME-SCAN.confirm primitive. If successful, the MLME-SCAN.confirm
- * primitive will contain a status of MAC_SUCCESS. If the device did not receive
- * a
- * coordinator realignment command, MLME-SCAN.confirm primitive will contain
- * a status of NO_BEACON. In either case, the PANDescriptorList and
- * EnergyDetectList parameters of the MLMESCAN.confirm primitive are null.
- *
- * If any parameter in the MLME-SCAN.request primitive is not supported or is
- * out of range, the MAC sublayer will issue the MLME-SCAN.confirm primitive
- * with a status of MAC_INVALID_PARAMETER.
- *
- * \ingroup group_mac_req_int
- * @param m The MLME_SCAN.request message
- */
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_ScanRequest(uint8_t *m)
 
-void MAC_MLME_ScanRequest(uint8_t *m);
+  Summary:
+    The MLME-SCAN.request primitive makes a request for a node to
+    start a scan procedure.
 
-/**
- * @brief Wrapper function for messages of type MLME_ScanConf_t
- *
- * This function is a callback for mlme scan confirm.
- *
- * \ingroup group_mac_conf_int
- * @param m Pointer to message structure
- */
-void MAC_MLME_ScanConf(uint8_t *m);
+  Description:
+    The MLME-SCAN.request primitive is used to initiate a channel scan over a
+    given list of channels. A device can use a channel scan to measure the
+    energy on the channel, search for the coordinator with which it associated,
+    or search for all coordinators transmitting beacon frames within the
+    POS of the scanning device.
+ 
+    The MLME-SCAN.request primitive is generated by the next higher layer and
+    issued to its MLME to initiate a channel scan to search for activity within
+    the POS of the device. This primitive can be used to perform an ED scan to
+    determine channel usage, an active or passive scan to locate beacon frames
+    containing any PAN identifier, or an orphan scan to locate a PAN to which
+    the device is currently associated.
+ 
+    ED or active scans can be performed before an FFD starts operation as a
+    PAN coordinator. Active or passive scans can be performed prior to selecting
+    a PAN for association. Orphan scans can be performed to attempt to locate a
+    specific coordinator with which communication has been lost.
+ 
+    All devices shall be capable of performing passive scans and orphan scans;
+    ED scans and active scans are optional for an RFD.
+ 
+    When the MLME receives the MLME-SCAN.request primitive, it initiates a scan
+    in all channels specified in the ScanChannels parameter. The MLME suspends
+    all beacon transmissions for the duration of the scan. During a scan, the
+    MAC sublayer only accepts frames received over the PHY data service that are
+    relevant to the scan being performed.
+ 
+    An ED scan allows a device to obtain a measure of the peak energy in each
+    requested channel. The ED scan is performed on each channel by the MLMEs
+    repeatedly issuing the PLME-ED.request primitive to the PHY until
+    [aBaseSuperframeDuration * (2n + 1)] symbols, where n is the value of the
+    ScanDuration parameter, have elapsed. The MLME notes the maximum energy
+    measurement and moves on to the next channel in the channel list. A device
+    will be able to store between one and an implementation-specified maximum
+    number of channel ED measurements. The ED scan terminates when the number
+    of channel ED measurements stored equals this implementation-specified
+    maximum or when every channel specified in the channel list has been scanned.
+ 
+    An active scan is used by an FFD to locate all coordinators transmitting
+    beacon frames within its POS. The active scan is performed on each channel
+    by the MLMEs first sending a beacon request command. The MLME
+    then enables the receiver and records the information contained in each
+    received beacon in a PAN descriptor structure.
+    A device will be able to store between one and an implementation-specified
+    maximum number of PAN descriptors. The active scan on a particular channel
+    terminates when the number of PAN descriptors stored equals this
+    implementation-specified maximum or when [aBaseSuperframeDuration*(2n + 1)]
+    symbols, where n is the value of the ScanDuration parameter, have elapsed.
+    If the latter condition has been satisfied, the channel is considered to
+    have been scanned. Where possible, the scan is repeated on each channel and
+    terminates when the number of PAN descriptors stored equals the
+    implementation-specified maximum or when every channel in the set of
+    available channels has been scanned.
+ 
+    A passive scan, like an active scan, is used to locate all coordinators
+    transmitting beacon frames within the POS of the scanning device; the
+    difference is that the passive scan is a receive-only operation and does not
+    transmit the beacon request command. The passive scan is performed on each
+    channel by the MLMEs enabling its receiver and recording the information
+    contained in each received beacon in a PAN descriptor structure
+    A device will be able to store between one and an implementation-specified 
+    maximum number of PAN descriptors. The passive scan on a particular channel 
+    terminates when the number of PAN descriptors stored equals this 
+    implementation-specified maximum or when [aBaseSuperframeDuration * (2n + 1)]
+    symbols, where n is the value of the ScanDuration parameter, have elapsed. 
+    If the latter condition has been satisfied, the channel is considered to 
+    have been scanned. Where possible, the scan is repeated on each channel and 
+    terminates when the number of PAN descriptors stored equals the 
+    implementation-specified maximum or when every channel in the set of 
+    available channels has been scanned.
+    
+    An orphan scan is used to locate the coordinator with which the scanning
+    device had previously associated. The orphan scan is performed on each
+    channel by the MLME first sending an orphan notification command
+    The MLME then enables its receiver for at most aResponseWaitTime symbols. 
+    If the device receives a coordinator realignment command within this time, 
+    the MLME will disable its receiver. Otherwise, the scan is repeated on the 
+    next channel in the channel list. The scan terminates when the device 
+    receives a coordinator realignment command or when every channel in the set
+    of available channels has been scanned.
+
+    The results of an ED scan are recorded in a list of ED values and reported
+    to the next higher layer through the MLME-SCAN.confirm primitive with a
+    status of MAC_SUCCESS. The results of an active or passive scan are recorded
+    in a set of PAN descriptor values and reported to the next higher layer
+    through the MLME-SCAN.confirm primitive. If no beacons were found, the
+    MLME-SCAN.confirm primitive will contain a null set of PAN descriptor
+    values and a status of NO_BEACON. Otherwise, the MLME-SCAN.confirm primitive
+    will contain the set of PANDescriptor values found, a list of un scanned
+    channels, and a status of MAC_SUCCESS.
+    
+    The results of an orphan scan are reported to the next higher layer through
+    the MLME-SCAN.confirm primitive. If successful, the MLME-SCAN.confirm
+    primitive will contain a status of MAC_SUCCESS. If the device did not receive
+    a coordinator realignment command, MLME-SCAN.confirm primitive will contain
+    a status of NO_BEACON. In either case, the PANDescriptorList and
+    EnergyDetectList parameters of the MLMESCAN.confirm primitive are null.
+    
+    If any parameter in the MLME-SCAN.request primitive is not supported or is
+    out of range, the MAC sub layer will issue the MLME-SCAN.confirm primitive
+    with a status of MAC_INVALID_PARAMETER.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   The MLME_SCAN.request message
+                      
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_ScanRequest(void *m);
+
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_ScanConf(void *m)
+
+  Summary:
+    Wrapper function for messages of type MLME_ScanConf_t
+
+  Description:
+    This function is a callback for mlme scan confirm.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to message structure                
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_ScanConf(void *m);
 
 #endif
 
 #if (MAC_START_REQUEST_CONFIRM == 1)
 
-/**
- * @brief The MLME-START.request primitive makes a request for the device to
- * start using a new superframe configuration
- *
- * \ingroup group_mac_req_int
- * @param m Pointer to MLME_START.request message issued by the NHLE
- */
-void MAC_MLME_StartRequest(uint8_t *m);
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_StartRequest(void *m)
 
-/**
- * @brief Wrapper function for messages of type MLME_StartConf_t
- *
- * This function is a callback for mlme start confirm.
- *
- * \ingroup group_mac_conf_int
- * @param m Pointer to message structure
- */
-void MAC_MLME_StartConf(uint8_t *m);
+  Summary:
+    The MLME-START.request primitive makes a request for the device to
+    start using a new superframe configuration
+
+  Description:
+    This function handles an MLME-START.request primitive.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to MLME_START.request message issued by the NHLE              
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_StartRequest(void *m);
+
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_StartConf(void *m)
+
+  Summary:
+    Wrapper function for messages of type MLME_StartConf_t
+
+  Description:
+    This function is a callback for mlme start confirm.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to message structure       
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_StartConf(void *m);
 
 #endif /* (MAC_START_REQUEST_CONFIRM == 1) */
 
 #if (MAC_ASSOCIATION_REQUEST_CONFIRM == 1)
 
-/**
- * @brief Handles the MLME associate request command from the NWK layer
- *
- * The MLME associate request primitive is generated by the next higher layer
- * of an unassociated device and issued to its MAC to request an association
- * with a coordinator.
- *
- * \ingroup group_mac_req_int
- * @param m Pointer to MLME association request parameters
- */
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_AssociateRequest(void *m)
 
-void MAC_MLME_AssociateRequest(uint8_t *m);
+  Summary:
+    Handles the MLME associate request command from the NWK layer
 
-/**
- * @brief Wrapper function for messages of type MLME_AssociateConf_t
- *
- * This function is a callback for mlme associate confirm.
- *
- * \ingroup group_mac_conf_int
- * @param m Pointer to message structure
- */
-void MAC_MLME_AssociateConf(uint8_t *m);
+  Description:
+    The MLME associate request primitive is generated by the next higher layer
+    of an unassociated device and issued to its MAC to request an association
+    with a coordinator.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to MLME association request parameters      
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_AssociateRequest(void *m);
+
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_AssociateConf(void *m)
+
+  Summary:
+    Wrapper function for messages of type MLME_AssociateConf_t
+
+  Description:
+    This function is a callback for mlme associate confirm.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to message structure   
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_AssociateConf(void *m);
 
 #endif  /* (MAC_ASSOCIATION_REQUEST_CONFIRM == 1) */
 #if (MAC_ASSOCIATION_INDICATION_RESPONSE == 1)
 
-/**
- * @brief Entry point from the stack for MLME associate response
- *
- * The MLME associate response primitive is used to initiate a response to a
- * MLME association indication primitive.
- *
- * \ingroup group_mac_resp_int
- * @param m Pointer to association response parameters
- */
-void MAC_MLME_AssociateResponse(uint8_t *m);
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_AssociateResponse(void *m)
 
-/**
- * @brief Wrapper function for messages of type MLME_AssociateInd_t
- *
- * This function is a callback for mlme associate indication.
- *
- * \ingroup group_mac_ind_int
- * @param m Pointer to message structure
- */
-void MAC_MLME_AssociateInd(uint8_t *m);
+  Summary:
+    Entry point from the stack for MLME associate response
+
+  Description:
+    The MLME associate response primitive is used to initiate a response to a
+    MLME association indication primitive
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to association response parameters 
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_AssociateResponse(void *m);
+
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_AssociateInd(void *m)
+
+  Summary:
+    Wrapper function for messages of type MLME_AssociateInd_t
+
+  Description:
+    This function is a callback for mlme associate indication.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to message structure
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_AssociateInd(void *m);
 
 #endif /* (MAC_ASSOCIATION_INDICATION_RESPONSE == 1) */
 #if (MAC_DISASSOCIATION_BASIC_SUPPORT == 1)
 
-/**
- * @brief Handles the MLME disassociate request command from the NWK layer
- *
- * The MLME-DISASSOCIATE.request primitive is generated by the next
- * higher layer of an associated device and issued to its MLME to
- * request disassociation from the PAN. It is also generated by the
- * next higher layer of the coordinator and issued to its MLME to
- * instruct an associated device to leave the PAN.
- *
- * \ingroup group_mac_req_int
- * @param m Pointer to the MLME-DISASSOCIATION.Request message passed by NHLE
- */
-void MAC_MLME_DisassociateRequest(uint8_t *m);
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_DisassociateRequest(void *m)
 
-/**
- * @brief Wrapper function for messages of type MLME_DisassociateConf_t
- *
- * This function is a callback for mlme disassociate confirm.
- *
- * \ingroup group_mac_conf_int
- * @param m Pointer to message structure
- */
-void MAC_MLME_DisassociateConf(uint8_t *m);
+  Summary:
+    Handles the MLME disassociate request command from the NWK layer
 
-/**
- * @brief Wrapper function for messages of type MLME_DisassociateInd_t
- *
- * This function is a callback for mlme disassociate indication.
- *
- * \ingroup group_mac_ind_int
- * @param m Pointer to message structure
- */
-void MAC_MLME_DisassociateInd(uint8_t *m);
+  Description:
+    The MLME-DISASSOCIATE.request primitive is generated by the next 
+    higher layer of an associated device and issued to its MLME to request 
+    disassociation from the PAN. It is also generated by the
+    next higher layer of the coordinator and issued to its MLME to
+    instruct an associated device to leave the PAN.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to the MLME-DISASSOCIATION.Request message passed by NHLE
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_DisassociateRequest(void *m);
+
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_DisassociateConf(void *m)
+
+  Summary:
+    Wrapper function for messages of type MLME_DisassociateConf_t
+
+  Description:
+    This function is a callback for mlme disassociate confirm.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to message structure
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_DisassociateConf(void *m);
+
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_DisassociateInd(void *m)
+
+  Summary:
+    Wrapper function for messages of type MLME_DisassociateInd_t
+
+  Description:
+    This function is a callback for mlme disassociate indication.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to message structure
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_DisassociateInd(void *m);
 
 #endif  /* (MAC_DISASSOCIATION_BASIC_SUPPORT == 1) */
 #if (MAC_ORPHAN_INDICATION_RESPONSE == 1)
 
-/**
- * @brief Implements the MLME-ORPHAN.response
- *
- * The MLME-ORPHAN.response primitive allows the next higher layer
- * of a coordinator to respond to the MLME-ORPHAN.indication primitive.
- * The MLME-ORPHAN.response primitive is generated by the next higher
- * layer and issued to its MLME when it reaches a decision about whether
- * the orphaned device indicated in the MLME-ORPHAN.indication primitive
- * is associated.
- *
- * \ingroup group_mac_resp_int
- * @param m Pointer to the message.
- */
-void MAC_MLME_OrphanResponse(uint8_t *m);
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_OrphanResponse(void *m)
 
-/**
- * @brief Wrapper function for messages of type MLME_OrphanInd_t
- *
- * This function is a callback for mlme orphan indication.
- *
- * \ingroup group_mac_ind_int
- * @param m Pointer to message structure
- */
-void MAC_MLME_OrphanInd(uint8_t *m);
+  Summary:
+    Implements the MLME-ORPHAN.response
+
+  Description:
+    The MLME-ORPHAN.response primitive allows the next higher layer 
+    of a coordinator to respond to the MLME-ORPHAN.indication primitive.
+    The MLME-ORPHAN.response primitive is generated by the next higher layer 
+    and issued to its MLME when it reaches a decision about whether
+    the orphaned device indicated in the MLME-ORPHAN.indication primitive
+    is associated.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to message structure
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_OrphanResponse(void *m);
+
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_OrphanInd(void *m)
+
+  Summary:
+    Wrapper function for messages of type MLME_OrphanInd_t
+
+  Description:
+    This function is a callback for mlme orphan indication.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to message structure
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_OrphanInd(void *m);
 
 #endif /* (MAC_ORPHAN_INDICATION_RESPONSE == 1) */
 #if (MAC_INDIRECT_DATA_BASIC == 1)
 
-/**
- * @brief Implements MLME-POLL.request
- *
- * This function handles an MLME-POLL.request primitive.
- * The MLME-POLL.request primitive is generated by the next
- * higher layer and issued to its MLME when data are to be
- * requested from a coordinator.
- *
- * \ingroup group_mac_req_int
- * @param m Pointer to the message
- */
-void MAC_MLME_PollRequest(uint8_t *m);
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_PollRequest(void *m)
 
-/**
- * @brief Wrapper function for messages of type MLME_PollConf_t
- *
- * This function is a callback for mlme poll confirm.
- *
- * \ingroup group_mac_conf_int
- * @param m Pointer to message structure
- */
-void MAC_MLME_PollConf(uint8_t *m);
+  Summary:
+    Implements MLME-POLL.request
+
+  Description:
+    This function handles an MLME-POLL.request primitive.
+    The MLME-POLL.request primitive is generated by the next
+    higher layer and issued to its MLME when data are to be
+    requested from a coordinator.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to the message
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_PollRequest(void *m);
+
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_PollConf(void *m)
+
+  Summary:
+    Wrapper function for messages of type MLME_PollConf_t
+
+  Description:
+    This function is a callback for mlme poll confirm.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to message structure
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_PollConf(void *m);
 
 #endif  /* (MAC_INDIRECT_DATA_BASIC == 1) */
 #if (MAC_RX_ENABLE_SUPPORT == 1)
 
-/**
- * @brief Implement the MLME-RX-ENABLE.request primitive.
- *
- * The MLME-RX-ENABLE.request primitive is generated by the next
- * higher layer and issued to MAC to enable the receiver for a
- * fixed duration, at a time relative to the start of the current or
- * next superframe on a beacon-enabled PAN or immediately on a
- * nonbeacon-enabled PAN. The receiver is enabled exactly once per
- * primitive request.
- *
- * \ingroup group_mac_req_int
- * @param m Pointer to the MLME-RX-ENABLE.request message
- */
-void MAC_MLME_RxEnableRequest(uint8_t *m);
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_RxEnableRequest(void *m)
 
-/**
- * @brief Wrapper function for messages of type MLME_RxEnableConf_t
- *
- * This function is a callback for mlme rx enable confirm.
- *
- * \ingroup group_mac_conf_int
- * @param m Pointer to message structure
- */
-void MAC_MLME_RxEnableConf(uint8_t *m);
+  Summary:
+    Implement the MLME-RX-ENABLE.request primitive.
+
+  Description:
+    The MLME-RX-ENABLE.request primitive is generated by the next
+    higher layer and issued to MAC to enable the receiver for a
+    fixed duration, at a time relative to the start of the current or
+    next superframe on a beacon-enabled PAN or immediately on a
+    nonbeacon-enabled PAN. The receiver is enabled exactly once per
+    primitive request.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to the MLME-RX-ENABLE.request message
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_RxEnableRequest(void *m);
+
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_RxEnableConf(void *m)
+
+  Summary:
+    Wrapper function for messages of type MLME_RxEnableConf_t
+
+  Description:
+    This function is a callback for mlme rx enable confirm.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to message structure
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_RxEnableConf(void *m);
 
 #endif  /* (MAC_RX_ENABLE_SUPPORT == 1) */
 
-/**
- * @brief Implements the MLME-SYNC request.
- *
- * The MLME-SYNC.request primitive requests to synchronize with the
- * coordinator by acquiring and, if specified, tracking its beacons.
- * The MLME-SYNC.request primitive is generated by the next higher layer of a
- * device on a beacon-enabled PAN and issued to its MLME to synchronize with
- * the coordinator.
- *
- * Enable receiver and search for beacons for at most an interval of
- * [aBaseSuperframeDuration * ((2 ^ (n))+ 1)] symbols where n is the value of
- * macBeaconOrder. If a beacon frame containing the current PAN identifier of
- * the device is not received, the MLME shall repeat this search. Once the
- * number of missed beacons reaches aMaxLostBeacons, the MLME shall notify
- * the next higher layer by issuing the MLME-SYNC-LOSS.indication primitive
- * with a loss reason of BEACON_LOSS.
- *
- * \ingroup group_mac_req_int
- * @param m Pointer to the MLME sync request parameters.
- */
-void MAC_MLME_SyncRequest(uint8_t *m);
-
 #if (MAC_BEACON_NOTIFY_INDICATION == 1)
 
-/**
- * @brief Wrapper function for messages of type MLME_BeaconNotifyInd_t
- *
- * This function is a callback for mlme beacon notify indication.
- *
- * \ingroup group_mac_ind_int
- * @param m Pointer to message structure
- */
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_BeaconNotifyInd(void *m)
 
-void MAC_MLME_BeaconNotifyInd(uint8_t *m);
+  Summary:
+    Wrapper function for messages of type MLME_BeaconNotifyInd_t
+
+  Description:
+    This function is a callback for mlme beacon notify indication.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to message structure
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_BeaconNotifyInd(void *m);
 
 #endif  /* (MAC_BEACON_NOTIFY_INDICATION == 1) */
 #if ((MAC_ORPHAN_INDICATION_RESPONSE == 1) || \
 	(MAC_ASSOCIATION_INDICATION_RESPONSE == 1))
 
-/**
- * @brief Wrapper function for messages of type MLME_CommStatusInd_t
- *
- * This function is a callback for mlme comm status indication.
- *
- * \ingroup group_mac_ind_int
- * @param m Pointer to message structure
- */
-void MAC_MLME_CommStatusInd(uint8_t *m);
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_CommStatusInd(void *m)
+
+  Summary:
+    Wrapper function for messages of type MLME_CommStatusInd_t
+
+  Description:
+    This function is a callback for mlme comm status indication.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to message structure
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_CommStatusInd(void *m);
 
 #endif  /* ((MAC_ORPHAN_INDICATION_RESPONSE == 1) ||
          *(MAC_ASSOCIATION_INDICATION_RESPONSE == 1)) */
 
-/**
- * @brief Wrapper function for messages of type MLME_ResetConf_t
- *
- * This function is a callback for mlme reset confirm.
- *
- * \ingroup group_mac_conf_int
- * @param m Pointer to message structure
- */
-void MAC_MLME_ResetConf(uint8_t *m);
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_ResetConf(void *m)
 
-/**
- * @brief Wrapper function for messages of type MLME_SyncLossInd_t
- *
- * This function is a callback for mlme sync loss indication.
- *
- * \ingroup group_mac_ind_int
- * @param m Pointer to message structure
- */
-void MAC_MLME_SyncLossInd(uint8_t *m);
+  Summary:
+    Wrapper function for messages of type MLME_ResetConf_t
 
-/**
- * @brief Handles an MLME-SET.request primitive
- *
- * This function handles the MLME-SET.request. The MLME-SET.request primitive
- * attempts to write the given value to the indicated PIB attribute.
- *
- * \ingroup group_mac_req_int
- * @param m Pointer to the request structure
- */
-void MAC_MLME_SetRequest(uint8_t *m);
+  Description:
+    This function is a callback for mlme reset confirm.
+ 
+  Precondition:
+    None
 
-/**
- * @brief Wrapper function for messages of type mlme_set_conf_t
- *
- * This function is a callback for mlme set confirm.
- *
- * \ingroup group_mac_conf_int
- * @param m Pointer to message structure
- */
+  Parameters:
+    m    -   Pointer to message structure
 
-void MAC_MLME_SetConf(uint8_t *m);
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_ResetConf(void *m);
+
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_SyncLossInd(void *m)
+
+  Summary:
+    Wrapper function for messages of type MLME_SyncLossInd_t
+
+  Description:
+    This function is a callback for mlme sync loss indication.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to message structure
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_SyncLossInd(void *m);
+
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_SetRequest(void *m)
+
+  Summary:
+    Handles an MLME-SET.request primitive
+
+  Description:
+    This function handles the MLME-SET.request. The MLME-SET.request primitive
+    attempts to write the given value to the indicated PIB attribute.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to the request structure
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_SetRequest(void *m);
+
+// *****************************************************************************
+/*
+  Function:
+    void MAC_MLME_SetConf(void *m)
+
+  Summary:
+    Wrapper function for messages of type mlme_set_conf_t
+
+  Description:
+    This function is a callback for mlme set confirm.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    m    -   Pointer to message structure
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
+void MAC_MLME_SetConf(void *m);
 
 #if (defined MAC_SECURITY_ZIP) || (defined MAC_SECURITY_2006)
 
-/**
- * @brief Setting of MAC PIB attributes via functional access
- *
- * In case the highest stack layer is above MAC (e.g. NWK or even
- * higher), it is not efficient to change PIB attributes using
- * the standard request / confirm primitive concept via the NHLE_MAC
- * queue. In order to allow a more efficient way to change PIB attributes
- * residing in MAC or TAL, this function replaces the standard primitive
- * access via a functional interface.
- *
- * An additional parameter allows for forcing the transceiver back to sleep
- * after PIB setting. Otherwise the transceiver will stay awake (if it has been
- * woken up before).
- * This enables the higher layer to change several PIB attributes without
- * waking up the transceiver and putting it back to sleep several times.
- *
- * @param attribute PIB attribute to be set
- * @param attribute_index Index of the PIB attribute to be set
- * @param attribute_value Attribute value to be set
- * @param set_trx_to_sleep Set TRX back to sleep after this PIB access if it was
- *        before starting this TRX access. Otherwise the transceiver state will
- *        remain as it is, i.e. in case the transceiver was woken up, it will
- * stay
- *        awake.
- *        The default value for just changing one variable is true, i.e. the
- *        transceiver will be put back to sleep if it has been woken up.
- *
- * @return Status of the attempt to set the TAL PIB attribute:
- *         MAC_UNSUPPORTED_ATTRIBUTE if the PIB attribute was not found
- *         MAC_SUCCESS if the attempt to set the PIB attribute was successful
- *         TAL_BUSY if the TAL is not in an idle state to change PIB attributes
- * \ingroup group_mac_gen_int
- */
+// *****************************************************************************
+/*
+  Function:
+    MAC_Retval_t MAC_MLME_Set(uint8_t attribute, uint8_t attributeIndex,
+		PibValue_t *attributeValue, bool setTrxToSleep)
+
+  Summary:
+    Setting of MAC PIB attributes via functional access
+
+  Description:
+    In case the highest stack layer is above MAC (e.g. NWK or even
+    higher), it is not efficient to change PIB attributes using
+    the standard request / confirm primitive concept via the NHLE_MAC
+    queue. In order to allow a more efficient way to change PIB attributes
+    residing in MAC or TAL, this function replaces the standard primitive
+    access via a functional interface.
+
+    An additional parameter allows for forcing the transceiver back to sleep
+    after PIB setting. Otherwise the transceiver will stay awake (if it has been
+    woken up before).
+    This enables the higher layer to change several PIB attributes without
+    waking up the transceiver and putting it back to sleep several times.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    attribute          -   PIB attribute to be set
+    attribute_index    -   Index of the PIB attribute to be set if enable security
+    attribute_value    -   Attribute value to be set
+    set_trx_to_sleep   -   Set TRX back to sleep after this PIB access if it was
+           before starting this TRX access. Otherwise the transceiver state will
+           remain as it is, i.e. in case the transceiver was woken up, it will
+           stay awake.
+           The default value for just changing one variable is true, i.e. the
+           transceiver will be put back to sleep if it has been woken up.
+  Returns:
+    Status of the attempt to set the MAC PIB attribute
+    MAC_UNSUPPORTED_ATTRIBUTE - if the PIB attribute was not found
+    MAC_SUCCESS - if the attempt to set the PIB attribute was successful
+
+  Remarks:
+    None 
+*/
 
 MAC_Retval_t MAC_MLME_Set(uint8_t attribute, uint8_t attributeIndex,
 		PibValue_t *attributeValue, bool setTrxToSleep);
@@ -935,9 +1488,35 @@ MAC_Retval_t MAC_MLME_Set(uint8_t attribute, PibValue_t *attributeValue,
 
 #if (defined MAC_SECURITY_ZIP) || (defined MAC_SECURITY_2006)
 
-/**
- * \ingroup group_mac_gen_int
- */
+// *****************************************************************************
+/*
+  Function:
+    MAC_Retval_t MAC_MLME_Get(uint8_t attribute, PibValue_t *attributeValue,
+		uint8_t attributeIndex)
+
+  Summary:
+    Getting of MAC PIB attributes via functional access
+
+  Description:
+    This function is MAC_MLME_GET Primitive.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    attribute          -   get PIB attribute
+    attribute_index    -   Index of the PIB attribute to be get if enable security
+    attribute_value    -   get Attribute value               
+
+  Returns:
+    Status of the attempt to get the MAC PIB attribute
+    MAC_UNSUPPORTED_ATTRIBUTE - if the PIB attribute was not found
+    MAC_SUCCESS - if the attempt to set the PIB attribute was successful
+
+  Remarks:
+    None 
+*/
+
 MAC_Retval_t MAC_MLME_Get(uint8_t attribute, PibValue_t *attributeValue,
 		uint8_t attributeIndex);
 
@@ -946,37 +1525,31 @@ MAC_Retval_t MAC_MLME_Get(uint8_t attribute, PibValue_t *attributeValue);
 
 #endif  /* (MAC_SECURITY_ZIP || MAC_SECURITY_2006)  */
 
-/**
- * @brief Initializes the MAC sublayer
- *
- * \ingroup group_mac_gen_int
- * @return MAC_SUCCESS  if TAL is intialized successfully else FAILURE
- */
-MAC_Retval_t MAC_Init(void);
-
-/**
- * @brief Runs the MAC scheduler
- *
- * This function runs the MAC scheduler.
- *
- * MLME and MCPS queues are removed alternately, starting with MLME queue.
- *
- * \ingroup group_mac_gen_int
- * @return true if event is dispatched, false if no event to dispatch.
- */
-bool MAC_TaskHandler(void);
-
+// *****************************************************************************
 /*
- * @brief Helper function to extract the complete address information
- *        of the received frame
- *
- * @param frame_ptr Pointer to first octet of Addressing fields of received
- * frame
- *        (See IEEE 802.15.4-2006 Figure 41)
- *
- * \ingroup group_mac_gen_int
- * @return bool Length of Addressing fields
- */
+  Function:
+    uint8_t MAC_ExtractMhrAddrInfo(uint8_t *framePtr)
+
+  Summary:
+    Extracting the complete address information of the received frame
+
+  Description:
+    Helper function to extract the complete address information of the 
+    received frame
+ 
+  Precondition:
+    None
+
+  Parameters:
+    framePtr  -  Pointer to first octet of Addressing fields of received frame      
+
+  Returns:
+    Returns Length of Addressing fields 
+
+  Remarks:
+    None 
+*/
+
 uint8_t MAC_ExtractMhrAddrInfo(uint8_t *framePtr);
 
 //DOM-IGNORE-BEGIN

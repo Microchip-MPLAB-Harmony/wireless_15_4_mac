@@ -74,15 +74,17 @@
  */
 void MAC_ProcessOrphanNotification(buffer_t *msg)
 {
-	MLME_OrphanInd_t *moi = (MLME_OrphanInd_t *)BMM_BUFFER_POINTER(msg);
+    qmm_status_t  status;
+	MLME_OrphanInd_t *moi = (MLME_OrphanInd_t *)MAC_BUFFER_POINTER(msg);
 
 	moi->cmdcode = MLME_ORPHAN_INDICATION;
 	ADDR_COPY_DST_SRC_64(moi->OrphanAddress,
 			macParseData.srcAddr.longAddress);
 
 	/* Append the MLME orphan indication message to MAC-NHLE queue */
-	qmm_queue_append(&macNhleQueue, msg);
+	status = qmm_queue_append(&macNhleQueue, msg);
     WPAN_PostTask();
+    (void)status;
 }
 
 #endif /* MAC_ORPHAN_INDICATION_RESPONSE */
@@ -101,14 +103,16 @@ void MAC_ProcessOrphanNotification(buffer_t *msg)
  *
  * @param m Pointer to the message.
  */
-void MAC_MLME_OrphanResponse(uint8_t *m)
+void MAC_MLME_OrphanResponse(void *m)
 {
+    PHY_Retval_t pibStatus = PHY_FAILURE;
     PibValue_t pib_panid;
     PibValue_t cur_channel;
     PibValue_t cur_chpage;
-    PHY_PibGet(macPANId, (uint8_t *)&pib_panid);
-    PHY_PibGet(phyCurrentChannel, (uint8_t *)&cur_channel);
-    PHY_PibGet(phyCurrentPage, (uint8_t *)&cur_chpage);
+    pibStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_panid);
+
+    pibStatus = PHY_PibGet(phyCurrentChannel, (uint8_t *)&cur_channel);
+    pibStatus = PHY_PibGet(phyCurrentPage, (uint8_t *)&cur_chpage);
 	bool transmission_status = MAC_TxCoordRealignmentCommand(
 			ORPHANREALIGNMENT,
 			(buffer_t *)m,
@@ -117,9 +121,10 @@ void MAC_MLME_OrphanResponse(uint8_t *m)
 			cur_chpage.pib_value_8bit);
 
 	if (!transmission_status) {
-		MAC_MLME_CommStatus(MAC_CHANNEL_ACCESS_FAILURE,
+		MAC_MLME_CommStatus((uint8_t)MAC_CHANNEL_ACCESS_FAILURE,
 				(buffer_t *)m);
 	}
+    (void)pibStatus;
 }
 
 #endif /* MAC_ORPHAN_INDICATION_RESPONSE */

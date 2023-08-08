@@ -88,13 +88,15 @@ void MAC_SyncLoss(uint8_t lossReason)
 
 	MLME_SyncLossInd_t *syncLossInd;
 	buffer_t *msg_ptr;
+    PHY_Retval_t pibStatus = PHY_FAILURE;
+    qmm_status_t  qmmStatus = QMM_QUEUE_FULL;
     PibValue_t pib_value;
 
 	/* Update static buffer allocated for sync loss indication. */
-	msg_ptr = (buffer_t *)MAC_SyncLossBuffer;
+	msg_ptr = (buffer_t *)((void *)MAC_SyncLossBuffer);
 	msg_ptr->body = &MAC_SyncLossBuffer[sizeof(buffer_t)]; /* begin of
 	                                                          * message */
-	syncLossInd = (MLME_SyncLossInd_t *)(msg_ptr->body);
+	syncLossInd = (MLME_SyncLossInd_t *)((void *)((msg_ptr->body)));
 
 	syncLossInd->cmdcode = MLME_SYNC_LOSS_INDICATION;
 	syncLossInd->LossReason = lossReason;
@@ -105,7 +107,7 @@ void MAC_SyncLoss(uint8_t lossReason)
 		(MAC_SCAN_PASSIVE_REQUEST_CONFIRM == 1))
 		syncLossInd->PANId = macScanOrigPanid;
 #else
-        PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+        pibStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_value);
 		syncLossInd->PANId = pib_value.pib_value_16bit;
 #endif  /* ((MAC_SCAN_ACTIVE_REQUEST_CONFIRM == 1) ||
 		 *(MAC_SCAN_PASSIVE_REQUEST_CONFIRM == 1)) */
@@ -114,16 +116,17 @@ void MAC_SyncLoss(uint8_t lossReason)
 	} else
 #endif  /* (MAC_SCAN_SUPPORT == 1) */
 	{
-        PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+        pibStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_value);
 		syncLossInd->PANId = pib_value.pib_value_16bit;
-        PHY_PibGet(phyCurrentChannel, (uint8_t *)&pib_value);
+        pibStatus = PHY_PibGet(phyCurrentChannel, (uint8_t *)&pib_value);
 		syncLossInd->LogicalChannel = pib_value.pib_value_8bit;
-        PHY_PibGet(phyCurrentPage, (uint8_t *)&pib_value);
+        pibStatus = PHY_PibGet(phyCurrentPage, (uint8_t *)&pib_value);
 		syncLossInd->ChannelPage = pib_value.pib_value_8bit;
 	}
+    (void)pibStatus;
 
 	/* Append the associate confirm message to MAC-NHLE queue. */
-	qmm_queue_append(&macNhleQueue, msg_ptr);
+	qmmStatus = qmm_queue_append(&macNhleQueue, msg_ptr);
 
 	/* A device that is neither scanning nor polling shall go to sleep now.
 	**/
@@ -137,6 +140,7 @@ void MAC_SyncLoss(uint8_t lossReason)
 
 	macSyncState = MAC_SYNC_NEVER;
     WPAN_PostTask();
+    (void)qmmStatus;
 }
 
 /**
@@ -153,11 +157,12 @@ void MAC_SyncLoss(uint8_t lossReason)
  */
 void MAC_ProcessCoordRealign(buffer_t *ind)
 {
+    PHY_Retval_t pibSetStatus = PHY_FAILURE;
 	/*
 	 * The coordinator realignment command is received without the orphan
 	 * notification. Hence a sync loss indication is given to NHLE.
 	 */
-	MAC_SyncLoss(MAC_REALIGNMENT);
+	MAC_SyncLoss((uint8_t)MAC_REALIGNMENT);
 
 	/*
 	 * The buffer in which the coordinator realignment is received is
@@ -167,14 +172,14 @@ void MAC_ProcessCoordRealign(buffer_t *ind)
 
 	/* Set the appropriate PIB entries */
 
-	SetTalPibInternal(macPANId,
+	pibSetStatus = SetPhyPibInternal(macPANId,
 			(void *)&macParseData.macPayloadData.coordRealignData.panId);
 
 	if (BROADCAST !=
 			macParseData.macPayloadData.coordRealignData.
 			shortAddr) {
 		/* Short address only to be set if not broadcast address */
-		SetTalPibInternal(macShortAddress,
+		pibSetStatus = SetPhyPibInternal(macShortAddress,
 				(void *)&macParseData.macPayloadData.coordRealignData.shortAddr);
 	}
 
@@ -185,14 +190,15 @@ void MAC_ProcessCoordRealign(buffer_t *ind)
 	 * If frame version subfield indicates a 802.15.4-2006 compatible frame,
 	 * the channel page is appended as additional information element.
 	 */
-	if (macParseData.fcf & FCF_FRAME_VERSION_2006) {
+	if (((macParseData.fcf & FCF_FRAME_VERSION_2006)) == FCF_FRAME_VERSION_2006)  {
 
-		SetTalPibInternal(phyCurrentPage,
+		pibSetStatus = SetPhyPibInternal(phyCurrentPage,
 				(void *)&macParseData.macPayloadData.coordRealignData.channelPage);
 	}
 
-	SetTalPibInternal(phyCurrentChannel,
+	pibSetStatus = SetPhyPibInternal(phyCurrentChannel,
 			(void *)&macParseData.macPayloadData.coordRealignData.logicalChannel);
+    (void)pibSetStatus;
 
 } /* MAC_ProcessCoordRealign() */
 

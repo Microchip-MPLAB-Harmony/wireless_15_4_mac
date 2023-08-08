@@ -72,7 +72,7 @@
 
 #if (MAC_INDIRECT_DATA_FFD == 1)
 static buffer_t *buildNullDataFrame(void);
-static uint8_t findLongBuffer(void *buf, void *longAddr);
+static uint8_t findLongBuffer(void *buf, void *long_addr);
 static uint8_t findShortBuffer(void *buf, void *shortAddr);
 
 #endif  /*  (MAC_INDIRECT_DATA_FFD == 1)*/
@@ -119,7 +119,7 @@ bool MAC_BuildAndTxDataReq(bool explPoll,
 		AddressField_t *explDestAddr,
 		uint16_t explDestPanId)
 {
-	MAC_Retval_t talTxStatus;
+	PHY_Retval_t phyStatus = PHY_FAILURE;
 	bool intrabit = false;
 	uint8_t frameLen;
 	uint8_t *framePtr;
@@ -131,7 +131,7 @@ bool MAC_BuildAndTxDataReq(bool explPoll,
 		return false;
 	}
 
-	MAC_FrameInfo_t *transmitFrame = (MAC_FrameInfo_t *)BMM_BUFFER_POINTER(
+	MAC_FrameInfo_t *transmitFrame = (MAC_FrameInfo_t *)MAC_BUFFER_POINTER(
 			bufPtr);
 
 	/*
@@ -172,7 +172,7 @@ bool MAC_BuildAndTxDataReq(bool explPoll,
 	 * Build the command frame id.
 	 * This is actually being written into "transmitFrame->payload[0]".
 	 */
-	*framePtr = DATAREQUEST;
+	*framePtr = (uint8_t)DATAREQUEST;
 
 	/* Source Address */
 
@@ -187,23 +187,23 @@ bool MAC_BuildAndTxDataReq(bool explPoll,
 	 * during association, since here we always need to use our
 	 * extended address.
 	 */
-    PHY_PibGet(macShortAddress, (uint8_t *)&pib_value);
+    phyStatus = PHY_PibGet(macShortAddress, (uint8_t *)&pib_value);
 	if ((BROADCAST == pib_value.pib_value_16bit) ||
 			(MAC_NO_SHORT_ADDR_VALUE ==
 			pib_value.pib_value_16bit) ||
 			forceOwnLongAddr) {
 		framePtr -= 8;
-		frameLen += 6; /* Add further 6 octets for long Source Address
+		frameLen += 6U; /* Add further 6 octets for long Source Address
 		                **/
 
 		/* Build the Source address. */
-        PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
+        phyStatus = PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
         convert_64_bit_to_byte_array(pib_value.pib_value_64bit, framePtr);
 		fcf = FCF_SET_FRAMETYPE(FCF_FRAMETYPE_MAC_CMD) |
 				FCF_SET_SOURCE_ADDR_MODE(FCF_LONG_ADDR) |
 				FCF_ACK_REQUEST;
 	} else {
-		framePtr -= 2;
+		framePtr -= 2U;
 
 		/* Build the Source address. */
         convert_16_bit_to_byte_array(pib_value.pib_value_16bit, framePtr);
@@ -231,12 +231,12 @@ bool MAC_BuildAndTxDataReq(bool explPoll,
 	 * different from
 	 * our own PAN-Id PIB attribute.
 	 */
-    PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+    phyStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_value);
 	if ((explDestAddrMode != FCF_NO_ADDR) &&
 			(explDestPanId != pib_value.pib_value_16bit)
 			) {
 		framePtr -= 2;
-		frameLen += 2; /* Add further 6 octets for long Source Pan-Id
+		frameLen += 2U; /* Add further 6 octets for long Source Pan-Id
 		                **/
         convert_16_bit_to_byte_array(pib_value.pib_value_16bit, framePtr);
 
@@ -263,7 +263,7 @@ bool MAC_BuildAndTxDataReq(bool explPoll,
 		fcf |= FCF_SET_DEST_ADDR_MODE(FCF_LONG_ADDR);
 
 		framePtr -= 8;
-		frameLen += 6; /* Add further 6 octets for long Destination
+		frameLen += 6U; /* Add further 6 octets for long Destination
 		                 * Address */
 		convert_64_bit_to_byte_array(explDestAddr->longAddress,
 				framePtr);
@@ -295,7 +295,7 @@ bool MAC_BuildAndTxDataReq(bool explPoll,
 			fcf |= FCF_SET_DEST_ADDR_MODE(FCF_LONG_ADDR);
 
 			framePtr -= 8;
-			frameLen += 6; /* Add further 6 octets for long
+			frameLen += 6U; /* Add further 6 octets for long
 			                 * Destination Address */
 			convert_64_bit_to_byte_array(
 					macPib.mac_CoordExtendedAddress,
@@ -308,7 +308,7 @@ bool MAC_BuildAndTxDataReq(bool explPoll,
 
 	if (intrabit) {
 		/* Add our PAN-Id. */
-        PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+        phyStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_value);
         convert_16_bit_to_byte_array(pib_value.pib_value_16bit, framePtr);
 	} else {
 		/*
@@ -333,11 +333,12 @@ bool MAC_BuildAndTxDataReq(bool explPoll,
 
 	/* Finished building of frame. */
 	transmitFrame->mpdu = framePtr;
+    (void)phyStatus;
 
 	/* In Nonbeacon build the frame is sent with unslotted CSMA-CA. */
-	talTxStatus = sendFrame(transmitFrame, CSMA_UNSLOTTED, true);
+	phyStatus = sendFrame(transmitFrame, CSMA_UNSLOTTED, true);
 
-	if (MAC_SUCCESS == talTxStatus) {
+	if (PHY_SUCCESS == phyStatus) {
 		MAKE_MAC_BUSY();
 		return true;
 	} else {
@@ -347,6 +348,7 @@ bool MAC_BuildAndTxDataReq(bool explPoll,
 
 		return false;
 	}
+    
 } /* MAC_BuildAndTxDataReq() */
 
 #if (MAC_INDIRECT_DATA_FFD == 1)
@@ -364,13 +366,14 @@ static buffer_t *buildNullDataFrame(void)
 	uint8_t *framePtr;
 	uint16_t fcf = 0;
 	buffer_t *bufPtr = bmm_buffer_alloc(LARGE_BUFFER_SIZE);
+    PHY_Retval_t pibStatus = PHY_FAILURE;
     PibValue_t pib_value;
 
 	if (NULL == bufPtr) {
 		return NULL;
 	}
 
-	transmitFrame = (MAC_FrameInfo_t *)BMM_BUFFER_POINTER(bufPtr);
+	transmitFrame = (MAC_FrameInfo_t *)MAC_BUFFER_POINTER(bufPtr);
 
 	/* No data payload, this is a null packet.*/
 	transmitFrame->msgType = NULL_FRAME;
@@ -396,26 +399,26 @@ static buffer_t *buildNullDataFrame(void)
 	/*
 	 * Set Source Address.
 	 */
-    PHY_PibGet(macShortAddress, (uint8_t *)&pib_value);
+    pibStatus = PHY_PibGet(macShortAddress, (uint8_t *)&pib_value);
 	if ((BROADCAST == pib_value.pib_value_16bit) ||
 			(MAC_NO_SHORT_ADDR_VALUE == pib_value.pib_value_16bit)
 			) {
 		/* Use long address as source address. */
 		framePtr -= 8;
-		frameLen += 6;
-        PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
+		frameLen += 6U;
+        pibStatus = PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
         convert_64_bit_to_byte_array(pib_value.pib_value_64bit, framePtr);
 		fcf |= FCF_SET_SOURCE_ADDR_MODE(FCF_LONG_ADDR);
 	} else {
 		/* Use short address as source address. */
 		framePtr -= 2;
-        PHY_PibGet(macShortAddress, (uint8_t *)&pib_value);
+        pibStatus = PHY_PibGet(macShortAddress, (uint8_t *)&pib_value);
         convert_16_bit_to_byte_array(pib_value.pib_value_16bit, framePtr);
 		fcf |= FCF_SET_SOURCE_ADDR_MODE(FCF_SHORT_ADDR);
 	}
 
 	/* Shall the Intra-PAN bit set? */
-    PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+    pibStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_value);
 	if (pib_value.pib_value_16bit == macParseData.srcPanid) {
 		/*
 		 * Both PAN-Ids are identical.
@@ -425,7 +428,7 @@ static buffer_t *buildNullDataFrame(void)
 	} else {
 		/* Set Source PAN-Id. */
 		framePtr -= 2;
-		frameLen += 2;
+		frameLen += 2U;
         convert_16_bit_to_byte_array(pib_value.pib_value_16bit, framePtr);
 	}
 
@@ -435,7 +438,7 @@ static buffer_t *buildNullDataFrame(void)
 	/* Destination address is set from source address of received frame. */
 	if (useLongAddrDest) {
 		framePtr -= 8;
-		frameLen += 6;
+		frameLen += 6U;
 		convert_64_bit_to_byte_array(
 				macParseData.srcAddr.longAddress,
 				framePtr);
@@ -470,6 +473,7 @@ static buffer_t *buildNullDataFrame(void)
 	/* Finished building of frame. */
 	transmitFrame->mpdu = framePtr;
 
+    (void)pibStatus;
 	return bufPtr;
 } /* buildNullDataFrame() */
 
@@ -489,7 +493,7 @@ void MAC_ProcessDataRequest(buffer_t *msg)
 	buffer_t *bufPtrNextData;
 	search_t findBuf;
 	MAC_FrameInfo_t *transmitFrame;
-	MAC_Retval_t talTxStatus;
+	PHY_Retval_t phyTxStatus;
 
 	/* Free the buffer of the received frame. */
 	bmm_buffer_free(msg);
@@ -548,7 +552,7 @@ void MAC_ProcessDataRequest(buffer_t *msg)
 		return;
 	} else {
 		/* Indirect data found and to be sent. */
-		transmitFrame = (MAC_FrameInfo_t *)BMM_BUFFER_POINTER(
+		transmitFrame = (MAC_FrameInfo_t *)MAC_BUFFER_POINTER(
 				bufPtrNextData);
 
 		/*
@@ -610,12 +614,13 @@ void MAC_ProcessDataRequest(buffer_t *msg)
 		}
 
 #ifdef MAC_SECURITY_ZIP
-		if (transmitFrame->mpdu[1] & FCF_SECURITY_ENABLED) {
-			MCPS_DataReq_t pmdr;
+		if (((transmitFrame->mpdu[1] & FCF_SECURITY_ENABLED)) == FCF_SECURITY_ENABLED) {
+			MCPS_DataReq_t pmdr = {0};
+            bool retVal;
 
-			BuildSecMcpsDataFrame(&pmdr, transmitFrame);
+			retVal = BuildSecMcpsDataFrame(&pmdr, transmitFrame);
 
-			if (pmdr.SecurityLevel > 0) {
+			if (pmdr.SecurityLevel > 0U) {
 				/* Secure the Frame */
 				MAC_Retval_t buildSec = MAC_Secure(transmitFrame,	\
 						transmitFrame->macPayload,
@@ -629,6 +634,7 @@ void MAC_ProcessDataRequest(buffer_t *msg)
 					return;
 				}
 			}
+            (void)retVal;
 		}
 #endif
 
@@ -637,10 +643,10 @@ void MAC_ProcessDataRequest(buffer_t *msg)
 		 * quickly after the ACK of the data request command.
 		 * Here it's done quickly after the ACK w/o CSMA.
 		 */
-		talTxStatus = sendFrame(transmitFrame, CSMA_UNSLOTTED,
+		phyTxStatus = sendFrame(transmitFrame, CSMA_UNSLOTTED,
 				false);
 
-		if (MAC_SUCCESS == talTxStatus) {
+		if (PHY_SUCCESS == phyTxStatus) {
 			MAKE_MAC_BUSY();
 		} else {
 			/*
@@ -663,7 +669,7 @@ void MAC_ProcessDataRequest(buffer_t *msg)
 void MAC_HandleTxNullDataFrame(void)
 {
 	MAC_FrameInfo_t *tx_frame;
-	MAC_Retval_t talTxStatus;
+	PHY_Retval_t phyTxStatus;
 	buffer_t *bufPtr;
 
 	/*
@@ -673,16 +679,16 @@ void MAC_HandleTxNullDataFrame(void)
 	bufPtr = buildNullDataFrame();
 
 	if (NULL != bufPtr) {
-		tx_frame = (MAC_FrameInfo_t *)BMM_BUFFER_POINTER(bufPtr);
+		tx_frame = (MAC_FrameInfo_t *)MAC_BUFFER_POINTER(bufPtr);
 
 		/*
 		 * Transmission should be done with CSMA-CA or
 		 * quickly after the ACK of the data request command.
 		 * Here it's done quickly after the ACK w/o CSMA.
 		 */
-		talTxStatus = sendFrame(tx_frame, CSMA_UNSLOTTED, false);
+		phyTxStatus = sendFrame(tx_frame, CSMA_UNSLOTTED, false);
 
-		if (MAC_SUCCESS == talTxStatus) {
+		if (PHY_SUCCESS == phyTxStatus) {
 			MAKE_MAC_BUSY();
 		} else {
 			/*
@@ -711,7 +717,7 @@ static uint8_t findShortBuffer(void *buf, void *shortAddr)
 {
 	MAC_FrameInfo_t *data = (MAC_FrameInfo_t *)buf;
 	uint16_t shortAddrTemp = 0;
-	memcpy((uint8_t *)&shortAddrTemp, (uint8_t *)shortAddr, \
+	(void)memcpy((uint8_t *)&shortAddrTemp, (uint8_t *)shortAddr, \
 			sizeof(shortAddrTemp));
 
 	if (!data->indirectInTransit) {
@@ -755,7 +761,7 @@ static uint8_t findLongBuffer(void *buf, void *long_addr)
 {
 	MAC_FrameInfo_t *data = (MAC_FrameInfo_t *)buf;
 	uint64_t longAddrTemp = 0;
-	memcpy((uint8_t *)&longAddrTemp, (uint8_t *)long_addr, \
+	(void)memcpy((uint8_t *)&longAddrTemp, (uint8_t *)long_addr, \
 			sizeof(longAddrTemp));
 
 	if (!data->indirectInTransit) {

@@ -57,27 +57,18 @@
 /* === Macros =============================================================== */
 
 /*
- * Time in (advance) symbols before beacon interval when beacon is prepared
- */
-#define ADVNC_BCN_PREP_TIME                 (50)
-
-/* Minimum Wakeup time for beacon synchronization when handling Wakeup from
- * application sleep*/
-#define MAC_MIN_WAKEUP_US                   (200)
-
-/*
  * (Minimal) Beacon payload length
  * 2 octets Superframe Spec
  * At least 1 octet GTS fields
  * At least 1 octet Pending Address fields
  */
-#define BEACON_PAYLOAD_LEN                  (4)
+#define BEACON_PAYLOAD_LEN                  (4U)
 
 /*
  * Maximum number of pending extended and/short addresses to be added to
  * Beacon frame indicating pending data.
  */
-#define BEACON_MAX_PEND_ADDR_CNT            (7)
+#define BEACON_MAX_PEND_ADDR_CNT            (7U)
 
 /* === Globals ============================================================== */
 
@@ -124,6 +115,7 @@ static uint8_t MAC_BufferAddPending(uint8_t *bufPtr);
 static uint8_t MAC_BufferAddPending(uint8_t *bufPtr)
 {
 	search_t findBuf;
+    buffer_t *buf;
 	uint8_t numberOfExtAddress = 0;
 
 	/*
@@ -148,13 +140,14 @@ static uint8_t MAC_BufferAddPending(uint8_t *bufPtr)
 	 * updates the beacon buffer with the pending extended addresses.
 	 */
 	findBuf.criteria_func = AddPendingExtendedAddressCb;
+    findBuf.handle = NULL;
 
 	/*
 	 * At the end of this function call (qmm_queue_read), the beacon buffer
 	 * will be updated with the short address (if any) of the indirect
 	 * data (if any) present in the indirect queue.
 	 */
-	qmm_queue_read(&indirectDataQueue, &findBuf);
+    buf = qmm_queue_read(&indirectDataQueue, &findBuf);
 
 	/*
 	 * The count of extended addresses added in the beacon frame is backed
@@ -178,7 +171,7 @@ static uint8_t MAC_BufferAddPending(uint8_t *bufPtr)
 	 * will be updated with the extended address (if any) of the indirect
 	 * data (if any) present in the indirect queue.
 	 */
-	qmm_queue_read(&indirectDataQueue, &findBuf);
+	buf = qmm_queue_read(&indirectDataQueue, &findBuf);
 
 	/*
 	 * Update buf_ptr to current position of beginning of
@@ -197,8 +190,9 @@ static uint8_t MAC_BufferAddPending(uint8_t *bufPtr)
 	 * is already included in the default beacon frame length
 	 * (see BEACON_PAYLOAD_LEN).
 	 */
-	pendingAddressCount = (pendingAddressCount * sizeof(uint16_t)) +
-			(numberOfExtAddress * sizeof(uint64_t));
+	pendingAddressCount = (uint8_t)((pendingAddressCount * sizeof(uint16_t)) +
+			(numberOfExtAddress * sizeof(uint64_t)));
+    (void)buf;
 
 	return pendingAddressCount;
 } /* mac_buffer_add_pending() */
@@ -224,15 +218,19 @@ void MAC_BuildAndTxBeacon(bool beaconEnabled,
 	uint16_t fcf;
 	uint8_t frameLen;
 	uint8_t *framePtr;
+    PHY_Retval_t phyStatus = PHY_FAILURE;
+    PibValue_t pib_shortaddr;
+    PibValue_t pib_ieeeaddr;
+    PibValue_t pib_panid;
     
-	uint8_t *beaconBuffer = (uint8_t *)BMM_BUFFER_POINTER(
+	uint8_t *beaconBuffer = (uint8_t *)MAC_BUFFER_POINTER(
 			beaconBufferHeader);
 
 	/*
 	 * The frame is given to the TAL in the 'MAC_FrameInfo_t' format,
 	 * hence an instance of the MAC_FrameInfo_t is created.
 	 */
-	transmitFrame = (MAC_FrameInfo_t *)beaconBuffer;
+	transmitFrame = (MAC_FrameInfo_t *)(void *)beaconBuffer;
 
 	/* Store buffer header to be able to release it later properly. */
 	transmitFrame->buffer_header = beaconBufferHeader;
@@ -242,21 +240,21 @@ void MAC_BuildAndTxBeacon(bool beaconEnabled,
 
 	/* Update the payload length. */
 	frameLen = BEACON_PAYLOAD_LEN +
-			2 + /* Add 2 octets for FCS */
-			2 + /* 2 octets for short Source Address */
-			2 + /* 2 octets for short Source PAN-Id */
-			3; /* 3 octets DSN and FCF */
+			2U + /* Add 2 octets for FCS */
+			2U + /* 2 octets for short Source Address */
+			2U + /* 2 octets for short Source PAN-Id */
+			3U; /* 3 octets DSN and FCF */
 
 	/* Get the payload pointer. */
 	framePtr = (uint8_t *)transmitFrame +
 			LARGE_BUFFER_SIZE - 2; /* Add 2 octets for FCS. */
 
 	/* Build the beacon payload if it exists. */
-	if (macPib.mac_BeaconPayloadLength > 0) {
+	if (macPib.mac_BeaconPayloadLength > 0U) {
 		framePtr -= macPib.mac_BeaconPayloadLength;
 		frameLen += macPib.mac_BeaconPayloadLength;
 
-		memcpy(framePtr, macBeacon_Payload,
+		(void *)memcpy(framePtr, macBeacon_Payload,
 				macPib.mac_BeaconPayloadLength);
 	}
 
@@ -268,11 +266,11 @@ void MAC_BuildAndTxBeacon(bool beaconEnabled,
 		 * nothing
 		 * to add as far as pending addresses is concerned.
 		 */
-		if (indirectDataQueue.size > 0) {
+		if (indirectDataQueue.size > 0U) {
 			uint8_t pending_addr_octets = MAC_BufferAddPending(
 					framePtr);
 			frameLen += pending_addr_octets;
-			framePtr -= pending_addr_octets + 1;
+			framePtr -= pending_addr_octets + 1U;
 		} else {
 			/* No pending data available. */
 			framePtr--;
@@ -294,16 +292,16 @@ void MAC_BuildAndTxBeacon(bool beaconEnabled,
 	/* The superframe specification field is updated. */
 
 	superframeSpec = NON_BEACON_NWK;
-	superframeSpec |= (NON_BEACON_NWK << 4);
-	superframeSpec |= (FINAL_CAP_SLOT_DEFAULT << 8);
+	superframeSpec |= (NON_BEACON_NWK << 4U);
+	superframeSpec |= (uint16_t)FINAL_CAP_SLOT_DEFAULT << 8U;
 
 	if (MAC_PAN_COORD_STARTED == macState) {
-		superframeSpec |= (1U << PAN_COORD_BIT_POS);
+		superframeSpec |= ((uint16_t)1 << PAN_COORD_BIT_POS);
 	}
 
 #if (MAC_ASSOCIATION_INDICATION_RESPONSE == 1)
-	if (macPib.mac_AssociationPermit) {
-		superframeSpec |= (1U << ASSOC_PERMIT_BIT_POS);
+	if ((macPib.mac_AssociationPermit) == 1U) {
+		superframeSpec |= ((uint16_t)1 << ASSOC_PERMIT_BIT_POS);
 	}
 #endif
 
@@ -313,16 +311,14 @@ void MAC_BuildAndTxBeacon(bool beaconEnabled,
 	/*
 	 * Source address.
 	 */
-    PibValue_t pib_shortaddr;
-    PibValue_t pib_ieeeaddr;
-    PibValue_t pib_panid;
-    PHY_PibGet(macShortAddress, (uint8_t *)&pib_shortaddr);
+    
+    phyStatus = PHY_PibGet(macShortAddress, (uint8_t *)&pib_shortaddr);
 	if (MAC_NO_SHORT_ADDR_VALUE ==
 			pib_shortaddr.pib_value_16bit) {
 		framePtr -= 8;
-		frameLen += 6; /* Add further 6 octets for long Source Address
+		frameLen += 6U; /* Add further 6 octets for long Source Address
 		                **/
-        PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_ieeeaddr);
+        phyStatus = PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_ieeeaddr);
         convert_64_bit_to_byte_array(pib_ieeeaddr.pib_value_64bit, framePtr);
 
 		fcf = FCF_SET_SOURCE_ADDR_MODE((uint16_t)FCF_LONG_ADDR);
@@ -334,7 +330,7 @@ void MAC_BuildAndTxBeacon(bool beaconEnabled,
 
 	/* Source PAN-Id */
 	framePtr -= 2;
-    PHY_PibGet(macPANId, (uint8_t *)&pib_panid);
+    phyStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_panid);
     convert_16_bit_to_byte_array(pib_panid.pib_value_16bit, framePtr);
 
 #ifdef TEST_HARNESS
@@ -373,11 +369,12 @@ void MAC_BuildAndTxBeacon(bool beaconEnabled,
 	 * In a beaconless network the beacon is transmitted with
 	 * unslotted CSMA-CA.
 	 */
-	sendFrame(transmitFrame, CSMA_UNSLOTTED, false);
+	phyStatus = sendFrame(transmitFrame, CSMA_UNSLOTTED, false);
 
 	MAKE_MAC_BUSY();
 
 	beaconEnabled = beaconEnabled; /* Keep compiler happy. */
+    (void)phyStatus;
 } /* MAC_BuildAndTxBeacon() */
 
 #if (MAC_INDIRECT_DATA_BASIC == 1)
@@ -411,7 +408,7 @@ static uint8_t AddPendingShortAddressCb(void *bufPtr, void *handle)
 				((frame->mpdu[PL_POS_FCF_2] >>
 				FCF_2_DEST_ADDR_OFFSET) & FCF_ADDR_MASK)) {
 			beaconPtr -= sizeof(uint16_t);
-			memcpy(beaconPtr, &frame->mpdu[PL_POS_DST_ADDR_START],
+			(void *)memcpy(beaconPtr, &frame->mpdu[PL_POS_DST_ADDR_START],
 					sizeof(uint16_t));
 			pendingAddressCount++;
 		}
@@ -455,7 +452,7 @@ static uint8_t AddPendingExtendedAddressCb(void *bufPtr, void *handle)
 				((frame->mpdu[PL_POS_FCF_2] >>
 				FCF_2_DEST_ADDR_OFFSET) & FCF_ADDR_MASK)) {
 			beaconPtr -= sizeof(uint64_t);
-			memcpy(beaconPtr, &frame->mpdu[PL_POS_DST_ADDR_START],
+			(void *)memcpy(beaconPtr, &frame->mpdu[PL_POS_DST_ADDR_START],
 					sizeof(uint64_t));
 			pendingAddressCount++;
 		}
@@ -478,9 +475,9 @@ static uint8_t AddPendingExtendedAddressCb(void *bufPtr, void *handle)
  *
  * @param msg Pointer to the buffer in which the beaocn request was received
  */
-void MAC_ProcessBeaconRequest(buffer_t *msg)
+void MAC_ProcessBeaconRequest(buffer_t *bufPtr)
 {
-	MAC_BuildAndTxBeacon(false, (buffer_t *)msg);
+	MAC_BuildAndTxBeacon(false, (buffer_t *)bufPtr);
 }
 
 #endif /* MAC_START_REQUEST_CONFIRM */

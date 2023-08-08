@@ -49,76 +49,76 @@
 /* === Macros =============================================================== */
 
 /* Security Control Field: Security Level mask */
-#define SEC_CTRL_SEC_LVL_MASK           (0x07)
+#define SEC_CTRL_SEC_LVL_MASK           (0x07U)
 
 /* Security Control Field: Key Identifier mask */
-#define SEC_CTRL_KEY_ID_MASK            (0x03)
+#define SEC_CTRL_KEY_ID_MASK            (0x03U)
 
 /* Security Control Field: Key Identifier Field position */
-#define SEC_CTRL_KEY_ID_FIELD_POS       (3)
+#define SEC_CTRL_KEY_ID_FIELD_POS       (3U)
 
 /* Security Control : Security Enabled Mask */
-#define SEC_CTRL_SEC_EN_MASK            (0x08)
+#define SEC_CTRL_SEC_EN_MASK            (0x08U)
 
 /* Frame Control Field: Frame Type Identifier mask */
-#define FCF_FRAME_TYPE_MASK             (0x03)
+#define FCF_FRAME_TYPE_MASK             (0x03U)
 
 /* Frame Counter MAX Value used to identify the
  * frame counter overflow
  */
-#define FRAME_COUNTER_MAX_VAL           (0xFFFFFFFF)
+#define FRAME_COUNTER_MAX_VAL           (0xFFFFFFFFU)
 
 /* Security Control Filed : Length */
-#define SEC_CTRL_FLD_LEN                (0x01)
+#define SEC_CTRL_FLD_LEN                (0x01U)
 
 /* Frame Counter Size or length */
-#define FRAME_COUNTER_LEN               (0x04)
+#define FRAME_COUNTER_LEN               (0x04U)
 
 /* IEEE Address Len */
-#define IEEE_ADDR_LEN                   (0x08)
+#define IEEE_ADDR_LEN                   (0x08U)
 
 /* CRC Calculation Output Length */
-#define CRC_LEN                         (0x02)
+#define CRC_LEN                         (0x02U)
 
 /* GTS Super Frame specification Length */
-#define SUPER_FRAME_SPEC_LEN                    (0x02)
+#define SUPER_FRAME_SPEC_LEN                    (0x02U)
 
 /* GTS Frame Address Specification Length */
-#define GTS_ADDR_SPEC_LEN                               (0x01)
+#define GTS_ADDR_SPEC_LEN                               (0x01U)
 
 /* Indirect Data Pending Address Specification Length */
-#define PENDING_ADDR_SPEC_LEN                   (0x01)
+#define PENDING_ADDR_SPEC_LEN                   (0x01U)
 
 /* key id mode and key identifier macros */
-#define KEY_ID_MODE_0                   (0x00)
-#define KEY_ID_MODE_1                   (0x01)
-#define KEY_ID_MODE_2                   (0x02)
-#define KEY_ID_MODE_3                   (0x03)
-#define KEY_SRC_LEN_4                   (0x04)
-#define KEY_SRC_LEN_8                   (0x08)
-#define KEY_ID_LEN_MODE_1               (0x01)
-#define KEY_ID_LEN_MODE_2               (0x05)
-#define KEY_ID_LEN_MODE_3               (0x09)
+#define KEY_ID_MODE_0                   (0x00U)
+#define KEY_ID_MODE_1                   (0x01U)
+#define KEY_ID_MODE_2                   (0x02U)
+#define KEY_ID_MODE_3                   (0x03U)
+#define KEY_SRC_LEN_4                   (0x04U)
+#define KEY_SRC_LEN_8                   (0x08U)
+#define KEY_ID_LEN_MODE_1               (0x01U)
+#define KEY_ID_LEN_MODE_2               (0x05U)
+#define KEY_ID_LEN_MODE_3               (0x09U)
 
 /* MAC Security : Look Up Data Size and macros */
-#define FIVE_OCTET_LOOK_UP              (0x00)
-#define NINE_OCTET_LOOK_UP              (0x01)
+#define FIVE_OCTET_LOOK_UP              (0x00U)
+#define NINE_OCTET_LOOK_UP              (0x01U)
 
 /* 16-bit Short Address Maximum usage Value */
-#define SHORT_ADDR_MAX                  (0xFFFD)
+#define SHORT_ADDR_MAX                  (0xFFFDU)
 
 /* 16-bit Short Address minimum Value */
-#define SHORT_ADDR_MIN                  (0x0000)
-#define NO_SHORT_ADDR                   (0xFFFE)
+#define SHORT_ADDR_MIN                  (0x0000U)
+#define NO_SHORT_ADDR                   (0xFFFEU)
 
-#define LOOK_UP_SIZE_4                    (0x04)
-#define LOOK_UP_SIZE_8                    (0x08)
+#define LOOK_UP_SIZE_4                    (0x04U)
+#define LOOK_UP_SIZE_8                    (0x08U)
 
-#define LOOK_UP_SIZE_5                    (0x05)
-#define LOOK_UP_SIZE_9                    (0x09)
+#define LOOK_UP_SIZE_5                    (0x05U)
+#define LOOK_UP_SIZE_9                    (0x09U)
 
 /* FCF Position in the MAC Header */
-#define FCF_POS                          (0x01)
+#define FCF_POS                          (0x01U)
 
 /* === Globals ============================================================= */
 
@@ -128,7 +128,7 @@ static uint8_t GetMicLength(uint8_t securityLevel);
 
 static inline uint8_t SecAdditionalLen(MCPS_DataReq_t *pmdr);
 
-static inline MAC_Retval_t ParseAuxSecHeader(Parse_t *macParseData,
+static inline MAC_Retval_t ParseAuxSecHeader(Parse_t *macParseDataInstance,
 		uint8_t *macPayload);
 
 static inline MAC_Retval_t UnsecureFrame(Parse_t *macParseDataBuf,
@@ -139,7 +139,7 @@ static inline MAC_Retval_t UnsecureFrame(Parse_t *macParseDataBuf,
 static inline MAC_Retval_t OutgoingKeyRetrieval(MCPS_DataReq_t *pmdr,
 		MAC_KeyTable_t **keyDesc);
 
-static inline MAC_Retval_t IncomingSecMaterialRetrieval(Parse_t *macParseData,
+static inline MAC_Retval_t IncomingSecMaterialRetrieval(Parse_t *macParseDataBuf,
 		MAC_KeyTable_t **keyDesc,
 		MAC_DeviceDesc_t **deviceDesc,
 		MAC_KeyDeviceDesc_t **keyDeviceDesc);
@@ -223,6 +223,7 @@ uint8_t GetKeyIdFieldLen(uint8_t keyIdMode)
 		break;
 
 	default:
+        lenField = 0;
 		break;
 	}
 
@@ -260,6 +261,7 @@ static uint8_t GetMicLength(uint8_t securityLevel)
 		break;
 
 	default:
+        micLen = 0;
 		break;
 	}
 
@@ -291,12 +293,12 @@ static void CreateNonce(uint8_t *ieeeAddr, uint8_t *frameCnt,
 	uint8_t *noncePtr = &nonce[1];
 
 	ptr = ieeeAddr;
-	ptr += IEEE_ADDR_LEN - 1;
+	ptr += IEEE_ADDR_LEN - 1U;
 	for (uint8_t i = 0; i < IEEE_ADDR_LEN; i++) {
 		*noncePtr++ = *ptr--;
 	}
 	ptr = frameCnt;
-	ptr += FRAME_COUNTER_LEN - 1;
+	ptr += FRAME_COUNTER_LEN - 1U;
 	for (uint8_t i = 0; i < FRAME_COUNTER_LEN; i++) {
 		*noncePtr++ = *ptr--;
 	}
@@ -339,7 +341,7 @@ MAC_Retval_t MAC_BuildAuxSecHeader(uint8_t **framePtr, MCPS_DataReq_t *pmdr,
 	if (macSecPib.FrameCounter == FRAME_COUNTER_MAX_VAL) {
 		return MAC_COUNTER_ERROR;
 	} else {
-		memcpy(secMsduPtr, &macSecPib.FrameCounter,
+		(void)memcpy(secMsduPtr, ((uint8_t *)(&macSecPib.FrameCounter)),
 				FRAME_COUNTER_LEN);
 		secMsduPtr += FRAME_COUNTER_LEN;
 	}
@@ -351,14 +353,18 @@ MAC_Retval_t MAC_BuildAuxSecHeader(uint8_t **framePtr, MCPS_DataReq_t *pmdr,
 	if (pmdr->KeyIdMode == KEY_ID_MODE_1) {
 		*secMsduPtr = pmdr->KeyIndex;
 	} else if (pmdr->KeyIdMode == KEY_ID_MODE_2) {
-		memcpy(secMsduPtr, pmdr->KeySource, KEY_SRC_LEN_4);
+		(void)memcpy(secMsduPtr, pmdr->KeySource, KEY_SRC_LEN_4);
 		secMsduPtr += KEY_SRC_LEN_4;
 		*secMsduPtr = pmdr->KeyIndex;
 	} else if (pmdr->KeyIdMode == KEY_ID_MODE_3) {
-		memcpy(secMsduPtr, pmdr->KeySource, KEY_SRC_LEN_8);
+		(void)memcpy(secMsduPtr, pmdr->KeySource, KEY_SRC_LEN_8);
 		secMsduPtr += KEY_SRC_LEN_8;
 		*secMsduPtr = pmdr->KeyIndex;
 	}
+    else
+    {
+        // do nothing
+    }
 
 	return MAC_SUCCESS;
 }
@@ -447,6 +453,7 @@ uint8_t msduLength = 4;
 MAC_Retval_t MAC_Secure(MAC_FrameInfo_t *frame, uint8_t *macPayloadPtr,
 		MCPS_DataReq_t *pmdr)
 {
+    MAC_Retval_t retStatus = MAC_SUCCESS;
 	/* Test Vector for testing the security module */
 #ifdef MAC_SECURITY_TEST_VECTOR
 	{
@@ -469,21 +476,23 @@ MAC_Retval_t MAC_Secure(MAC_FrameInfo_t *frame, uint8_t *macPayloadPtr,
 
 	uint8_t *key;
 	MAC_KeyTable_t *keyDesc;
+    PHY_Retval_t pibStatus = PHY_FAILURE;
     PibValue_t pib_value;
-	bool securityEnabled = frame->mpdu[FCF_POS] & SEC_CTRL_SEC_EN_MASK;
+    STB_Ccm_t stbCcmStatus = STB_CCM_FAILURE;
+	bool securityEnabled = (bool)(frame->mpdu[FCF_POS] & SEC_CTRL_SEC_EN_MASK);
 	/* 7.5.8.2.1 (a) */
 	if (securityEnabled == false) {
 		pmdr->SecurityLevel = 0;
 	}
 
 	/* 7.5.8.2.1 (b) */
-	if (securityEnabled == true && pmdr->SecurityLevel == 0) {
+	if (securityEnabled == true && pmdr->SecurityLevel == 0U) {
 		return MAC_UNSUPPORTED_SECURITY;
 	}
 
 	/* 7.5.8.2.1 (c) */
 	if ((macPib.mac_SecurityEnabled == false) &&
-			(pmdr->SecurityLevel != 0)) {
+			(pmdr->SecurityLevel != 0U)) {
 		return MAC_UNSUPPORTED_SECURITY;
 	}
 
@@ -501,12 +510,13 @@ MAC_Retval_t MAC_Secure(MAC_FrameInfo_t *frame, uint8_t *macPayloadPtr,
 	/* Encrypt payload data */
 	uint8_t nonce[AES_BLOCKSIZE] = {0};
 	uint8_t encData[aMaxPHYPacketSize - FCS_LEN + AES_BLOCKSIZE];
-    PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
+    pibStatus = PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
 	/* Extra AES Bloc size at end required for MIC generation. */
 	CreateNonce((uint8_t *)&pib_value.pib_value_64bit,
 			(uint8_t *)&macSecPib.FrameCounter,
 			pmdr->SecurityLevel,
 			nonce);
+    (void)pibStatus;
 
 	/*
 	 * Create string a
@@ -514,20 +524,20 @@ MAC_Retval_t MAC_Secure(MAC_FrameInfo_t *frame, uint8_t *macPayloadPtr,
 	 * = FCF (2) | SeqNo (1) | AddrFields
 	 */
 	uint8_t hdrLen = macPayloadPtr - &frame->mpdu[1] - m;
-	memcpy(encData, &frame->mpdu[FCF_POS], hdrLen);
+	(void)memcpy(encData, &frame->mpdu[FCF_POS], hdrLen);
 
 	switch (frame->mpdu[FCF_POS] & FCF_FRAME_TYPE_MASK) { /* FCF */
 	case FCF_FRAMETYPE_BEACON:                  /* (0x00) */
 	{
 		/* Append payload (string m) */
-		memcpy(&encData[hdrLen], macPayloadPtr, pmdr->msduLength);
+		(void)memcpy(&encData[hdrLen], macPayloadPtr, pmdr->msduLength);
 		{
 			uint8_t *currentKey;
 
 			/* Shall the real key be used or rather a test key? */
 			currentKey = key;
 
-			STB_CcmSecure(encData,         /* plain text header
+			stbCcmStatus = STB_CcmSecure(encData,         /* plain text header
 				                          * (string a)
 				                          * and payload
 				                          * concatenated */
@@ -543,27 +553,28 @@ MAC_Retval_t MAC_Secure(MAC_FrameInfo_t *frame, uint8_t *macPayloadPtr,
 					pmdr->SecurityLevel,         /* security
 				                                      * level
 				                                      **/
-					AES_DIR_ENCRYPT);
+					AES_DIR_ENCRYPT);    
 		}
 		macSecPib.FrameCounter++;
 
 		/* Replace original payload by secured payload */
-		memcpy(macPayloadPtr - m, &encData[hdrLen],
-				pmdr->msduLength + m);
+		(void)memcpy(macPayloadPtr - m, &encData[hdrLen],
+				(uint8_t)(pmdr->msduLength + m));
+        (void)stbCcmStatus;
 	}
 	break;
 
 	case FCF_FRAMETYPE_DATA:                  /* (0x01) */
 	{
 		/* Append payload (string m) */
-		memcpy(&encData[hdrLen], macPayloadPtr, pmdr->msduLength);
+		(void)memcpy(&encData[hdrLen], macPayloadPtr,(uint8_t)(pmdr->msduLength));
 		{
 			uint8_t *currentKey;
 
 			/* Shall the real key be used or rather a test key? */
 			currentKey = key;
 
-			STB_CcmSecure(encData,         /* plaintext header
+			stbCcmStatus = STB_CcmSecure(encData,         /* plaintext header
 				                          * (string a)
 				                          * and payload
 				                          * concatenated */
@@ -585,15 +596,19 @@ MAC_Retval_t MAC_Secure(MAC_FrameInfo_t *frame, uint8_t *macPayloadPtr,
 		macSecPib.FrameCounter++;
 
 		/* Replace original payload by secured payload */
-		memcpy(macPayloadPtr - m, &encData[hdrLen],
-				pmdr->msduLength + m);
+		(void)memcpy(macPayloadPtr - m, &encData[hdrLen],
+				(uint8_t)(pmdr->msduLength + m));
+        (void)stbCcmStatus;
 	}
 	break;
 
 	default:
-		return MAC_UNSUPPORTED_SECURITY;
+    {
+		retStatus = MAC_UNSUPPORTED_SECURITY;
+        break;
+    }
 	}
-	return MAC_SUCCESS;
+	return retStatus;
 }
 
 /** @brief This function retrieves the  key descriptor for the outgoing
@@ -610,9 +625,10 @@ MAC_Retval_t MAC_Secure(MAC_FrameInfo_t *frame, uint8_t *macPayloadPtr,
 static inline MAC_Retval_t OutgoingKeyRetrieval(MCPS_DataReq_t *pmdr,
 		MAC_KeyTable_t **keyDesc)
 {
-	uint8_t keyLookupDataSize;
+	uint8_t keyLookupDataSize = 0;
 	uint8_t lookupData[9] = {0};
-	MAC_KeyTable_t *currKeyDesc;
+	MAC_KeyTable_t *currKeyDesc = {NULL};
+    MAC_Retval_t retStatus = MAC_SUCCESS;
 	if (pmdr->KeyIdMode == KEY_ID_MODE_0) { /* implicit key identification
 		                                **/
 		switch (pmdr->DstAddrMode) {
@@ -620,13 +636,14 @@ static inline MAC_Retval_t OutgoingKeyRetrieval(MCPS_DataReq_t *pmdr,
 			/* 2) is not applicable for ZIP */
 #ifndef MAC_SECURITY_ZIP
         PibValue_t pib_value;
+        PHY_Retval_t pibStatus = PHY_FAILURE;
 		/* 7.5.8.2.2 - a.1 & a.2 */
 		case FCF_NO_ADDR:
 			if (macSecPib.PANCoordShortAddress <=
 					SHORT_ADDR_MAX &&
 					macSecPib.PANCoordShortAddress >=
 					SHORT_ADDR_MIN) {
-                PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+                pibStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_value);
 				lookupData[1] = (uint8_t)pib_value.pib_value_16bit;
 				lookupData[0] = (uint8_t)(pib_value.pib_value_16bit >> 8);
 				lookupData[3]
@@ -667,7 +684,7 @@ static inline MAC_Retval_t OutgoingKeyRetrieval(MCPS_DataReq_t *pmdr,
 				                                            **/
 			} else if (macSecPib.PANCoordShortAddress ==
 					NO_SHORT_ADDR) {
-				memcpy(&lookupData[0],
+				(void)memcpy(&lookupData[0],
 						&(macSecPib.
 						PANCoordExtendedAddress),
 						8);
@@ -701,6 +718,7 @@ static inline MAC_Retval_t OutgoingKeyRetrieval(MCPS_DataReq_t *pmdr,
 				                                            * 1
 				                                            **/
 			}
+            (void)pibStatus;
 			break;
 #endif
 		/* 7.5.8.2.2 -  a.3 */
@@ -724,7 +742,7 @@ static inline MAC_Retval_t OutgoingKeyRetrieval(MCPS_DataReq_t *pmdr,
 
 		case FCF_LONG_ADDR:
 			/* lookup_data: 8-octet dest addr right-concatenated */
-			memcpy(&lookupData[0], &pmdr->DstAddr, 8);
+			(void)memcpy(&lookupData[0], ((uint8_t *)(&pmdr->DstAddr)), 8);
 			lookupData[8] = 0x00; /* single octet 0x00 */
 			keyLookupDataSize = NINE_OCTET_LOOK_UP; /* key lookup
 			                                            * size = 9
@@ -736,8 +754,8 @@ static inline MAC_Retval_t OutgoingKeyRetrieval(MCPS_DataReq_t *pmdr,
 			break;
 
 		default:
-			return MAC_UNSUPPORTED_SECURITY; /* applies for ZIP only
-			                                 **/
+			retStatus = MAC_UNSUPPORTED_SECURITY; /* applies for ZIP only**/
+			break;                                 
 		}
 	} else if (pmdr->KeyIdMode == KEY_ID_MODE_1) { /* explicit key
 		                                        * identification */
@@ -804,7 +822,7 @@ static inline MAC_Retval_t OutgoingKeyRetrieval(MCPS_DataReq_t *pmdr,
 		return status;
 	}
 
-	return MAC_SUCCESS;
+	return retStatus;
 }
 
 /* --- Incoming Security --------------------------------------------------- */
@@ -835,7 +853,7 @@ MAC_Retval_t MAC_Unsecure(Parse_t *macParseDataBuf, uint8_t *mpdu,
 
 	/* 7.5.8.2.3 (d) */
 	if (macPib.mac_SecurityEnabled == false) {
-		if (macParseDataBuf->secCtrl.secLevel == 0) {
+		if (macParseDataBuf->secCtrl.secLevel == 0U) {
 			return MAC_SUCCESS;
 		} else {
 			return MAC_UNSUPPORTED_SECURITY;
@@ -844,7 +862,7 @@ MAC_Retval_t MAC_Unsecure(Parse_t *macParseDataBuf, uint8_t *mpdu,
 
 	/* 7.5.8.2.3 (e) todo implementation of 7.5.8.2.8*/
 	/* 7.5.8.2.3 (f) */
-	if (macParseDataBuf->secCtrl.secLevel == 0) {
+	if (macParseDataBuf->secCtrl.secLevel == 0U) {
 		return MAC_SUCCESS;
 	}
 
@@ -867,39 +885,37 @@ MAC_Retval_t MAC_Unsecure(Parse_t *macParseDataBuf, uint8_t *mpdu,
 static inline MAC_Retval_t ParseAuxSecHeader(Parse_t *macParseDataInstance,
 		uint8_t *macPayload)
 {
-	memcpy(&macParseDataInstance->secCtrl, &macPayload[0],
+	(void)memcpy(((uint8_t *)(&macParseDataInstance->secCtrl)), &macPayload[0],
 			SEC_CTRL_FLD_LEN);
-	memcpy(&macParseDataInstance->frameCnt, &macPayload[1],
+	(void)memcpy(((uint8_t *)(&macParseDataInstance->frameCnt)), &macPayload[1],
 			FRAME_COUNTER_LEN);
 	macParseDataInstance->keyIdLen = GetKeyIdFieldLen(
 			macParseDataInstance->secCtrl.keyIdMode);
 	/* 7.5.8.2.3 (c)*/
-	if (macParseDataInstance->secCtrl.secLevel == 0) {
+	if (macParseDataInstance->secCtrl.secLevel == 0U) {
 		return MAC_UNSUPPORTED_SECURITY;
 	}
 
-	if (macParseDataInstance->secCtrl.keyIdMode != 0) {
+	if (macParseDataInstance->secCtrl.keyIdMode != 0U) {
 		macPayload += 5;
-		if (macParseDataInstance->keyIdLen > 1) {
+		if (macParseDataInstance->keyIdLen > 1U) {
 			/* Key Id Len must not be larger than 1 for ZIP. */
 #ifndef MAC_SECURITY_2006
 			return MAC_UNSUPPORTED_SECURITY;
 
 #else
-			memcpy(macParseDataInstance->keyId, macPayload,
-					macParseDataInstance->keyIdLen -
-					1);
+			(void)memcpy(macParseDataInstance->keyId, macPayload,(uint8_t)(macParseDataInstance->keyIdLen - 1U));
 #endif
 		}
 
-		macPayload += macParseDataInstance->keyIdLen - 1;
+		macPayload += macParseDataInstance->keyIdLen - 1U;
 		macParseDataInstance->keyId[macParseDataInstance->
-		keyIdLen - 1] = *(macPayload);
+		keyIdLen - 1U] = *(macPayload);
 	}
 
 	/* See 802.15.4-2006 section 7.5.8.2.3 b) */
-	if ((macParseDataInstance->fcf & FCF_SECURITY_ENABLED) &&
-			(!(macParseDataInstance->fcf &
+	if (((bool)(macParseDataInstance->fcf & FCF_SECURITY_ENABLED)) &&
+			(!(bool)(macParseDataInstance->fcf &
 			FCF_FRAME_VERSION_2006))
 			) {
 		return MAC_UNSUPPORTED_LEGACY;
@@ -930,6 +946,7 @@ static inline MAC_Retval_t UnsecureFrame(Parse_t *macParseDataBuf,
 	MAC_KeyTable_t *keyDesc;
 	MAC_DeviceDesc_t *deviceDesc;
 	MAC_KeyDeviceDesc_t *keyDeviceDesc;
+    MAC_Retval_t retStatus = MAC_SUCCESS;
 
 	/* Todo 7.5.8.2.3 (e) 7.5.8.2.8 security level checking procedure*/
 	MAC_Retval_t status = IncomingSecMaterialRetrieval(macParseDataBuf,
@@ -1034,6 +1051,7 @@ static inline MAC_Retval_t UnsecureFrame(Parse_t *macParseDataBuf,
 				= encryPayloadLen;
 		} else {
 			return MAC_SECURITY_ERROR;
+            break;
 		}
 	}
 	break;
@@ -1091,21 +1109,21 @@ static inline MAC_Retval_t UnsecureFrame(Parse_t *macParseDataBuf,
 
 		/* Calculate the variable field GTS Field Length */
 		gtsFieldLen
-			= ((mpdu[(mhrLen +
-				SUPER_FRAME_SPEC_LEN)] & 0x07) * 3);
-		if (gtsFieldLen) {
+			= (uint8_t)((mpdu[(mhrLen +
+				SUPER_FRAME_SPEC_LEN)] & 0x07U) * 3U);
+		if ((bool)gtsFieldLen) {
 			/* GTS direction fields are available */
 			gtsFieldLen++;
 		}
 
 		/* Calculate the variable field Pending Address Field Length */
 		pendingAddrLen
-			= ((mpdu[(mhrLen + SUPER_FRAME_SPEC_LEN +
+			= (uint8_t)(((mpdu[(mhrLen + SUPER_FRAME_SPEC_LEN +
 				GTS_ADDR_SPEC_LEN + \
-				gtsFieldLen)] & 0x07) * 2) + \
+				gtsFieldLen)] & 0x07U) * 2U) + \
 				(((mpdu[(mhrLen + SUPER_FRAME_SPEC_LEN +
 				GTS_ADDR_SPEC_LEN + \
-				gtsFieldLen)] & 0x70) >> 4) * 8);
+				gtsFieldLen)] & 0x70U) >> 4U) * 8U));
 
 		/* Total Additional Address Length Field */
 		beaconAddLen += pendingAddrLen + gtsFieldLen;
@@ -1154,20 +1172,21 @@ static inline MAC_Retval_t UnsecureFrame(Parse_t *macParseDataBuf,
 	break;
 
 	default:
-		return MAC_UNSUPPORTED_SECURITY;
+		retStatus = MAC_UNSUPPORTED_SECURITY;
+        break;
 	}
 	/* 7.5.8.2.3 (n) */
 	if ((FCF_FRAMETYPE_DATA == macParseDataBuf->frameType) ||
 			(FCF_FRAMETYPE_BEACON ==
 			macParseDataBuf->frameType)) {
-		deviceDesc->FrameCounter = (macParseDataBuf->frameCnt) + 1;
+		deviceDesc->FrameCounter = (macParseDataBuf->frameCnt) + 1U;
 		/* 7.5.8.2.3 (o) */
 		if (deviceDesc->FrameCounter == FRAME_COUNTER_MAX_VAL) {
 			keyDeviceDesc->BlackListed = true;
 		}
 	}
 
-	return MAC_SUCCESS;
+	return retStatus;
 }
 
 /** @brief Incoming Security material retrieval
@@ -1193,12 +1212,13 @@ static inline MAC_Retval_t IncomingSecMaterialRetrieval(
 	/* @ToDo: Check a holy bunch of other stuff, see 7.5.8.2.3*/
 
 	uint8_t lookupDataSize = 0;
-	uint8_t lookupData[9];
+	uint8_t lookupData[9] = {0};
 	uint8_t deviceLookupDataSize = 0;
 	uint8_t deviceLookupData[8];
 	MAC_KeyTable_t *currKeyDesc;
 	MAC_DeviceDesc_t *currentDeviceDesc;
 	MAC_KeyDeviceDesc_t *currKeyDeviceDesc;
+    MAC_Retval_t retStatus = MAC_SUCCESS;
 	/* 7.5.8.2.3 (a) & (b) */
 	if (macParseDataBuf->secCtrl.keyIdMode == KEY_ID_MODE_0) { /*
 		                                                          *
@@ -1240,7 +1260,7 @@ static inline MAC_Retval_t IncomingSecMaterialRetrieval(
 					                               * 0 */
 			} else if (macSecPib.PANCoordShortAddress ==
 					NO_SHORT_ADDR) {
-				memcpy(&lookupData[0],
+				(void)memcpy(&lookupData[0],
 						&(macSecPib.
 						PANCoordExtendedAddress),
 						8);
@@ -1255,6 +1275,10 @@ static inline MAC_Retval_t IncomingSecMaterialRetrieval(
 					                               * size =
 					                               * 1 */
 			}
+            else
+           {
+              // do nothing  
+           }
 		}
 		break;
 
@@ -1301,8 +1325,8 @@ static inline MAC_Retval_t IncomingSecMaterialRetrieval(
 		case FCF_LONG_ADDR:
 		{
 			/* lookup_data: 8-octet dest addr right-concatenated */
-			memcpy(&lookupData[0],
-					&macParseDataBuf->srcAddr.longAddress,
+			(void)memcpy(&lookupData[0],
+					((uint8_t *)(&macParseDataBuf->srcAddr.longAddress)),
 					8);
 			lookupData[8] = 0x00; /* single octet 0x00 */
 			lookupDataSize = NINE_OCTET_LOOK_UP; /* key lookup
@@ -1314,13 +1338,14 @@ static inline MAC_Retval_t IncomingSecMaterialRetrieval(
 		break;
 
 		default:
-			return MAC_UNSUPPORTED_SECURITY;
+			retStatus = MAC_UNSUPPORTED_SECURITY;
+            break;
 		}
 	} else if (macParseDataBuf->secCtrl.keyIdMode == KEY_ID_MODE_1) {
 		/* lookup_data: 8-octet of macDefaultKeySource
 		 * right-concatenated */
 		/* single octet: Key Index parameter */
-		for (uint8_t i = 0; i < 8; i++) {
+		for (uint8_t i = 0; i < 8U; i++) {
 			lookupData[i] = macSecPib.DefaultKeySource[i];
 		}
 		lookupData[8] = macParseDataBuf->keyId[0];
@@ -1386,11 +1411,15 @@ static inline MAC_Retval_t IncomingSecMaterialRetrieval(
 					>> 8);
 			deviceLookupDataSize = LOOK_UP_SIZE_4;
 		} else if (macSecPib.PANCoordShortAddress == NO_SHORT_ADDR) {
-			memcpy(&deviceLookupData[0],
+			(void)memcpy(&deviceLookupData[0],
 					&(macSecPib.PANCoordExtendedAddress),
 					8);
 			deviceLookupDataSize = LOOK_UP_SIZE_8;
 		}
+        else
+        {
+            // do nothing
+        }
 	}
 	break;
 
@@ -1428,8 +1457,8 @@ static inline MAC_Retval_t IncomingSecMaterialRetrieval(
 
 	case FCF_LONG_ADDR:
 	{
-		memcpy(&deviceLookupData[0],
-				&macParseDataBuf->srcAddr.longAddress,
+		(void)memcpy(&deviceLookupData[0],
+				((uint8_t *)(&macParseDataBuf->srcAddr.longAddress)),
 				LOOK_UP_SIZE_8);
 		deviceLookupDataSize = LOOK_UP_SIZE_8; /* key lookup size = 9
 			                                   * -> key lookup data
@@ -1438,7 +1467,8 @@ static inline MAC_Retval_t IncomingSecMaterialRetrieval(
 	break;
 
 	default:
-		return MAC_UNSUPPORTED_SECURITY;
+		retStatus = MAC_UNSUPPORTED_SECURITY;
+        break;
 	}
 	/* 7.5.8.2.3 (e) */
 	status = BlacklistCheckingProcedure(deviceLookupData,
@@ -1452,7 +1482,7 @@ static inline MAC_Retval_t IncomingSecMaterialRetrieval(
 
 	*deviceDesc = currentDeviceDesc;
 	*keyDeviceDesc = currKeyDeviceDesc;
-	return MAC_SUCCESS;
+	return retStatus;
 }
 
 /** @brief Compare the received key descriptor and available key descriptor from
@@ -1475,6 +1505,7 @@ static MAC_Retval_t KeyDescriptorLookup(uint8_t *lookupData,
 		uint8_t lookupDataSize,
 		MAC_KeyTable_t **keyDesc)
 {
+    MAC_Retval_t retStatus = MAC_SUCCESS;
 	/* Get key from KeyDescriptor as 7.5.8.2.5 */
 	for (uint8_t i = 0; i < macSecPib.KeyTableEntries; i++) {
 		for (uint8_t k
@@ -1485,7 +1516,7 @@ static MAC_Retval_t KeyDescriptorLookup(uint8_t *lookupData,
 			if (macSecPib.KeyTable[i].KeyIdLookupList[k].
 					LookupDataSize == lookupDataSize) {
 				int16_t compare;
-				uint8_t len;
+				uint8_t len = 5U;
 
 				switch (lookupDataSize) {
 				case FIVE_OCTET_LOOK_UP:
@@ -1497,16 +1528,17 @@ static MAC_Retval_t KeyDescriptorLookup(uint8_t *lookupData,
 					break;
 
 				default:
-					return MAC_UNSUPPORTED_SECURITY;
+					retStatus = MAC_UNSUPPORTED_SECURITY;
+                    break;
 				}
-				compare = memcmp(
+				compare = (int16_t)memcmp(
 						macSecPib.KeyTable[i].KeyIdLookupList[
 							k].LookupData,
 						lookupData,
 						len);
 				if (compare == 0x00) {
 					*keyDesc = &(macSecPib.KeyTable[i]);
-					return MAC_SUCCESS;
+					return retStatus;
 				}
 			}
 		}
@@ -1602,21 +1634,25 @@ static MAC_Retval_t DeviceDescriptorLookup(MAC_DeviceDesc_t deviceDesc,
 		                                                            *MSB
 		                                                            **/
 		compare
-			= memcmp(deviceLookupData, lookupData,
+			= (int16_t)memcmp(deviceLookupData, lookupData,
 				LOOK_UP_SIZE_4);
 		if (compare == 0x00) {
 			return MAC_SUCCESS;
 		}
 	} else if (deviceLookupDataSize == LOOK_UP_SIZE_8) {
-		memcpy(&lookupData[0], &deviceDesc.ExtAddress,
+		(void)memcpy(&lookupData[0], ((uint8_t *)(&deviceDesc.ExtAddress)),
 				LOOK_UP_SIZE_8);
 		compare
-			= memcmp(deviceLookupData, lookupData,
+			= (int16_t)memcmp(deviceLookupData, lookupData,
 				LOOK_UP_SIZE_8);
 		if (compare == 0x00) {
 			return MAC_SUCCESS;
 		}
 	}
+    else
+    {
+        // do nothing
+    }
 
 	return FAILURE;
 }
@@ -1644,11 +1680,11 @@ bool BuildSecMcpsDataFrame(MCPS_DataReq_t *mpdr, MAC_FrameInfo_t *mframe)
 
 	mpduPtr += (2 /*FCF*/ + 1 /*Seq.No*/);
 
-	mpdr->SrcAddrMode = (fcf >> FCF_SOURCE_ADDR_OFFSET) & FCF_ADDR_MASK;
-	mpdr->DstAddrMode = (fcf >> FCF_DEST_ADDR_OFFSET) & FCF_ADDR_MASK;
-	intraPan = fcf & FCF_PAN_ID_COMPRESSION;
+	mpdr->SrcAddrMode =(uint8_t)((fcf >> FCF_SOURCE_ADDR_OFFSET) & FCF_ADDR_MASK);
+	mpdr->DstAddrMode = (uint8_t)((fcf >> FCF_DEST_ADDR_OFFSET) & FCF_ADDR_MASK);
+	intraPan = (bool)(fcf & FCF_PAN_ID_COMPRESSION);
 
-	if (mpdr->DstAddrMode != 0) {
+	if (mpdr->DstAddrMode != 0U) {
 		mpdr->DstPANId = convert_byte_array_to_16_bit(
 				mpduPtr);
 		mpduPtr += PAN_ID_LEN;
@@ -1671,9 +1707,13 @@ bool BuildSecMcpsDataFrame(MCPS_DataReq_t *mpdr, MAC_FrameInfo_t *mframe)
 			mpduPtr += EXT_ADDR_LEN;
 			addrFieldLen += EXT_ADDR_LEN;
 		}
+        else
+        {
+            // do nothing
+        }
 	}
 
-	if (mpdr->SrcAddrMode != 0) {
+	if (mpdr->SrcAddrMode != 0U) {
 		if (!intraPan) {
 			/*
 			 * Source PAN ID is present in the frame only if the
@@ -1710,9 +1750,13 @@ bool BuildSecMcpsDataFrame(MCPS_DataReq_t *mpdr, MAC_FrameInfo_t *mframe)
 			mpduPtr += EXT_ADDR_LEN;
 			addrFieldLen += EXT_ADDR_LEN;
 		}
+        else
+        {
+            // do nothing
+        }
 	}
 
-	if (fcf & FCF_SECURITY_ENABLED) {
+	if ((bool)(fcf & FCF_SECURITY_ENABLED)) {
 		uint8_t keyidLen;
 
 		/* Security Fields are available so extract the aux security
@@ -1723,7 +1767,7 @@ bool BuildSecMcpsDataFrame(MCPS_DataReq_t *mpdr, MAC_FrameInfo_t *mframe)
 				SEC_CTRL_KEY_ID_FIELD_POS) &
 				SEC_CTRL_KEY_ID_MASK);
 
-		memcpy(mpduPtr, (uint8_t *)&macSecPib.FrameCounter, \
+		(void)memcpy(mpduPtr, (uint8_t *)&macSecPib.FrameCounter, \
 				FRAME_COUNTER_LEN);
 		mpduPtr += FRAME_COUNTER_LEN;
 
@@ -1756,7 +1800,7 @@ bool BuildSecMcpsDataFrame(MCPS_DataReq_t *mpdr, MAC_FrameInfo_t *mframe)
 			 * Source field and the Key Index field.
 			 */
 			mpdr->KeySource = mpduPtr;
-			mpduPtr += (keyidLen - 1);
+			mpduPtr += (keyidLen - 1U);
 			mpdr->KeyIndex = *mpduPtr++;
 			break;
 
@@ -1766,7 +1810,7 @@ bool BuildSecMcpsDataFrame(MCPS_DataReq_t *mpdr, MAC_FrameInfo_t *mframe)
 			 * Source field and the Key Index field.
 			 */
 			mpdr->KeySource = mpduPtr;
-			mpduPtr += (keyidLen - 1);
+			mpduPtr += (keyidLen - 1U);
 			mpdr->KeyIndex = *mpduPtr++;
 			break;
 
@@ -1783,7 +1827,7 @@ bool BuildSecMcpsDataFrame(MCPS_DataReq_t *mpdr, MAC_FrameInfo_t *mframe)
 			mframe->mpdu + 1);
 
 	mpdr->msdu = mframe->macPayload;
-	return MAC_SUCCESS;
+	return (bool)MAC_SUCCESS;
 }
 
 /** @brief Incoming key usage policy for the frame particular frame type
@@ -1823,6 +1867,10 @@ static MAC_Retval_t IncomingKeyUsagePolicy(MAC_KeyTable_t *keyDesc,
 			}
 		}
 	}
+    else
+    {
+        // do nothing
+    }
 
 	return MAC_IMPROPER_KEY_TYPE;
 }

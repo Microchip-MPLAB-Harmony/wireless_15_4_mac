@@ -50,17 +50,10 @@
 /* === Prototypes ========================================================== */
 
 /* === Implementation ====================================================== */
-#if (defined __GNUC__)
 void __attribute__((weak)) USR_MLME_SyncLossInd(uint8_t LossReason,
 		uint16_t PANId,
 		uint8_t LogicalChannel,
 		uint8_t ChannelPage)
-#else
-void USR_MLME_SyncLossInd(uint8_t LossReason,
-		uint16_t PANId,
-		uint8_t LogicalChannel,
-		uint8_t ChannelPage)
-#endif
 {
 	/* Keep compiler happy. */
 	LossReason = LossReason;

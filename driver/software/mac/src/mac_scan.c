@@ -68,7 +68,7 @@
  * where \f$0 <= SD <= 14\f$
  */
 #define MAC_CALCULATE_SYMBOL_TIME_SCANDURATION(SD) \
-	(aBaseSuperframeDuration * ((1UL << (SD)) + 1))
+	(aBaseSuperframeDuration * ((1UL << (SD)) + 1U))
 
 /*
  * Max beacon Order in beacon-enabled network
@@ -106,9 +106,9 @@ static void MAC_Timer_ScanDurationCb(void *callbackParameter);
         *  (MAC_SCAN_ORPHAN_REQUEST_CONFIRM == 1))
         */
 
-static void MAC_AwakeScan(buffer_t *buff_ptr);
+static void MAC_AwakeScan(buffer_t *scanBuf);
 static void ScanSetComplete(MAC_Retval_t setStatus);
-static void ScanCleanUp(buffer_t *buf);
+static void ScanCleanUp(buffer_t *buffer);
 static void ScanProceed(uint8_t scanningType, buffer_t *buf);
 static bool SendScanCmd(bool beaconReq);
 
@@ -127,11 +127,13 @@ static bool SendScanCmd(bool beaconReq);
  */
 static void ScanProceed(uint8_t scanningType, buffer_t *buf)
 {
-	MAC_Retval_t setStatus;
-	MLME_ScanConf_t *msc = (MLME_ScanConf_t *)BMM_BUFFER_POINTER(buf);
+	MAC_Retval_t setStatus = FAILURE;
+    PHY_Retval_t pibSetStatus = PHY_FAILURE;
+    qmm_status_t qmmStatus = QMM_QUEUE_FULL;
+	MLME_ScanConf_t *msc = (MLME_ScanConf_t *)MAC_BUFFER_POINTER(buf);
 
 	/* Set the channel page to perform scan */
-	setStatus = SetTalPibInternal(phyCurrentPage,
+	pibSetStatus = SetPhyPibInternal(phyCurrentPage,
 			(void *)&scanCurrPage);
 
 	/* Loop over all channels the MAC has been requested to scan */
@@ -141,7 +143,7 @@ static void ScanProceed(uint8_t scanningType, buffer_t *buf)
 		if (
 			((MAC_SCAN_ACTIVE == macScanState) ||
 			(MAC_SCAN_PASSIVE == macScanState)) &&
-			macPib.mac_AutoRequest
+			((macPib.mac_AutoRequest) == 1U)
 			) {
 			/*
 			 * For active or passive scans, bail out if we
@@ -168,14 +170,13 @@ static void ScanProceed(uint8_t scanningType, buffer_t *buf)
 			 * In an orphan scan, terminate if any coordinator
 			 * realignment packet has been received.
 			 */
-			if (msc->ResultListSize) {
+			if ((msc->ResultListSize) > 0U) {
 				break;
 			}
 		}
 #endif /* (MAC_SCAN_ORPHAN_REQUEST_CONFIRM == 1) */
 
-		if ((msc->UnscannedChannels & (1UL << scanCurrChannel)) !=
-				0) {
+		if ((msc->UnscannedChannels & (1UL << scanCurrChannel)) != 0U) {
 #if (MAC_SCAN_ACTIVE_REQUEST_CONFIRM == 1)
 			if (MLME_SCAN_TYPE_ACTIVE == scanningType) {
 				macScanState = MAC_SCAN_ACTIVE;
@@ -191,35 +192,39 @@ static void ScanProceed(uint8_t scanningType, buffer_t *buf)
 			}
 
 			/* Set the channel to perform scan */
-			setStatus = SetTalPibInternal(phyCurrentChannel,
+			pibSetStatus = SetPhyPibInternal(phyCurrentChannel,
 					(void *)&scanCurrChannel);
 
-			if (MAC_SUCCESS != setStatus) {
+			if (PHY_SUCCESS != pibSetStatus) {
 				/*
 				 * Free the buffer used for sending orphan
 				 * notification command
 				 */
-				bmm_buffer_free((buffer_t *)macScanCmdBufPtr);
+				bmm_buffer_free((buffer_t *)((void *)macScanCmdBufPtr));
 
 				macScanCmdBufPtr = NULL;
 
 				/* Set radio to sleep if allowed */
 				MAC_SleepTrans();
 
-				msc->status = MAC_NO_BEACON;
+				msc->status = (uint8_t)MAC_NO_BEACON;
 
 				/* Orphan scan does not return any list. */
 				msc->ResultListSize = 0;
 
 				/* Append the scan confirm message to the
 				 * MAC-NHLE queue */
-				qmm_queue_append(&macNhleQueue, buf);
+				qmmStatus = qmm_queue_append(&macNhleQueue, buf);
 
 				macScanState = MAC_SCAN_IDLE;
 			}
 			/* Continue scanning, after setting channel */
-			ScanSetComplete(setStatus);
+			if(pibSetStatus == PHY_SUCCESS){
+                setStatus = MAC_SUCCESS;
+            }
+            ScanSetComplete(setStatus);
             WPAN_PostTask();
+            (void)qmmStatus;
 			return;
 		}
 	}
@@ -228,7 +233,7 @@ static void ScanProceed(uint8_t scanningType, buffer_t *buf)
 	switch (scanningType) {
 #if (MAC_SCAN_ED_REQUEST_CONFIRM == 1)
 	case MLME_SCAN_TYPE_ED:
-		msc->status = MAC_SUCCESS;
+		msc->status = (uint8_t)MAC_SUCCESS;
 		ScanCleanUp(buf);
 		break;
 #endif /* (MAC_SCAN_ED_REQUEST_CONFIRM == 1) */
@@ -241,44 +246,46 @@ static void ScanProceed(uint8_t scanningType, buffer_t *buf)
 		 * reused
 		 * for beacon request frame transmission.
 		 */
-		bmm_buffer_free((buffer_t *)macScanCmdBufPtr);
+		bmm_buffer_free((buffer_t *)((void *)macScanCmdBufPtr));
 
 		macScanCmdBufPtr = NULL;
 
-		if (!macPib.mac_AutoRequest) {
-			msc->status = MAC_SUCCESS;
+		if (((macPib.mac_AutoRequest) == 0U)) {
+			msc->status = (uint8_t)MAC_SUCCESS;
 		} else if (msc->ResultListSize >= MAX_PANDESCRIPTORS) {
-			msc->status = MAC_LIMIT_REACHED;
-		} else if (msc->ResultListSize) {
-			msc->status = MAC_SUCCESS;
+			msc->status = (uint8_t)MAC_LIMIT_REACHED;
+		} else if ((msc->ResultListSize) > 0U) {
+			msc->status = (uint8_t)MAC_SUCCESS;
 		} else {
-			msc->status = MAC_NO_BEACON;
+			msc->status = (uint8_t)MAC_NO_BEACON;
 		}
 
 		/* Restore macPANId after active scan completed. */
-		SetTalPibInternal(macPANId, (void *)&macScanOrigPanid);
+		pibSetStatus = SetPhyPibInternal(macPANId, (void *)&macScanOrigPanid);
 		/* Done with scanning */
-		ScanCleanUp((buffer_t *)macConfBufPtr);
+		ScanCleanUp((buffer_t *)((void *)macConfBufPtr));
+        (void)pibSetStatus;
 	}
 	break;
 #endif /* (MAC_SCAN_ACTIVE_REQUEST_CONFIRM == 1) */
 
 #if (MAC_SCAN_PASSIVE_REQUEST_CONFIRM == 1)
 	case MLME_SCAN_TYPE_PASSIVE:
-		if (!macPib.mac_AutoRequest) {
-			msc->status = MAC_SUCCESS;
+		if (((macPib.mac_AutoRequest) == 0U)) {
+			msc->status = (uint8_t)MAC_SUCCESS;
 		} else if (msc->ResultListSize >= MAX_PANDESCRIPTORS) {
-			msc->status = MAC_LIMIT_REACHED;
-		} else if (msc->ResultListSize) {
-			msc->status = MAC_SUCCESS;
+			msc->status = (uint8_t)MAC_LIMIT_REACHED;
+		} else if (msc->ResultListSize > 0U) {
+			msc->status = (uint8_t)MAC_SUCCESS;
 		} else {
-			msc->status = MAC_NO_BEACON;
+			msc->status = (uint8_t)MAC_NO_BEACON;
 		}
 
 		/* Restore macPANId after passive scan completed. */
-		SetTalPibInternal(macPANId, (void *)&macScanOrigPanid);
+		pibSetStatus = SetPhyPibInternal(macPANId, (void *)&macScanOrigPanid);
 
 		ScanCleanUp(buf);
+        (void)pibSetStatus;
 		break;
 #endif /* (MAC_SCAN_PASSIVE_REQUEST_CONFIRM == 1) */
 
@@ -287,14 +294,14 @@ static void ScanProceed(uint8_t scanningType, buffer_t *buf)
 
 		/* Free the buffer used for sending orphan notification command
 		**/
-		bmm_buffer_free((buffer_t *)macScanCmdBufPtr);
+		bmm_buffer_free((buffer_t *)((void *)macScanCmdBufPtr));
 
 		macScanCmdBufPtr = NULL;
 
-		if (msc->ResultListSize > 0) {
-			msc->status = MAC_SUCCESS;
+		if (msc->ResultListSize > 0U) {
+			msc->status = (uint8_t)MAC_SUCCESS;
 		} else {
-			msc->status = MAC_NO_BEACON;
+			msc->status = (uint8_t)MAC_NO_BEACON;
 		}
 
 		/* Orphan scan does not return any list. */
@@ -305,6 +312,7 @@ static void ScanProceed(uint8_t scanningType, buffer_t *buf)
 #endif /* (MAC_SCAN_ORPHAN_REQUEST_CONFIRM == 1) */
 
 	default:
+        __NOP();
 		break;
 	}
 } /* ScanProceed() */
@@ -318,7 +326,9 @@ static void MAC_AwakeScan(buffer_t *scanBuf)
 {
 	MLME_ScanConf_t *msc;
     PibValue_t pib_value;
-	msc = (MLME_ScanConf_t *)BMM_BUFFER_POINTER(scanBuf);
+    PHY_Retval_t pibStatus = PHY_FAILURE;
+    qmm_status_t  qmmStatus = QMM_QUEUE_FULL;
+	msc = (MLME_ScanConf_t *)MAC_BUFFER_POINTER(scanBuf);
 
 	/* Set the first channel at which the scan is started */
 	scanCurrChannel = MIN_CHANNEL;
@@ -351,10 +361,11 @@ static void MAC_AwakeScan(buffer_t *scanBuf)
 		 */
 		uint16_t broadcast_panid = BROADCAST;
 
-		PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+		pibStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_value);
         macScanOrigPanid = pib_value.pib_value_16bit;
 
-		SetTalPibInternal(macPANId, (void *)&broadcast_panid);
+		pibStatus = SetPhyPibInternal(macPANId, (void *)&broadcast_panid);
+        (void)pibStatus;
 
 		if (MLME_SCAN_TYPE_ACTIVE == scanType) {
 			/*
@@ -376,14 +387,15 @@ static void MAC_AwakeScan(buffer_t *scanBuf)
 			 * to send
 			 * the scan confirmation.
 			 */
-			msc->status = MAC_INVALID_PARAMETER;
+			msc->status = (uint8_t)MAC_INVALID_PARAMETER;
 
 			/* Append scan confirm message to the MAC-NHLE queue */
-			qmm_queue_append(&macNhleQueue, scanBuf);
+			qmmStatus = qmm_queue_append(&macNhleQueue, scanBuf);
 
 			/* Set radio to sleep if allowed */
 			MAC_SleepTrans();
             WPAN_PostTask();
+            (void)qmmStatus;
 			return;
 		}
 
@@ -392,8 +404,8 @@ static void MAC_AwakeScan(buffer_t *scanBuf)
 			bmm_buffer_free(scanBuf);
 		}
 
-		msc = (MLME_ScanConf_t *)BMM_BUFFER_POINTER(
-				(buffer_t *)macConfBufPtr);
+		msc = (MLME_ScanConf_t *)MAC_BUFFER_POINTER(
+				(buffer_t *)((void *)macConfBufPtr));
 
 		msc->cmdcode = MLME_SCAN_CONFIRM;
 		msc->ScanType = scanType;
@@ -402,7 +414,7 @@ static void MAC_AwakeScan(buffer_t *scanBuf)
 		msc->ResultListSize = 0;
 		msc->scanResultList[0].edValue[0] = 0;
 
-		ScanProceed(scanType, (buffer_t *)macConfBufPtr);
+		ScanProceed(scanType, (buffer_t *)((void *)macConfBufPtr));
 		break;
 	}
 #endif /* ((MAC_SCAN_ACTIVE_REQUEST_CONFIRM == 1) ||
@@ -415,30 +427,32 @@ static void MAC_AwakeScan(buffer_t *scanBuf)
 			= (uint8_t *)bmm_buffer_alloc(LARGE_BUFFER_SIZE);
 
 		if (NULL == macScanCmdBufPtr) {
-			msc->status = MAC_INVALID_PARAMETER;
+			msc->status = (uint8_t)MAC_INVALID_PARAMETER;
 
 			/* Append scan confirm message to the MAC-NHLE queue */
-			qmm_queue_append(&macNhleQueue, scanBuf);
+			qmmStatus = qmm_queue_append(&macNhleQueue, scanBuf);
 
 			/* Set radio to sleep if allowed */
 			MAC_SleepTrans();
             WPAN_PostTask();
+            (void)qmmStatus;
 			return;
 		}
 
 		ScanProceed(MLME_SCAN_TYPE_ORPHAN,
-				(buffer_t *)macConfBufPtr);
+				(buffer_t *)((void *)macConfBufPtr));
 		break;
 #endif /* (MAC_SCAN_ORPHAN_REQUEST_CONFIRM == 1) */
 
 	default:
-		msc->status = MAC_INVALID_PARAMETER;
+		msc->status = (uint8_t)MAC_INVALID_PARAMETER;
 		/* Append scan confirm message to the MAC-NHLE queue */
-		qmm_queue_append(&macNhleQueue, scanBuf);
+		qmmStatus = qmm_queue_append(&macNhleQueue, scanBuf);
 
 		/* Set radio to sleep if allowed */
 		MAC_SleepTrans();
         WPAN_PostTask();
+        (void)qmmStatus;
 		break;
 	}
 } /* MAC_AwakeScan() */
@@ -461,7 +475,7 @@ static void MAC_AwakeScan(buffer_t *scanBuf)
  */
 static bool SendScanCmd(bool beaconReq)
 {
-	MAC_Retval_t talTxStatus;
+	PHY_Retval_t phyStatus = PHY_FAILURE;
 	uint8_t frameLen;
 	uint8_t *framePtr;
 	uint16_t fcf;
@@ -477,8 +491,8 @@ static bool SendScanCmd(bool beaconReq)
 	 * allocated to send an orphan notification.
 	 */
 	MAC_FrameInfo_t *transmitFrame
-		= (MAC_FrameInfo_t *)BMM_BUFFER_POINTER(
-			(buffer_t *)macScanCmdBufPtr);
+		= (MAC_FrameInfo_t *)MAC_BUFFER_POINTER(
+			(buffer_t *)((void *)macScanCmdBufPtr));
 
 	/* Get the payload pointer. */
 	framePtr = (uint8_t *)transmitFrame +
@@ -486,7 +500,7 @@ static bool SendScanCmd(bool beaconReq)
 			BEAC_REQ_ORPH_NOT_PAYLOAD_LEN - 2; /* Add 2 octets for
 	                                                    * FCS. */
 
-	transmitFrame->buffer_header = (buffer_t *)macScanCmdBufPtr;
+	transmitFrame->buffer_header = (buffer_t *)((void *)macScanCmdBufPtr);
 
 	if (beaconReq) {
 		fcf = FCF_SET_FRAMETYPE(FCF_FRAMETYPE_MAC_CMD) |
@@ -495,13 +509,14 @@ static bool SendScanCmd(bool beaconReq)
 
 		/* Update the length. */
 		frameLen = BEAC_REQ_ORPH_NOT_PAYLOAD_LEN +
-				2 + /* Add 2 octets for FCS */
-				2 + /* 2 octets for short Destination Address */
-				2 + /* 2 octets for Destination PAN-Id */
-				3; /* 3 octets DSN and FCF */
+				2U + /* Add 2 octets for FCS */
+				2U + /* 2 octets for short Destination Address */
+				2U + /* 2 octets for Destination PAN-Id */
+				3U; /* 3 octets DSN and FCF */
 
 		/* Build the command frame id. */
-		*framePtr = transmitFrame->msgType = BEACONREQUEST;
+        transmitFrame->msgType = BEACONREQUEST;
+		*framePtr = (uint8_t)(transmitFrame->msgType);
 	} else { /* Orphan Notification command */
 		fcf = FCF_SET_FRAMETYPE(FCF_FRAMETYPE_MAC_CMD) |
 				FCF_SET_DEST_ADDR_MODE(FCF_SHORT_ADDR) |
@@ -510,18 +525,19 @@ static bool SendScanCmd(bool beaconReq)
 
 		/* Update the length. */
 		frameLen = BEAC_REQ_ORPH_NOT_PAYLOAD_LEN +
-				2 + /* Add 2 octets for FCS */
-				2 + /* 2 octets for short Destination Address */
-				2 + /* 2 octets for Destination PAN-Id */
-				8 + /* 8 octets for long Source Address */
-				3; /* 3 octets DSN and FCF */
+				2U + /* Add 2 octets for FCS */
+				2U + /* 2 octets for short Destination Address */
+				2U + /* 2 octets for Destination PAN-Id */
+				8U + /* 8 octets for long Source Address */
+				3U; /* 3 octets DSN and FCF */
 
 		/* Build the command frame id. */
-		*framePtr = transmitFrame->msgType = ORPHANNOTIFICATION;
+        transmitFrame->msgType = ORPHANNOTIFICATION;
+		*framePtr = (uint8_t)(transmitFrame->msgType);
 
 		/* Orphan notification contains long source address. */
 		framePtr -= 8;
-        PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
+        phyStatus = PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
         convert_64_bit_to_byte_array(pib_value.pib_value_64bit, framePtr);
 
 	}
@@ -548,11 +564,12 @@ static bool SendScanCmd(bool beaconReq)
 
 	/* Finished building of frame. */
 	transmitFrame->mpdu = framePtr;
+    (void)phyStatus;
 
 	/* Transmit data with unslotted CSMA-CA and no frame retry. */
-	talTxStatus = sendFrame(transmitFrame, CSMA_UNSLOTTED, false);
+	phyStatus = sendFrame(transmitFrame, CSMA_UNSLOTTED, false);
 
-	if (MAC_SUCCESS == talTxStatus) {
+	if (PHY_SUCCESS == phyStatus) {
 		MAKE_MAC_BUSY();
 		return true;
 	} else {
@@ -571,7 +588,7 @@ static bool SendScanCmd(bool beaconReq)
  *
  * @param set_status Status of the Request to change the PIB attribute
  */
-void ScanSetComplete(MAC_Retval_t setStatus)
+static void ScanSetComplete(MAC_Retval_t setStatus)
 {
 	switch (macScanState) {
 #if (MAC_SCAN_ED_REQUEST_CONFIRM == 1)
@@ -579,7 +596,9 @@ void ScanSetComplete(MAC_Retval_t setStatus)
 	{
 		if (MAC_SUCCESS == setStatus) {
 			MAKE_MAC_BUSY();
-			PHY_EdStart(scanDuration);
+			PHY_Retval_t status = PHY_FAILURE;
+			status = PHY_EdStart(scanDuration);
+            (void)status;
 		} else {
 			/* Channel not supported, continue. */
 			scanCurrChannel++;
@@ -624,10 +643,11 @@ void ScanSetComplete(MAC_Retval_t setStatus)
 	case MAC_SCAN_PASSIVE:
 	{
 		if (MAC_SUCCESS == setStatus) {
-			uint8_t status = PHY_RxEnable(PHY_STATE_RX_ON);
+            PHY_TrxStatus_t status;
+			status = PHY_RxEnable(PHY_STATE_RX_ON);
 
 			if (PHY_RX_ON == status) {
-				MAC_Retval_t timerStatus;
+				PAL_Status_t timerStatus;
 				uint32_t tmr
 					= MAC_CALCULATE_SYMBOL_TIME_SCANDURATION(
 						scanDuration);
@@ -639,7 +659,7 @@ void ScanSetComplete(MAC_Retval_t setStatus)
 						&MAC_Timer_ScanDurationCb,
 						NULL,CALLBACK_SINGLE);
 
-				if (MAC_SUCCESS != timerStatus) {
+				if (PAL_SUCCESS != timerStatus) {
 					uint8_t timer_id = Timer_ScanDuration;
 
 					/*
@@ -657,7 +677,7 @@ void ScanSetComplete(MAC_Retval_t setStatus)
 				/* Did not work, continue. */
 				scanCurrChannel++;
 				ScanProceed(MLME_SCAN_TYPE_PASSIVE,
-						(buffer_t *)macConfBufPtr);
+						(buffer_t *)((void *)macConfBufPtr));
 			}
 		} else {
 			/* Channel not supported, continue. */
@@ -692,6 +712,7 @@ void ScanSetComplete(MAC_Retval_t setStatus)
 #endif /* (MAC_SCAN_ORPHAN_REQUEST_CONFIRM == 1) */
 
 	default:
+        __NOP();
 		break;
 	}
 } /* ScanSetComplete() */
@@ -709,7 +730,7 @@ void ScanSetComplete(MAC_Retval_t setStatus)
  */
 void MAC_ScanSendComplete(MAC_Retval_t status)
 {
-	MAC_Retval_t timerStatus;
+	PAL_Status_t timerStatus;
 
 	macPib.mac_DSN++;
 
@@ -734,7 +755,7 @@ void MAC_ScanSendComplete(MAC_Retval_t status)
 				&MAC_Timer_ScanDurationCb,
 				NULL,CALLBACK_SINGLE);
 
-		if (MAC_SUCCESS != timerStatus) {
+		if (PAL_SUCCESS != timerStatus) {
 			uint8_t timer_id = Timer_ScanDuration;
 
 			/*
@@ -748,7 +769,7 @@ void MAC_ScanSendComplete(MAC_Retval_t status)
 	} else {
 		/* Did not work, continue. */
 		scanCurrChannel++;
-		ScanProceed(scanType, (buffer_t *)macConfBufPtr);
+		ScanProceed(scanType, (buffer_t *)((void *)macConfBufPtr));
 	}
 }
 
@@ -768,18 +789,19 @@ static void MAC_Timer_ScanDurationCb(void *callbackParameter)
 {
 	/* mac_conf_buf_ptr holds the buffer for scan confirm */
 	MLME_ScanConf_t *msc
-		= (MLME_ScanConf_t *)BMM_BUFFER_POINTER(
-			(buffer_t *)macConfBufPtr);
+		= (MLME_ScanConf_t *)MAC_BUFFER_POINTER(
+			(buffer_t *)((void *)macConfBufPtr));
 
 	switch (macScanState) {
 	case MAC_SCAN_ACTIVE:
 	case MAC_SCAN_PASSIVE:
 	case MAC_SCAN_ORPHAN:
 		msc->UnscannedChannels &= ~(1UL << scanCurrChannel);
-		ScanProceed(scanType, (buffer_t *)macConfBufPtr);
+		ScanProceed(scanType, (buffer_t *)((void *)macConfBufPtr));
 		break;
 
 	default:
+        __NOP();
 		break;
 	}
 
@@ -903,19 +925,22 @@ static void MAC_Timer_ScanDurationCb(void *callbackParameter)
  *
  * @param m The MLME_SCAN.request message
  */
-void MAC_MLME_ScanRequest(uint8_t *m)
+void MAC_MLME_ScanRequest(void *m)
 {
-	MLME_ScanReq_t *msr = (MLME_ScanReq_t *)BMM_BUFFER_POINTER(
+	MLME_ScanReq_t *msr = (MLME_ScanReq_t *)MAC_BUFFER_POINTER(
 			(buffer_t *)m);
 	MLME_ScanConf_t *msc;
+    PHY_Retval_t pibStatus = PHY_FAILURE;
+    qmm_status_t  qmmStatus = QMM_QUEUE_FULL;
     PibValue_t pib_value;
 	/* Save the original channel. */
-    PHY_PibGet(phyCurrentChannel, (uint8_t *)&pib_value);
+    pibStatus = PHY_PibGet(phyCurrentChannel, (uint8_t *)&pib_value);
 	macScanOrigChannel = pib_value.pib_value_8bit;
 
 	/* Save the original channel page. */
-    PHY_PibGet(phyCurrentPage, (uint8_t *)&pib_value);
+    pibStatus = PHY_PibGet(phyCurrentPage, (uint8_t *)&pib_value);
 	macScanOrigPage = pib_value.pib_value_8bit;
+    (void)pibStatus;
 
 	/* Save the scan request parameters */
 	scanDuration = msr->ScanDuration;
@@ -923,7 +948,7 @@ void MAC_MLME_ScanRequest(uint8_t *m)
 	scanChannels = msr->ScanChannels;
 	scanCurrPage = msr->ChannelPage;
 
-	msc = (MLME_ScanConf_t *)msr;
+	msc = (MLME_ScanConf_t *)((void *)msr);
 
 	/*
 	 * Store the scan request buffer reused to create the corresponding
@@ -943,11 +968,12 @@ void MAC_MLME_ScanRequest(uint8_t *m)
 			) { 
 		/* Ignore scan request while being in a polling state or
 		 * scanning. */
-		msc->status = MAC_INVALID_PARAMETER;
+		msc->status = (uint8_t)MAC_INVALID_PARAMETER;
 
 		/* Append the scan confirmation message to the MAC-NHLE queue */
-		qmm_queue_append(&macNhleQueue, (buffer_t *)m);
+		qmmStatus = qmm_queue_append(&macNhleQueue, (buffer_t *)m);
         WPAN_PostTask();
+        (void)qmmStatus;
 
 		return;
 		/* no break here due to return */
@@ -963,15 +989,16 @@ void MAC_MLME_ScanRequest(uint8_t *m)
 	 * Checck also for a scan duration that is lower than
 	 * the max. beacon order.
 	 */
-	if ((0 == scanChannels) ||
-			((scanChannels & INVERSE_CHANNEL_MASK) != 0) ||
+	if ((0U == scanChannels) ||
+			((scanChannels & INVERSE_CHANNEL_MASK) != 0U) ||
 			(scanDuration > BEACON_NETWORK_MAX_BO)
 			) {
-		msc->status = MAC_INVALID_PARAMETER;
+		msc->status = (uint8_t)MAC_INVALID_PARAMETER;
 
 		/* Append the scan confirm message to the MAC-NHLE queue */
-		qmm_queue_append(&macNhleQueue, (buffer_t *)m);
+		qmmStatus = qmm_queue_append(&macNhleQueue, (buffer_t *)m);
         WPAN_PostTask();
+        (void)qmmStatus;
 
 		return;
 	}
@@ -983,11 +1010,12 @@ void MAC_MLME_ScanRequest(uint8_t *m)
 	 * will be rejected before node will be woken up.
 	 */
 	if (MLME_SCAN_TYPE_ED == scanType) {
-		msc->status = MAC_INVALID_PARAMETER;
+		msc->status = (uint8_t)MAC_INVALID_PARAMETER;
 
 		/* Append the scan confirm message to the MAC-NHLE queue */
-		qmm_queue_append(&macNhleQueue, (buffer_t *)m);
+		qmmStatus = qmm_queue_append(&macNhleQueue, (buffer_t *)m);
         WPAN_PostTask();
+        (void)qmmStatus;
 
 		return;
 	}
@@ -1020,20 +1048,20 @@ void PHY_EdEndCallback(uint8_t energyLevel)
 	 * scan
 	 * which is stored in macConfBufPtr.
 	 */
-	msc = (MLME_ScanConf_t *)BMM_BUFFER_POINTER(
-			(buffer_t *)macConfBufPtr);
+	msc = (MLME_ScanConf_t *)MAC_BUFFER_POINTER(
+			(buffer_t *)((void *)macConfBufPtr));
 
 	uint8_t n_eds;
 
 	n_eds = msc->ResultListSize;
 	msc->scanResultList[0].edValue[n_eds] = energyLevel;
 	msc->ResultListSize++;
-	msc->scanResultList[0].edValue[n_eds + 1] = 0;
+	msc->scanResultList[0].edValue[n_eds + 1U] = 0U;
 
 	msc->UnscannedChannels &= ~(1UL << scanCurrChannel);
 
 	/* Continue with next channel */
-	ScanProceed(MLME_SCAN_TYPE_ED, (buffer_t *)macConfBufPtr);
+	ScanProceed(MLME_SCAN_TYPE_ED, (buffer_t *)((void *)macConfBufPtr));
 }
 
 #endif /* (MAC_SCAN_ED_REQUEST_CONFIRM == 1) */
@@ -1048,23 +1076,26 @@ void PHY_EdEndCallback(uint8_t energyLevel)
  */
 static void ScanCleanUp(buffer_t *buffer)
 {
-
+    PHY_Retval_t pibSetStatus = PHY_FAILURE;
+    qmm_status_t  qmmStatus = QMM_QUEUE_FULL;
 	/* Append the scan confirm message into the internal event queue */
-	qmm_queue_append(&macNhleQueue, buffer);
+	qmmStatus = qmm_queue_append(&macNhleQueue, buffer);
+    (void)qmmStatus;
 
 	/* Set original channel page and channel. */
 	scanCurrPage = macScanOrigPage;
 
-	SetTalPibInternal(phyCurrentPage, (void *)&scanCurrPage);
+	pibSetStatus = SetPhyPibInternal(phyCurrentPage, (void *)&scanCurrPage);
 
 	scanCurrChannel = macScanOrigChannel;
 
-	SetTalPibInternal(phyCurrentChannel, (void *)&scanCurrChannel);
+	pibSetStatus = SetPhyPibInternal(phyCurrentChannel, (void *)&scanCurrChannel);
 
 	macScanState = MAC_SCAN_IDLE;
 
 	/* Set radio to sleep if allowed */
 	MAC_SleepTrans();
+    (void)pibSetStatus;
     
     WPAN_PostTask();
 }
@@ -1084,12 +1115,14 @@ static void ScanCleanUp(buffer_t *buffer)
  */
 void MAC_ProcessOrphanRealign(buffer_t *bufPtr)
 {
-	MAC_Retval_t setStatus;
+	MAC_Retval_t setStatus = FAILURE;
+    PHY_Retval_t pibSetStatus = PHY_FAILURE;
+    qmm_status_t  qmmStatus = QMM_QUEUE_FULL;
 
 	/* Device received a coordinator realignment during an orphan scan */
 
 	/* Free the buffer used for sending orphan notification command */
-	bmm_buffer_free((buffer_t *)macScanCmdBufPtr);
+	bmm_buffer_free((buffer_t *)((void *)macScanCmdBufPtr));
 	macScanCmdBufPtr = NULL;
 
 	/*
@@ -1097,19 +1130,20 @@ void MAC_ProcessOrphanRealign(buffer_t *bufPtr)
 	 * scan request buffer, which was stored in macConfBufPtr.
 	 */
 	MLME_ScanConf_t *msc
-		= (MLME_ScanConf_t *)BMM_BUFFER_POINTER(
-			(buffer_t *)macConfBufPtr);
+		= (MLME_ScanConf_t *)MAC_BUFFER_POINTER(
+			(buffer_t *)((void *)macConfBufPtr));
 
 	msc->cmdcode = MLME_SCAN_CONFIRM;
-	msc->status = MAC_SUCCESS;
+	msc->status = (uint8_t)MAC_SUCCESS;
 	msc->ScanType = MLME_SCAN_TYPE_ORPHAN;
 	msc->UnscannedChannels = 0;
 	msc->ResultListSize = 0;
 
 	/* Append the scan confirmation message to the MAC-NHLE queue */
-	qmm_queue_append(&macNhleQueue, (buffer_t *)macConfBufPtr);
+	qmmStatus = qmm_queue_append(&macNhleQueue, (buffer_t *)((void *)macConfBufPtr));
 
 	macScanState = MAC_SCAN_IDLE;
+    (void)qmmStatus;
 
 	/* Set radio to sleep if allowed */
 	MAC_SleepTrans();
@@ -1121,14 +1155,14 @@ void MAC_ProcessOrphanRealign(buffer_t *bufPtr)
 	bmm_buffer_free(bufPtr);
 
 	/* Set the appropriate PIB entries */
-	setStatus = SetTalPibInternal(macPANId,
+	pibSetStatus = SetPhyPibInternal(macPANId,
 			(void *)&macParseData.macPayloadData.coordRealignData.panId);
 
 	if (BROADCAST !=
 			macParseData.macPayloadData.coordRealignData.
 			shortAddr) {
 		/* Short address only to be set if not broadcast address */
-		setStatus = SetTalPibInternal(macShortAddress,
+		pibSetStatus = SetPhyPibInternal(macShortAddress,
 				(void *)&macParseData.macPayloadData.coordRealignData.shortAddr);
 
 	}
@@ -1141,17 +1175,21 @@ void MAC_ProcessOrphanRealign(buffer_t *bufPtr)
 	 * If frame version subfield indicates a 802.15.4-2006 compatible frame,
 	 * the channel page is appended as additional information element.
 	 */
-	if (macParseData.fcf & FCF_FRAME_VERSION_2006) {
-		setStatus
-			= SetTalPibInternal(phyCurrentPage,
+	if ((macParseData.fcf & FCF_FRAME_VERSION_2006) == FCF_FRAME_VERSION_2006) {
+		pibSetStatus
+			= SetPhyPibInternal(phyCurrentPage,
 				(void *)&macParseData.macPayloadData.coordRealignData.channelPage);
 	}
 
-	setStatus = SetTalPibInternal(phyCurrentChannel,
+	pibSetStatus = SetPhyPibInternal(phyCurrentChannel,
 			(void *)&macParseData.macPayloadData.coordRealignData.logicalChannel);
 
-	ScanSetComplete(setStatus);
+	if(pibSetStatus == PHY_SUCCESS){
+        setStatus = MAC_SUCCESS;
+    }
+    ScanSetComplete(setStatus);
     WPAN_PostTask();
+    
 } /* MAC_ProcessOrphanRealign() */
 
 #endif /* (MAC_SCAN_ORPHAN_REQUEST_CONFIRM == 1) */

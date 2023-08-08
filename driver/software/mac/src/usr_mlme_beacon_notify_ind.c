@@ -50,21 +50,12 @@
 /* === Prototypes ========================================================== */
 
 /* === Implementation ====================================================== */
-#if (defined __GNUC__)
 void __attribute__((weak)) USR_MLME_BeaconNotifyInd(uint8_t BSN,
 		WPAN_Pandescriptor_t *PANDescriptor,
 		uint8_t PendAddrSpec,
 		uint8_t *AddrList,
 		uint8_t sduLength,
 		uint8_t *sdu)
-#else
-void USR_MLME_BeaconNotifyInd(uint8_t BSN,
-		WPAN_Pandescriptor_t *PANDescriptor,
-		uint8_t PendAddrSpec,
-		uint8_t *AddrList,
-		uint8_t sduLength,
-		uint8_t *sdu)
-#endif
 {
 	/* Keep compiler happy. */
 	BSN = BSN;

@@ -50,17 +50,24 @@
 // *****************************************************************************
 #include "sal_generic.h"
 
-/* === Macros ============================================================= */
-
 // *****************************************************************************
 // *****************************************************************************
 // Types
 // *****************************************************************************
 // *****************************************************************************
 
-/**
- * CCM status values
+// *****************************************************************************
+/* STB CCM status values
+ 
+   Summary:
+    list of CCM status values.
+ 
+   Description:
+    None
+   Remarks:
+    None 
  */
+
 typedef enum {
 	/** CCM en/decryption OK */
 	STB_CCM_OK = 0,
@@ -74,6 +81,17 @@ typedef enum {
     STB_CCM_FAILURE
 } STB_Ccm_t;
 
+// *****************************************************************************
+/* security levels
+ 
+   Summary:
+    Enumeration for security levels.
+ 
+   Description:
+    None
+   Remarks:
+    None 
+ */
 typedef enum {
 	/** Security Level 0 */
 	SECURITY_00_LEVEL = 0x00,
@@ -93,16 +111,127 @@ typedef enum {
 	SECURITY_07_LEVEL
 } Security_Level_t;
 
-/** Macros for MIC Calculation and Security */
+// *****************************************************************************
+// *****************************************************************************
+// Macros for MIC Calculation and Security
+// *****************************************************************************
+// *****************************************************************************
+
+// *****************************************************************************
+/*  
+ 
+   Summary:
+    This macro holds ENCRYPTION_NOT_REQD
+   Description:
+    None
+   Remarks:
+    None 
+ */
+
 #define ENCRYPTION_NOT_REQD     (0x00)
+
+// *****************************************************************************
+/* 
+ 
+   Summary:
+    This macro holds ENCRYPTION_REQD
+   Description:
+    None
+   Remarks:
+    None 
+ */
+
 #define ENCRYPTION_REQD         (0x01)
+
+// *****************************************************************************
+/* 
+ 
+   Summary:
+    This macro holds PLAINTEXT_FLAG
+   Description:
+    None
+   Remarks:
+    None 
+ */
+
 #define PLAINTEXT_FLAG          (0x01)
+
+// *****************************************************************************
+/* 
+ 
+   Summary:
+    This macro holds LEN_FIELD
+   Description:
+    None
+   Remarks:
+    None 
+ */
+
 #define LEN_FIELD                       (0x01)
+
+// *****************************************************************************
+/* 
+ 
+   Summary:
+    This macro holds ADATA
+   Description:
+    None
+   Remarks:
+    None 
+ */
+
 #define ADATA                           (0x40)
 
+// *****************************************************************************
+/* 
+ 
+   Summary:
+    This macro holds LEN_MIC_00
+   Description:
+    None
+   Remarks:
+    None 
+ */
+
 #define LEN_MIC_00                      (0x00)
+
+// *****************************************************************************
+/* 
+ 
+   Summary:
+    This macro holds LEN_MIC_32
+   Description:
+    None
+   Remarks:
+    None 
+ */
+
 #define LEN_MIC_32                      (0x04)
+
+// *****************************************************************************
+/* 
+ 
+   Summary:
+    This macro holds LEN_MIC_64
+   Description:
+    None
+   Remarks:
+    None 
+ */
+
 #define LEN_MIC_64                      (0x08)
+
+// *****************************************************************************
+/* 
+ 
+   Summary:
+    This macro holds LEN_MIC_128
+   Description:
+    None
+   Remarks:
+    None 
+ */
+
 #define LEN_MIC_128                     (0x10)
 
 /* === Externals ========================================================== */
@@ -121,43 +250,72 @@ typedef enum {
 #endif
 // DOM-IGNORE-END
 
-/**
- * @brief STB Initialization
- *
- * This function initializes the STB.
- *
- * @ingroup group_StbApi
- */
+// *****************************************************************************
+/*
+  Function:
+    void STB_Init(void)
+
+  Summary:
+    STB Initialization
+
+  Description:
+    This function initializes the STB.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    None
+
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
 void STB_Init(void);
 
-/**
- * @brief Secure one block with CCM*
- *
- * This functions secures one block with CCM* according to 802.15.4.
- *
- * @param[in,out] buffer Input: plaintext header and payload concatenated;
- *                       for encryption: MUST HAVE 'AES_BLOCKSIZE'
- *                       BYTES SPACE AT THE END FOR THE MIC!
- *                       Output: frame secured (with MIC at end)/unsecured
- * @param[in]  nonce   The nonce: Initialization Vector (IV) as used in
- *                     cryptography; the ZigBee nonce (13 bytes long)
- *                     are the bytes 2...14 of this nonce
- * @param[in] key The key to be used; if NULL, use the current key
- * @param[in] hdr_len Length of plaintext header (will not be encrypted)
- * @param[in] pld_len Length of payload to be encrypted; if 0, then only MIC
- *                    authentication implies
- * @param[in] sec_level Security level according to IEEE 802.15.4,
- *                    7.6.2.2.1, Table 95:
- *                    - the value may be 0 ... 7;
- *                    - the two LSBs contain the MIC length in bytes
- *                      (0, 4, 8 or 16);
- *                    - bit 2 indicates whether encryption applies or not
- * @param[in] aes_dir AES_DIR_ENCRYPT if secure, AES_DIR_DECRYPT if unsecure
- *
- * @return STB CCM Status
- *
- * @ingroup group_StbApi
- */
+// *****************************************************************************
+/*
+  Function:
+    STB_Ccm_t STB_CcmSecure(uint8_t * buffer, uint8_t nonce[AES_BLOCKSIZE], uint8_t * key,
+     uint8_t hdr_len, uint8_t pld_len, uint8_t sec_level, uint8_t aes_dir);
+
+  Summary:
+    Secure one block with CCM*
+
+  Description:
+    This functions secures one block with CCM* according to 802.15.4.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    buffer Input      -  plaintext header and payload concatenated;
+                         for encryption: MUST HAVE 'AES_BLOCKSIZE'
+                         BYTES SPACE AT THE END FOR THE MIC!
+                         Output: frame secured (with MIC at end)/unsecured
+    nonce             -  The nonce: Initialization Vector (IV) as used in
+                         cryptography; the ZigBee nonce (13 bytes long)
+                         are the bytes 2...14 of this nonce
+    key               - The key to be used; if NULL, use the current key
+    hdr_len           - Length of plaintext header (will not be encrypted)
+    pld_len           - Length of payload to be encrypted; if 0, then only MIC
+                        authentication implies
+    sec_level         - Security level according to IEEE 802.15.4,
+                        - the value may be 0 ... 7;
+                        - the two LSBs contain the MIC length in bytes (0, 4, 8 or 16);
+                        - bit 2 indicates whether encryption applies or not
+    aes_dir           - AES_DIR_ENCRYPT if secure, AES_DIR_DECRYPT if unsecure
+
+  Returns:
+    STB CCM Status
+
+  Remarks:
+    None 
+*/
+
 STB_Ccm_t STB_CcmSecure(uint8_t * buffer,
 uint8_t nonce[AES_BLOCKSIZE],
 uint8_t * key,

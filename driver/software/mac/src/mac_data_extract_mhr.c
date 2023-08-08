@@ -58,12 +58,12 @@
 uint8_t MAC_ExtractMhrAddrInfo(uint8_t *framePtr)
 {
 	uint16_t fcf = macParseData.fcf;
-	uint8_t srcAddrMode = (fcf >> FCF_SOURCE_ADDR_OFFSET) & FCF_ADDR_MASK;
-	uint8_t dstAddrMode = (fcf >> FCF_DEST_ADDR_OFFSET) & FCF_ADDR_MASK;
-	bool intraPan = fcf & FCF_PAN_ID_COMPRESSION;
+	uint8_t srcAddrMode = (uint8_t)((fcf >> FCF_SOURCE_ADDR_OFFSET) & FCF_ADDR_MASK);
+	uint8_t dstAddrMode = (uint8_t)((fcf >> FCF_DEST_ADDR_OFFSET) & FCF_ADDR_MASK);
+	bool intraPan = (bool)(fcf & FCF_PAN_ID_COMPRESSION);
 	uint8_t addrFieldLen = 0;
 
-	if (dstAddrMode != 0) {
+	if (dstAddrMode != 0U) {
 		macParseData.destPanid = convert_byte_array_to_16_bit(
 				framePtr);
 		framePtr += PAN_ID_LEN;
@@ -86,9 +86,12 @@ uint8_t MAC_ExtractMhrAddrInfo(uint8_t *framePtr)
 			framePtr += EXT_ADDR_LEN;
 			addrFieldLen += EXT_ADDR_LEN;
 		}
-	}
+        else{
+            // do nothing
+        }
+        }
 
-	if (srcAddrMode != 0) {
+	if (srcAddrMode != 0U) {
 		if (!intraPan) {
 			/*
 			 * Source PAN ID is present in the frame only if the
@@ -127,7 +130,10 @@ uint8_t MAC_ExtractMhrAddrInfo(uint8_t *framePtr)
 			framePtr += EXT_ADDR_LEN;
 			addrFieldLen += EXT_ADDR_LEN;
 		}
-	}
+        else{
+            // do nothing
+        }
+        }
 
 	/*
 	 * The length of the Addressing Field is known, so the length of the

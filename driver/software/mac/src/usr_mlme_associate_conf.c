@@ -50,13 +50,8 @@
 /* === Prototypes ========================================================== */
 
 /* === Implementation ====================================================== */
-#if (defined __GNUC__)
 void __attribute__((weak)) USR_MLME_AssociateConf(uint16_t AssocShortAddress,
 		uint8_t status)
-#else
-void USR_MLME_AssociateConf(uint16_t AssocShortAddress,
-		uint8_t status)
-#endif
 {
 	/* Keep compiler happy. */
 	AssocShortAddress = AssocShortAddress;

@@ -53,7 +53,7 @@
 #include "mac.h"
 #include "mac_config.h"
 /* === Macros ============================================================== */
-#define CMD_ID_OCTET     (0)
+#define CMD_ID_OCTET     (0U)
 /* === Globals ============================================================= */
 /* Regular MAC Dispatcher table */
 static const Handler_t dispatch_Table[LAST_MESSAGE + 1] = {
@@ -105,7 +105,7 @@ static const Handler_t dispatch_Table[LAST_MESSAGE + 1] = {
 #endif /* ((MAC_PURGE_REQUEST_CONFIRM == 1) && (MAC_INDIRECT_DATA_BASIC == 1))
 	**/
 
-	[TAL_DATA_INDICATION]                 = MAC_ProcessTalDataInd,
+	[PHY_DATA_INDICATION]                 = MAC_ProcessPhyDataInd,
 	[MCPS_DATA_CONFIRM]                   = MAC_MCPS_DataConf,
 	[MCPS_DATA_INDICATION]                = MAC_MCPS_DataInd,
 
@@ -180,14 +180,14 @@ static const Handler_t dispatch_Table[LAST_MESSAGE + 1] = {
  * @param event Pointer to the buffer header whose body part holds the message
  * type and message elemnets
  */
-void DispatchEvent(uint8_t *event)
+void DispatchEvent(void *event)
 {
 	/*
 	 * A pointer to the body of the buffer is obtained from the pointer to
 	 * the
 	 * received header.
 	 */
-	uint8_t *bufferBody = (uint8_t *)BMM_BUFFER_POINTER((buffer_t *)event);
+	uint8_t *bufferBody = (uint8_t *)MAC_BUFFER_POINTER((buffer_t *)event);
 
 	/* Check is done to see if the message type is valid */
 
@@ -211,7 +211,7 @@ void DispatchEvent(uint8_t *event)
 	 */
     
 	/* Check for regular MAC requests. */
-	if (bufferBody[CMD_ID_OCTET] <= LAST_MESSAGE) {
+	if (bufferBody[CMD_ID_OCTET] <= (uint8_t)(LAST_MESSAGE)) {
 		/*
 		 * The following statement reads the address from the dispatch
 		 * table

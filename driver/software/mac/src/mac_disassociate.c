@@ -101,9 +101,10 @@ static void MAC_Gen_MLME_DisassociateConf(buffer_t *buf,
 		uint16_t devPanid,
 		AddressField_t *devAddr)
 {
+    qmm_status_t  qmmStatus = QMM_QUEUE_FULL;
 	MLME_DisassociateConf_t *mdc;
 
-	mdc = (MLME_DisassociateConf_t *)BMM_BUFFER_POINTER(buf);
+	mdc = (MLME_DisassociateConf_t *)MAC_BUFFER_POINTER(buf);
 
 	mdc->cmdcode = MLME_DISASSOCIATE_CONFIRM;
 	mdc->status = status;
@@ -122,8 +123,9 @@ static void MAC_Gen_MLME_DisassociateConf(buffer_t *buf,
 				devAddr->longAddress);
 	}
 
-	qmm_queue_append(&macNhleQueue, (buffer_t *)buf);
+	qmmStatus = qmm_queue_append(&macNhleQueue, (buffer_t *)buf);
     WPAN_PostTask();
+    (void)qmmStatus;
 }
 
 /**
@@ -137,25 +139,28 @@ static void MAC_Gen_MLME_DisassociateConf(buffer_t *buf,
  *
  * @param m Pointer to the MLME-DISASSOCIATION.Request message passed by NHLE
  */
-void MAC_MLME_DisassociateRequest(uint8_t *m)
+void MAC_MLME_DisassociateRequest(void *m)
 {
 	MLME_DisassociateReq_t disassocReq;
     PibValue_t pib_value;
+    PHY_Retval_t pibStatus = PHY_FAILURE;
 
 	MAC_FrameInfo_t *transmitFrame
-		= (MAC_FrameInfo_t *)BMM_BUFFER_POINTER((buffer_t *)m);
+		= (MAC_FrameInfo_t *)MAC_BUFFER_POINTER((buffer_t *)m);
 
 	/* Store the disassociation request received from NHLE. */
-	memcpy((uint8_t *)&disassocReq, (uint8_t *)transmitFrame,
+	(void)memcpy((uint8_t *)&disassocReq, (uint8_t *)transmitFrame,
 			sizeof(MLME_DisassociateReq_t));
 
-    PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+    pibStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+
 	if (disassocReq.DevicePANId != pib_value.pib_value_16bit) {
 		MAC_Gen_MLME_DisassociateConf((buffer_t *)m,
-				MAC_INVALID_PARAMETER,
+				(uint8_t)MAC_INVALID_PARAMETER,
 				disassocReq.DeviceAddrMode,
 				disassocReq.DevicePANId,
-				(AddressField_t *)&disassocReq.DeviceAddress);
+				(AddressField_t *)((void *)&disassocReq.DeviceAddress));
+        (void)pibStatus;
 		return;
 	}
 
@@ -187,7 +192,7 @@ void MAC_MLME_DisassociateRequest(uint8_t *m)
 		                                                           **/
 
 		/* Update the payload field. */
-		*framePtr++ = DISASSOCIATIONNOTIFICATION;
+		*framePtr++ = (uint8_t)DISASSOCIATIONNOTIFICATION;
 
 		/* Set up the disassociation reason code. */
 		*framePtr = disassocReq.DisassociateReason;
@@ -205,7 +210,7 @@ void MAC_MLME_DisassociateRequest(uint8_t *m)
 
 		/* Source address */
 		framePtr -= 8;
-        PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
+        pibStatus = PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
         convert_64_bit_to_byte_array(pib_value.pib_value_64bit, framePtr);
 
 
@@ -213,17 +218,17 @@ void MAC_MLME_DisassociateRequest(uint8_t *m)
 		if (FCF_SHORT_ADDR == disassocReq.DeviceAddrMode) {
 			framePtr -= 2;
 			convert_16_bit_to_byte_address(
-					disassocReq.DeviceAddress, framePtr);
+					((uint16_t)(disassocReq.DeviceAddress)), framePtr);
 		} else {
 			framePtr -= 8;
-			frameLen += 6;
+			frameLen += 6U;
 			convert_64_bit_to_byte_array(disassocReq.DeviceAddress,
 					framePtr);
 		}
 
 		/* Destination PAN-Id */
 		framePtr -= 2;
-        PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+        pibStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_value);
         convert_16_bit_to_byte_array(pib_value.pib_value_16bit, framePtr);
 
 
@@ -251,6 +256,7 @@ void MAC_MLME_DisassociateRequest(uint8_t *m)
 		/* Finished building of frame. */
 		transmitFrame->mpdu = framePtr;
 	}
+    (void)pibStatus;
 
 #if (MAC_DISASSOCIATION_FFD_SUPPORT == 1)
 	/* Indirect transmission not ongoing yet. */
@@ -286,10 +292,10 @@ void MAC_MLME_DisassociateRequest(uint8_t *m)
 				 * TRANSACTION_OVERFLOW.
 				 */
 				MAC_Gen_MLME_DisassociateConf((buffer_t *)m,
-						MAC_TRANSACTION_OVERFLOW,
+						(uint8_t)MAC_TRANSACTION_OVERFLOW,
 						disassocReq.DeviceAddrMode,
 						disassocReq.DevicePANId,
-						(AddressField_t *)&disassocReq.DeviceAddress);
+						(AddressField_t *)((void *)&disassocReq.DeviceAddress));
 				return;
 			}
 
@@ -309,10 +315,10 @@ void MAC_MLME_DisassociateRequest(uint8_t *m)
 
 		else {
 			MAC_Gen_MLME_DisassociateConf((buffer_t *)m,
-					MAC_INVALID_PARAMETER,
+					(uint8_t)MAC_INVALID_PARAMETER,
 					disassocReq.DeviceAddrMode,
 					disassocReq.DevicePANId,
-					(AddressField_t *)&disassocReq.DeviceAddress);
+					(AddressField_t *)((void *)&disassocReq.DeviceAddress));
 			return;
 		}
 	} else /* Device */
@@ -329,10 +335,10 @@ void MAC_MLME_DisassociateRequest(uint8_t *m)
 			/* Create the MLME DISASSOCIATION confirmation message
 			**/
 			MAC_Gen_MLME_DisassociateConf((buffer_t *)m,
-					MAC_CHANNEL_ACCESS_FAILURE,
+					(uint8_t)MAC_CHANNEL_ACCESS_FAILURE,
 					disassocReq.DeviceAddrMode,
 					disassocReq.DevicePANId,
-					(AddressField_t *)&disassocReq.DeviceAddress);
+					(AddressField_t *)((void *)&disassocReq.DeviceAddress));
 
 			/* Set radio to sleep if allowed */
 			MAC_SleepTrans();
@@ -354,18 +360,18 @@ void MAC_MLME_DisassociateRequest(uint8_t *m)
 static bool MAC_AwakeDisassociate(buffer_t *bufPtr)
 {
 	MAC_FrameInfo_t *transmitFrame;
-	transmitFrame = (MAC_FrameInfo_t *)BMM_BUFFER_POINTER(bufPtr);
+	transmitFrame = (MAC_FrameInfo_t *)MAC_BUFFER_POINTER(bufPtr);
 
 	/*
 	 * Send the disassociation information to the TAL.
 	 * Start CSMA-CA using backoff and retry (direct transmission).
 	 */
-	MAC_Retval_t talTxStatus;
+	PHY_Retval_t phyStatus;
 
 	/* In Nonbeacon build the frame is sent with unslotted CSMA-CA. */
-	talTxStatus = sendFrame(transmitFrame, CSMA_UNSLOTTED, true);
+	phyStatus = sendFrame(transmitFrame, CSMA_UNSLOTTED, true);
 
-	if (MAC_SUCCESS == talTxStatus) {
+	if (PHY_SUCCESS == phyStatus) {
 		MAKE_MAC_BUSY();
 	} else {
 		return false;
@@ -385,8 +391,9 @@ static bool MAC_AwakeDisassociate(buffer_t *bufPtr)
  */
 void MAC_ProcessDisassociateNotification(buffer_t *msg)
 {
+    qmm_status_t  qmmStatus = QMM_QUEUE_FULL;
 	MLME_DisassociateInd_t *dai
-		= (MLME_DisassociateInd_t *)BMM_BUFFER_POINTER(
+		= (MLME_DisassociateInd_t *)MAC_BUFFER_POINTER(
 			((buffer_t *)msg));
 
 	/* Set up the header portion of the MLME_DisassociateInd_t. */
@@ -406,19 +413,20 @@ void MAC_ProcessDisassociateNotification(buffer_t *msg)
 		= macParseData.macPayloadData.disassocReqData.
 			disassocReason;
 
-	qmm_queue_append(&macNhleQueue, (buffer_t *)msg);
+	qmmStatus = qmm_queue_append(&macNhleQueue, (buffer_t *)msg);
 
 	/*
 	 * Once a device is disassociated from a coordinator, the coordinator's
 	 * address info should be cleared.
 	 */
-	memset((uint8_t *)&macPib.mac_CoordExtendedAddress, 0,
+	(void)memset((uint8_t *)&macPib.mac_CoordExtendedAddress, 0,
 			sizeof(macPib.mac_CoordExtendedAddress));
 	/* macPib.mac_CoordExtendedAddress = (uint64_t)CLEAR_ADDR_64; */
 
 	/* The default short address is 0xFFFF. */
 	macPib.mac_CoordShortAddress = INVALID_SHORT_ADDRESS;
     WPAN_PostTask();
+    (void)qmmStatus;
 }
 
 /**
@@ -434,18 +442,19 @@ void MAC_ProcessDisassociateNotification(buffer_t *msg)
 void MAC_PrepDisassocConf(buffer_t *buf,
 		uint8_t status)
 {
-	MAC_FrameInfo_t *framePtr = (MAC_FrameInfo_t *)BMM_BUFFER_POINTER(buf);
-
-#if (MAC_DISASSOCIATION_FFD_SUPPORT == 1)
-	uint8_t disDestAddrMode;
-	uint64_t tempDevAddr = 0;
+	MAC_FrameInfo_t *framePtr = (MAC_FrameInfo_t *)MAC_BUFFER_POINTER(buf);
+    PHY_Retval_t pibStatus = PHY_FAILURE;
     PibValue_t pib_panid;
     PibValue_t pib_shortaddr;
     PibValue_t pib_ieeeaddr;
 
+#if (MAC_DISASSOCIATION_FFD_SUPPORT == 1)
+	uint8_t disDestAddrMode;
+	uint64_t tempDevAddr = 0;
+
 	disDestAddrMode
 		= (((framePtr->mpdu[PL_POS_FCF_2]) >>
-			FCF_2_DEST_ADDR_OFFSET) & 3);
+			FCF_2_DEST_ADDR_OFFSET) & 3U);
 
 	if ((FCF_SHORT_ADDR == disDestAddrMode) ||
 			(FCF_LONG_ADDR  == disDestAddrMode)) {
@@ -465,19 +474,19 @@ void MAC_PrepDisassocConf(buffer_t *buf,
 		 * ourvelves, the destination address information is to be used
 		 * here.
 		 */
-        PHY_PibGet(macPANId, (uint8_t *)&pib_panid);
+        pibStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_panid);
 		if (FCF_SHORT_ADDR == disDestAddrMode) {
 			MAC_Gen_MLME_DisassociateConf((buffer_t *)buf,
 					status,
 					disDestAddrMode,
 					pib_panid.pib_value_16bit,
-					(AddressField_t *)&tempDevAddr);
+					(AddressField_t *)((void *)&tempDevAddr));
 		} else {
 			MAC_Gen_MLME_DisassociateConf((buffer_t *)buf,
 					status,
 					disDestAddrMode,
 					pib_panid.pib_value_16bit,
-					(AddressField_t *)&tempDevAddr);
+					(AddressField_t *)((void *)&tempDevAddr));
 		}
 	} else if (MAC_COORDINATOR == macState) {
 		/* We are a coordinator. */
@@ -528,9 +537,9 @@ void MAC_PrepDisassocConf(buffer_t *buf,
 			 * own device parameter into the disassociation confirm
 			 * message.
 			 */
-            PHY_PibGet(macShortAddress, (uint8_t *)&pib_shortaddr);
-            PHY_PibGet(macPANId, (uint8_t *)&pib_panid);
-            PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_ieeeaddr);
+            pibStatus = PHY_PibGet(macShortAddress, (uint8_t *)&pib_shortaddr);
+            pibStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_panid);
+            pibStatus = PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_ieeeaddr);
 			if ((BROADCAST == pib_shortaddr.pib_value_16bit) ||
 					(MAC_NO_SHORT_ADDR_VALUE ==
 					pib_shortaddr.pib_value_16bit)
@@ -540,14 +549,14 @@ void MAC_PrepDisassocConf(buffer_t *buf,
 						status,
 						FCF_LONG_ADDR,
 						pib_panid.pib_value_16bit,
-						(AddressField_t *)&pib_ieeeaddr.pib_value_64bit);
+						(AddressField_t *)((void *)&pib_ieeeaddr.pib_value_64bit));
 			} else {
 				/* We have a valid short address. */
 				MAC_Gen_MLME_DisassociateConf((buffer_t *)buf,
 						status,
 						FCF_SHORT_ADDR,
 						pib_panid.pib_value_16bit,
-						(AddressField_t *)&pib_shortaddr.pib_value_16bit);
+						(AddressField_t *)((void *)&pib_shortaddr.pib_value_16bit));
 			}
 		} else {
 			/*
@@ -563,12 +572,12 @@ void MAC_PrepDisassocConf(buffer_t *buf,
 			 * ourvelves, the destination address information is to
 			 * be used here.
 			 */
-            PHY_PibGet(macPANId, (uint8_t *)&pib_panid);
+            pibStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_panid);
 			MAC_Gen_MLME_DisassociateConf((buffer_t *)buf,
 					status,
 					disDestAddrMode,
 					pib_panid.pib_value_16bit,
-					(AddressField_t *)&tempDevAddr);
+					(AddressField_t *)((void *)&tempDevAddr));
 		}
 	} else
 #endif /* (MAC_DISASSOCIATION_FFD_SUPPORT == 1) */
@@ -578,12 +587,9 @@ void MAC_PrepDisassocConf(buffer_t *buf,
 		 * We are an end device, so we need to fill in our own device
 		 * parameter into the disassociation confirm message.
 		 */
-        PibValue_t pib_panid;
-        PibValue_t pib_shortaddr;
-        PibValue_t pib_ieeeaddr;
-        PHY_PibGet(macShortAddress, (uint8_t *)&pib_shortaddr);
-        PHY_PibGet(macPANId, (uint8_t *)&pib_panid);
-        PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_ieeeaddr);
+        pibStatus = PHY_PibGet(macShortAddress, (uint8_t *)&pib_shortaddr);
+        pibStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_panid);
+        pibStatus = PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_ieeeaddr);
 		if ((BROADCAST == pib_shortaddr.pib_value_16bit) ||
 				(MAC_NO_SHORT_ADDR_VALUE ==
 				pib_shortaddr.pib_value_16bit)
@@ -593,17 +599,18 @@ void MAC_PrepDisassocConf(buffer_t *buf,
 					status,
 					FCF_LONG_ADDR,
 					pib_panid.pib_value_16bit,
-					(AddressField_t *)&pib_ieeeaddr.pib_value_64bit);
+					(AddressField_t *)((void *)&pib_ieeeaddr.pib_value_64bit));
 		} else {
 			/* We have a valid short address. */
 			MAC_Gen_MLME_DisassociateConf((buffer_t *)buf,
 					status,
 					FCF_SHORT_ADDR,
 					pib_panid.pib_value_16bit,
-					(AddressField_t *)&pib_shortaddr.pib_value_16bit);
+					(AddressField_t *)((void *)&pib_shortaddr.pib_value_16bit));
 		}
 	}
 
+    (void)pibStatus;
 	framePtr = framePtr; /* Keep compiler happy. */
 }
 

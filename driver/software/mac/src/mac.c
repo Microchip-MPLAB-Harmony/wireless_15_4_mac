@@ -60,7 +60,7 @@
 /* === Macros =============================================================== */
 
 /* === Globals ============================================================== */
-#define MAC_GUARD_TIME_US 1000
+
 #define READY_TO_SLEEP    1
 
 /**
@@ -192,7 +192,7 @@ PHY_FrameInfo_t phyTxFrameInfo;
 
 
 /* === Prototypes =========================================================== */
-#ifdef ENABLE_SLEEP
+#ifdef ENABLE_DEVICE_DEEP_SLEEP
 static void MAC_ReadyToDeepSleep(void);
 static void MAC_WakeUpFromDeepSleep(void);
 #endif
@@ -214,7 +214,7 @@ bool MAC_TaskHandler(void)
 
 	if (!macBusy) {
 		/* Check whether queue is empty */
-		if (nhleMacQueue.size != 0) {
+		if (nhleMacQueue.size != 0U) {
 			event = (uint8_t *)qmm_queue_remove(&nhleMacQueue, NULL);
 
 			/* If an event has been detected, handle it. */
@@ -231,7 +231,7 @@ bool MAC_TaskHandler(void)
 	 * irrespective of the dispatcher state.
 	 */
 	/* Check whether queue is empty */
-	if (phyMacQueue.size != 0) {
+	if (phyMacQueue.size != 0U) {
 		event = (uint8_t *)qmm_queue_remove(&phyMacQueue, NULL);
 
 		/* If an event has been detected, handle it. */
@@ -262,23 +262,23 @@ uint32_t MAC_ReadyToSleep(void)
 	uint32_t sleepTime = 0;
     PHY_TrxStatus_t trxStatus = PHY_GetTrxStatus();
 	if (macBusy ||
-			(macNhleQueue.size != 0) ||
-			(nhleMacQueue.size != 0) ||
-			(phyMacQueue.size != 0) ||
+			(macNhleQueue.size != 0U) ||
+			(nhleMacQueue.size != 0U) ||
+			(phyMacQueue.size != 0U) ||
 
 			(trxStatus != PHY_TRX_SLEEP)
 			) {
 		sleepTime = 0;
 	} else {
 		sleepTime = READY_TO_SLEEP;
-#ifdef ENABLE_SLEEP
+#ifdef ENABLE_DEVICE_DEEP_SLEEP
         MAC_ReadyToDeepSleep();
 #endif
 	}
 	return sleepTime;
 }
 
-PHY_Retval_t sendFrame(MAC_FrameInfo_t *macFrame, uint8_t csmaType, bool frameRetry)
+PHY_Retval_t sendFrame(MAC_FrameInfo_t *macFrame, PHY_CSMAMode_t csmaType, bool frameRetry)
 {
     PHY_Retval_t phyStatus;
     
@@ -296,7 +296,7 @@ PHY_Retval_t sendFrame(MAC_FrameInfo_t *macFrame, uint8_t csmaType, bool frameRe
 }
 
 
-#ifdef ENABLE_SLEEP
+#ifdef ENABLE_DEVICE_DEEP_SLEEP
 
 typedef __PACKED_STRUCT mac_ds_param
 {
@@ -322,10 +322,10 @@ static uint64_t    macieeeaddr;
 static uint16_t    panid;
 
 #if ((defined MAC_SECURITY_ZIP)  || (defined MAC_SECURITY_2006))
-MAC_SecPib_t __attribute__ ((persistent)) macSecPibBackup;
+static MAC_SecPib_t __attribute__ ((persistent)) macSecPibBackup;
 #endif
 
-MAC_Ds_Param_t __attribute__((persistent)) mdsParam;
+static MAC_Ds_Param_t __attribute__((persistent)) mdsParam;
 
 static void memcpy4ByteAligned(void* outbuf, void* inbuf, uint16_t length)
 {
@@ -335,12 +335,16 @@ static void memcpy4ByteAligned(void* outbuf, void* inbuf, uint16_t length)
   uint32_t* src = (uint32_t* )inbuf;
   uint32_t* dst = (uint32_t* )outbuf;
 
-  mod_size = (length % 4);
+  mod_size = (length % 4U);
   // total_length is in multiple of 4
-  if (mod_size !=0)
-    size  = length + 4 - mod_size; 
+  if (mod_size != 0U)
+  {
+    size  = length + 4U - mod_size; 
+  }
   else 
+  {
     size  = length;
+  }
 
   size  = size >> 2;
   for (k = 0; k < size; k++)
@@ -353,37 +357,40 @@ static void memcpy4ByteAligned(void* outbuf, void* inbuf, uint16_t length)
 
 static void MAC_ReadyToDeepSleep(void)
 {  
-    MAC_Ds_Param_t param; 
+    MAC_Ds_Param_t param;
+    PHY_Retval_t pibStatus = PHY_FAILURE;
         
     param.mac_CoordExtAddr = macPib.mac_CoordExtendedAddress;
     param.mac_CoordShtAddr = macPib.mac_CoordShortAddress;
     param.mac_max_frame_total_wait_time = macPib.mac_MaxFrameTotalWaitTime;
     param.mac_response_wait_time = macPib.mac_ResponseWaitTime;    
-    param.mac_state = macState;      
-    param.mac_poll_state = macPollState;
-    param.mac_radio_sleep_state = macRadioSleepState;    
+    param.mac_state =  (uint32_t)macState;      
+    param.mac_poll_state = (uint32_t)macPollState;
+    param.mac_radio_sleep_state = (uint32_t)macRadioSleepState;    
     param.mac_associated_PAN_coord = macPib.mac_AssociatedPANCoord;
     param.mac_auto_request = macPib.mac_AutoRequest;      
     param.mac_batt_life_ext_periods = macPib.mac_BattLifeExtPeriods;
     param.mac_dsn = macPib.mac_DSN;
             
-    PHY_PibGet(macPANId, (uint8_t *)&panid);
+    pibStatus = PHY_PibGet(macPANId, (uint8_t *)&panid);
     param.panid = (uint32_t)panid;
     
-    PHY_PibGet(macShortAddress, (uint8_t *)&macshortaddr);
+    pibStatus = PHY_PibGet(macShortAddress, (uint8_t *)&macshortaddr);
     param.mac_short_addr = (uint32_t)macshortaddr;
     
-    PHY_PibGet(macIeeeAddress, (uint8_t *)&macieeeaddr);
+    pibStatus = PHY_PibGet(macIeeeAddress, (uint8_t *)&macieeeaddr);
     param.mac_ieee_addr = macieeeaddr;
     
     uint8_t channelBeforeSleep;
-    PHY_PibGet(phyCurrentChannel, &channelBeforeSleep);
+    pibStatus = PHY_PibGet(phyCurrentChannel, &channelBeforeSleep);
     param.phy_current_channel = (uint32_t)channelBeforeSleep; 
         
-    memcpy4ByteAligned(&mdsParam,&param,sizeof(mdsParam)); 
+    memcpy4ByteAligned(&mdsParam,&param,((uint16_t)sizeof(mdsParam))); 
 #if ((defined MAC_SECURITY_ZIP)  || (defined MAC_SECURITY_2006))   
-    memcpy4ByteAligned(&macSecPibBackup, &macSecPib, sizeof(macSecPib) );
+    memcpy4ByteAligned(&macSecPibBackup, &macSecPib, ((uint16_t)sizeof(macSecPib)) );
 #endif
+    (void)pibStatus;
+    
 } 
 
 static void MAC_WakeUpFromDeepSleep(void)
@@ -391,41 +398,44 @@ static void MAC_WakeUpFromDeepSleep(void)
     MAC_Ds_Param_t param1;
     uint8_t channelAfterSleep;
         
-    memset (&param1, 0, sizeof(param1)); 
-    memcpy4ByteAligned(&param1,&mdsParam,sizeof(mdsParam));
+    (void)memset (&param1, 0, sizeof(param1)); 
+    memcpy4ByteAligned(&param1,&mdsParam,((uint16_t)sizeof(mdsParam)));
     
     macPib.mac_CoordExtendedAddress = param1.mac_CoordExtAddr;
     macieeeaddr = param1.mac_ieee_addr;    
-    macPib.mac_CoordShortAddress = param1.mac_CoordShtAddr;
-    macshortaddr = param1.mac_short_addr;
-    macPib.mac_MaxFrameTotalWaitTime = param1.mac_max_frame_total_wait_time;
-    macPib.mac_ResponseWaitTime = param1.mac_response_wait_time;   
-    macState = param1.mac_state;      
-    macPollState = param1.mac_poll_state ;
-    macRadioSleepState = param1.mac_radio_sleep_state;   
-    macPib.mac_AssociatedPANCoord = param1.mac_associated_PAN_coord;
-    macPib.mac_AutoRequest = param1.mac_auto_request;       
-    macPib.mac_BattLifeExtPeriods = param1.mac_batt_life_ext_periods;
-    macPib.mac_DSN = param1.mac_dsn;      
-    channelAfterSleep = param1.phy_current_channel;
-    panid = param1.panid;
+    macPib.mac_CoordShortAddress = (uint16_t)param1.mac_CoordShtAddr;
+    macshortaddr = (uint16_t)param1.mac_short_addr;
+    macPib.mac_MaxFrameTotalWaitTime = (uint16_t)param1.mac_max_frame_total_wait_time;
+    macPib.mac_ResponseWaitTime = (uint16_t)param1.mac_response_wait_time;   
+    macState = (MAC_State_t)param1.mac_state;      
+    macPollState = (MAC_PollState_t)param1.mac_poll_state ;
+    macRadioSleepState = (MAC_RadioSleepState_t)param1.mac_radio_sleep_state;   
+    macPib.mac_AssociatedPANCoord = (uint8_t)param1.mac_associated_PAN_coord;
+    macPib.mac_AutoRequest = (uint8_t)param1.mac_auto_request;       
+    macPib.mac_BattLifeExtPeriods = (uint8_t)param1.mac_batt_life_ext_periods;
+    macPib.mac_DSN = (uint8_t)param1.mac_dsn;      
+    channelAfterSleep = (uint8_t)param1.phy_current_channel;
+    panid = (uint16_t)param1.panid;
     
     PibValue_t pibValue;
+    PHY_Retval_t pibStatus = PHY_FAILURE;
        
     pibValue.pib_value_8bit = channelAfterSleep;
-    SetTalPibInternal(phyCurrentChannel, &pibValue);
+    pibStatus = SetPhyPibInternal(phyCurrentChannel, &pibValue);
     
     pibValue.pib_value_16bit = macshortaddr;
-    SetTalPibInternal(macShortAddress, &pibValue);   
+    pibStatus = SetPhyPibInternal(macShortAddress, &pibValue);  
     
     pibValue.pib_value_64bit = macieeeaddr;
-    SetTalPibInternal(macIeeeAddress, &pibValue);
+    pibStatus = SetPhyPibInternal(macIeeeAddress, &pibValue);
     
     pibValue.pib_value_16bit = panid;
-    SetTalPibInternal(macPANId, &pibValue);
+    pibStatus = SetPhyPibInternal(macPANId, &pibValue);
+
 #if ((defined MAC_SECURITY_ZIP)  || (defined MAC_SECURITY_2006))   
-    memcpy4ByteAligned(&macSecPib, &macSecPibBackup, sizeof(macSecPibBackup) );
+    memcpy4ByteAligned(&macSecPib, &macSecPibBackup, ((uint16_t)sizeof(macSecPibBackup)) );
 #endif
+    (void)pibStatus;
 
 }
 

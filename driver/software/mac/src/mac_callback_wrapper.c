@@ -68,14 +68,14 @@
  *
  * @param m Pointer to message structure
  */
-void MAC_MCPS_DataInd(uint8_t *m)
+void MAC_MCPS_DataInd(void *m)
 {
 	MCPS_DataInd_t *pmsg;
 	WPAN_AddrSpec_t srcAddr;
 	WPAN_AddrSpec_t dstAddr;
 
 	/* Get the buffer body from buffer header */
-	pmsg = (MCPS_DataInd_t *)BMM_BUFFER_POINTER(((buffer_t *)m));
+	pmsg = (MCPS_DataInd_t *)MAC_BUFFER_POINTER(((buffer_t *)m));
 
 	/* Source address spec */
 	srcAddr.AddrMode = pmsg->SrcAddrMode;
@@ -127,12 +127,12 @@ void MAC_MCPS_DataInd(uint8_t *m)
  *
  * @param m Pointer to message structure
  */
-void MAC_MCPS_DataConf(uint8_t *m)
+void MAC_MCPS_DataConf(void *m)
 {
 	MCPS_DataConf_t *pmsg;
 
 	/* Get the buffer body from buffer header */
-	pmsg = (MCPS_DataConf_t *)BMM_BUFFER_POINTER(((buffer_t *)m));
+	pmsg = (MCPS_DataConf_t *)MAC_BUFFER_POINTER(((buffer_t *)m));
 
 #ifdef ENABLE_TSTAMP
 	USR_MCPS_DataConf(pmsg->msduHandle, pmsg->status, pmsg->Timestamp);
@@ -153,13 +153,15 @@ void MAC_MCPS_DataConf(uint8_t *m)
  *
  * @param m Pointer to message structure
  */
-void MAC_MCPS_PurgeConf(uint8_t *m)
+
+void MAC_MCPS_PurgeConf(void *m)
 {
 	MCPS_PurgeConf_t *pmsg;
 
 	/* Get the buffer body from buffer header */
-	pmsg = (MCPS_PurgeConf_t *)BMM_BUFFER_POINTER(((buffer_t *)m));
-
+    
+	pmsg = (MCPS_PurgeConf_t *)MAC_BUFFER_POINTER(((buffer_t *)m));
+    
 	USR_MCPS_PurgeConf(pmsg->msduHandle, pmsg->status);
 
 	/* Free the buffer */
@@ -178,12 +180,12 @@ void MAC_MCPS_PurgeConf(uint8_t *m)
  *
  * @param m Pointer to message structure
  */
-void MAC_MLME_AssociateConf(uint8_t *m)
+void MAC_MLME_AssociateConf(void *m)
 {
 	MLME_AssociateConf_t *pmsg;
 
 	/* Get the buffer body from buffer header */
-	pmsg = (MLME_AssociateConf_t *)BMM_BUFFER_POINTER(((buffer_t *)m));
+	pmsg = (MLME_AssociateConf_t *)MAC_BUFFER_POINTER(((buffer_t *)m));
 
 	USR_MLME_AssociateConf(pmsg->AssocShortAddress, pmsg->status);
 
@@ -202,12 +204,12 @@ void MAC_MLME_AssociateConf(uint8_t *m)
  *
  * @param m Pointer to message structure
  */
-void MAC_MLME_AssociateInd(uint8_t *m)
+void MAC_MLME_AssociateInd(void *m)
 {
 	MLME_AssociateInd_t *pmsg;
 
 	/* Get the buffer body from buffer header */
-	pmsg = (MLME_AssociateInd_t *)BMM_BUFFER_POINTER((buffer_t *)m);
+	pmsg = (MLME_AssociateInd_t *)MAC_BUFFER_POINTER((buffer_t *)m);
 	USR_MLME_AssociateInd(pmsg->DeviceAddress,
 			pmsg->CapabilityInformation);
 
@@ -226,12 +228,12 @@ void MAC_MLME_AssociateInd(uint8_t *m)
  *
  * @param m Pointer to message structure
  */
-void MAC_MLME_BeaconNotifyInd(uint8_t *m)
+void MAC_MLME_BeaconNotifyInd(void *m)
 {
 	MLME_BeaconNotifyInd_t *pmsg;
 
 	/* Get the buffer body from buffer header */
-	pmsg = (MLME_BeaconNotifyInd_t *)BMM_BUFFER_POINTER(((buffer_t *)m));
+	pmsg = (MLME_BeaconNotifyInd_t *)MAC_BUFFER_POINTER(((buffer_t *)m));
 
 	/* Callback function */
 	USR_MLME_BeaconNotifyInd(pmsg->BSN,           /* BSN */
@@ -256,14 +258,14 @@ void MAC_MLME_BeaconNotifyInd(uint8_t *m)
  *
  * @param m Pointer to message structure
  */
-void MAC_MLME_CommStatusInd(uint8_t *m)
+void MAC_MLME_CommStatusInd(void *m)
 {
 	MLME_CommStatusInd_t *pmsg;
 	WPAN_AddrSpec_t srcAddr;
 	WPAN_AddrSpec_t dstAddr;
 
 	/* Get the buffer body from buffer header */
-	pmsg = (MLME_CommStatusInd_t *)BMM_BUFFER_POINTER(((buffer_t *)m));
+	pmsg = (MLME_CommStatusInd_t *)MAC_BUFFER_POINTER(((buffer_t *)m));
 
 	/* Source address spec */
 	srcAddr.PANId = pmsg->PANId;
@@ -295,13 +297,13 @@ void MAC_MLME_CommStatusInd(uint8_t *m)
  *
  * @param m Pointer to message structure
  */
-void MAC_MLME_DisassociateConf(uint8_t *m)
+void MAC_MLME_DisassociateConf(void *m)
 {
 	MLME_DisassociateConf_t *pmsg;
 	WPAN_AddrSpec_t device_addr;
 
 	/* Get the buffer body from buffer header */
-	pmsg = (MLME_DisassociateConf_t *)BMM_BUFFER_POINTER(((buffer_t *)m));
+	pmsg = (MLME_DisassociateConf_t *)MAC_BUFFER_POINTER(((buffer_t *)m));
 
 	/* Device address spec */
 	device_addr.AddrMode = pmsg->DeviceAddrMode;
@@ -327,12 +329,12 @@ void MAC_MLME_DisassociateConf(uint8_t *m)
  *
  * @param m Pointer to message structure
  */
-void MAC_MLME_DisassociateInd(uint8_t *m)
+void MAC_MLME_DisassociateInd(void *m)
 {
 	MLME_DisassociateInd_t *pmsg;
 
 	/* Get the buffer body from buffer header */
-	pmsg = (MLME_DisassociateInd_t *)BMM_BUFFER_POINTER(((buffer_t *)m));
+	pmsg = (MLME_DisassociateInd_t *)MAC_BUFFER_POINTER(((buffer_t *)m));
 
 	USR_MLME_DisassociateInd(pmsg->DeviceAddress,
 			pmsg->DisassociateReason);
@@ -352,12 +354,12 @@ void MAC_MLME_DisassociateInd(uint8_t *m)
  *
  * @param m Pointer to message structure
  */
-void MAC_MLME_GetConf(uint8_t *m)
+void MAC_MLME_GetConf(void *m)
 {
 	MLME_GetConf_t *pmsg;
 
 	/* Get the buffer body from buffer header */
-	pmsg = (MLME_GetConf_t *)BMM_BUFFER_POINTER(((buffer_t *)m));
+	pmsg = (MLME_GetConf_t *)MAC_BUFFER_POINTER(((buffer_t *)m));
 
 	/* Callback function */
 	USR_MLME_GetConf(pmsg->status,
@@ -382,12 +384,12 @@ void MAC_MLME_GetConf(uint8_t *m)
  *
  * @param m Pointer to message structure
  */
-void MAC_MLME_OrphanInd(uint8_t *m)
+void MAC_MLME_OrphanInd(void *m)
 {
 	MLME_OrphanInd_t *pmsg;
 
 	/* Get the buffer body from buffer header */
-	pmsg = (MLME_OrphanInd_t *)BMM_BUFFER_POINTER(((buffer_t *)m));
+	pmsg = (MLME_OrphanInd_t *)MAC_BUFFER_POINTER(((buffer_t *)m));
 
 	/* Callback function */
 	USR_MLME_OrphanInd(pmsg->OrphanAddress);
@@ -407,12 +409,12 @@ void MAC_MLME_OrphanInd(uint8_t *m)
  *
  * @param m Pointer to message structure
  */
-void MAC_MLME_PollConf(uint8_t *m)
+void MAC_MLME_PollConf(void *m)
 {
 	MLME_PollConf_t *pmsg;
 
 	/* Get the buffer body from buffer header */
-	pmsg = (MLME_PollConf_t *)BMM_BUFFER_POINTER(((buffer_t *)m));
+	pmsg = (MLME_PollConf_t *)MAC_BUFFER_POINTER(((buffer_t *)m));
 
 	USR_MLME_PollConf(pmsg->status);
 
@@ -429,12 +431,12 @@ void MAC_MLME_PollConf(uint8_t *m)
  *
  * @param m Pointer to message structure
  */
-void MAC_MLME_ResetConf(uint8_t *m)
+void MAC_MLME_ResetConf(void *m)
 {
 	MLME_ResetConf_t *pmsg;
 
 	/* Get the buffer body from buffer header */
-	pmsg = (MLME_ResetConf_t *)BMM_BUFFER_POINTER(((buffer_t *)m));
+	pmsg = (MLME_ResetConf_t *)MAC_BUFFER_POINTER(((buffer_t *)m));
 
 	USR_MLME_ResetConf(pmsg->status);
 
@@ -451,12 +453,12 @@ void MAC_MLME_ResetConf(uint8_t *m)
  *
  * @param m Pointer to message structure
  */
-void MAC_MLME_RxEnableConf(uint8_t *m)
+void MAC_MLME_RxEnableConf(void *m)
 {
 	MLME_RxEnableConf_t *pmsg;
 
 	/* Get the buffer body from buffer header */
-	pmsg = (MLME_RxEnableConf_t *)BMM_BUFFER_POINTER(((buffer_t *)m));
+	pmsg = (MLME_RxEnableConf_t *)MAC_BUFFER_POINTER(((buffer_t *)m));
 
 	USR_MLME_RxEnableConf(pmsg->status);
 
@@ -475,12 +477,12 @@ void MAC_MLME_RxEnableConf(uint8_t *m)
  *
  * @param m Pointer to message structure
  */
-void MAC_MLME_ScanConf(uint8_t *m)
+void MAC_MLME_ScanConf(void *m)
 {
 	MLME_ScanConf_t*pmsg;
 
 	/* Get the buffer body from buffer header */
-	pmsg = (MLME_ScanConf_t *)BMM_BUFFER_POINTER(((buffer_t *)m));
+	pmsg = (MLME_ScanConf_t *)MAC_BUFFER_POINTER(((buffer_t *)m));
 
 	/* Callback */
 	USR_MLME_ScanConf(pmsg->status,
@@ -503,12 +505,12 @@ void MAC_MLME_ScanConf(uint8_t *m)
  *
  * @param m Pointer to message structure
  */
-void MAC_MLME_SetConf(uint8_t *m)
+void MAC_MLME_SetConf(void *m)
 {
 	MLME_SetConf_t *pmsg;
 
 	/* Get the buffer body from buffer header */
-	pmsg = (MLME_SetConf_t *)BMM_BUFFER_POINTER(((buffer_t *)m));
+	pmsg = (MLME_SetConf_t *)MAC_BUFFER_POINTER(((buffer_t *)m));
 
 #if ((defined MAC_SECURITY_ZIP)  || (defined MAC_SECURITY_2006))
 	USR_MLME_SetConf(pmsg->status, pmsg->PIBAttribute,
@@ -530,12 +532,12 @@ void MAC_MLME_SetConf(uint8_t *m)
  *
  * @param m Pointer to message structure
  */
-void MAC_MLME_StartConf(uint8_t *m)
+void MAC_MLME_StartConf(void *m)
 {
 	MLME_StartConf_t *pmsg;
 
 	/* Get the buffer body from buffer header */
-	pmsg = (MLME_StartConf_t *)BMM_BUFFER_POINTER(((buffer_t *)m));
+	pmsg = (MLME_StartConf_t *)MAC_BUFFER_POINTER(((buffer_t *)m));
 
 	USR_MLME_StartConf(pmsg->status);
 
@@ -554,12 +556,12 @@ void MAC_MLME_StartConf(uint8_t *m)
  *
  * @param m Pointer to message structure
  */
-void MAC_MLME_SyncLossInd(uint8_t *m)
+void MAC_MLME_SyncLossInd(void *m)
 {
 	MLME_SyncLossInd_t *pmsg;
 
 	/* Get the buffer body from buffer header */
-	pmsg = (MLME_SyncLossInd_t *)BMM_BUFFER_POINTER(((buffer_t *)m));
+	pmsg = (MLME_SyncLossInd_t *)MAC_BUFFER_POINTER(((buffer_t *)m));
 
 	USR_MLME_SyncLossInd(pmsg->LossReason,
 			pmsg->PANId,

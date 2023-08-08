@@ -84,17 +84,19 @@ void MAC_GenMLMEAssociateConf(buffer_t *bufPtr,
 		uint8_t status,
 		uint16_t assocShortAddr)
 {
+    qmm_status_t qmmStatus  = QMM_QUEUE_FULL;
 	/* Reuse the associate request buffer for associate confirm. */
 	MLME_AssociateConf_t *assocConf
-		= (MLME_AssociateConf_t *)BMM_BUFFER_POINTER(bufPtr);
+		= (MLME_AssociateConf_t *)MAC_BUFFER_POINTER(bufPtr);
 
 	assocConf->cmdcode = MLME_ASSOCIATE_CONFIRM;
 	assocConf->status = status;
 	assocConf->AssocShortAddress = assocShortAddr;
 
 	/* Append the associate confirm message to MAC-NHLE queue. */
-	qmm_queue_append(&macNhleQueue, bufPtr);
+	qmmStatus = qmm_queue_append(&macNhleQueue, bufPtr);
     WPAN_PostTask();
+    (void)qmmStatus;
 }
 
 #endif /* (MAC_ASSOCIATION_REQUEST_CONFIRM == 1) */
@@ -110,10 +112,12 @@ void MAC_GenMLMEAssociateConf(buffer_t *bufPtr,
  *
  * @param m Pointer to MLME association request parameters
  */
-void MAC_MLME_AssociateRequest(uint8_t *m)
+void MAC_MLME_AssociateRequest(void *m)
 {
 	MLME_AssociateReq_t mar;
-	memcpy(&mar, BMM_BUFFER_POINTER((buffer_t *)m),
+    PHY_Retval_t chPageStatus, curChStatus;
+    PHY_Retval_t phyStatus = PHY_FAILURE;
+	(void)memcpy(((void *)&mar), (MAC_BUFFER_POINTER((buffer_t *)m)),
 			sizeof(MLME_AssociateReq_t));
 
 	/*
@@ -126,7 +130,7 @@ void MAC_MLME_AssociateRequest(uint8_t *m)
 	if ((FCF_SHORT_ADDR != mar.CoordAddrMode) &&
 			(FCF_LONG_ADDR != mar.CoordAddrMode)) {
 		MAC_GenMLMEAssociateConf((buffer_t *)m,
-				MAC_INVALID_PARAMETER,
+				(uint8_t)MAC_INVALID_PARAMETER,
 				INVALID_SHORT_ADDRESS);
 
 		return;
@@ -148,12 +152,11 @@ void MAC_MLME_AssociateRequest(uint8_t *m)
 	}
 
 	/* Set the PAN ID. */
-	SetTalPibInternal(macPANId, (void *)&mar.CoordPANId);
+	phyStatus = SetPhyPibInternal(macPANId, (void *)&mar.CoordPANId);
 
 	MAC_TrxWakeup();
 
 	/* Build the Association Request command frame. */
-	MAC_Retval_t status, status_2;
 	uint8_t frameLen;
 	uint8_t *framePtr;
 	uint8_t *tempFramePtr;
@@ -166,7 +169,7 @@ void MAC_MLME_AssociateRequest(uint8_t *m)
 	 * association request frame.
 	 */
 	MAC_FrameInfo_t *assocReqFrame
-		= (MAC_FrameInfo_t *)(BMM_BUFFER_POINTER((buffer_t *)m));
+		= (MAC_FrameInfo_t *)(MAC_BUFFER_POINTER((buffer_t *)m));
     
 
 	assocReqFrame->msgType = ASSOCIATIONREQUEST;
@@ -179,7 +182,7 @@ void MAC_MLME_AssociateRequest(uint8_t *m)
 					ASSOC_REQ_PAYLOAD_LEN - 2; /* Add 2 octets for FCS */
 
 	/* Update the payload field. */
-	*framePtr++ = ASSOCIATIONREQUEST;
+	*framePtr++ = (uint8_t)ASSOCIATIONREQUEST;
 	/* Build the capability info. */
 	*framePtr = mar.CapabilityInformation;
 
@@ -197,7 +200,7 @@ void MAC_MLME_AssociateRequest(uint8_t *m)
 
 	/* Source address */
 	framePtr -= 8;
-    PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
+    phyStatus = PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
     convert_64_bit_to_byte_array(pib_value.pib_value_64bit, framePtr);
 
 
@@ -217,7 +220,7 @@ void MAC_MLME_AssociateRequest(uint8_t *m)
 				FCF_ACK_REQUEST;
 	} else {
 		framePtr -= 8;
-		frameLen += 6; /* Add further 6 octets for long Destination
+		frameLen += 6U; /* Add further 6 octets for long Destination
 		                 * Address */
 
 		convert_64_bit_to_byte_array(macPib.mac_CoordExtendedAddress,
@@ -231,7 +234,7 @@ void MAC_MLME_AssociateRequest(uint8_t *m)
 
 	/* Destination PAN-Id */
 	framePtr -= 2;
-    PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+    phyStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_value);
     convert_16_bit_to_byte_array(pib_value.pib_value_16bit, framePtr);
     
 
@@ -249,29 +252,30 @@ void MAC_MLME_AssociateRequest(uint8_t *m)
 
 	/* Finished building of frame. */
 	assocReqFrame->mpdu = framePtr;
+    (void)phyStatus;
     
 	/* Set the channel page passed by the request. */
-	status = SetTalPibInternal(phyCurrentPage,
+	chPageStatus = SetPhyPibInternal(phyCurrentPage,
 			(void *)&(mar.ChannelPage));
 
 	/* Set the channel passed by the request. */
-	status_2 = SetTalPibInternal(phyCurrentChannel,
+	curChStatus = SetPhyPibInternal(phyCurrentChannel,
 			(void *)&(mar.LogicalChannel));
 
-	if ((MAC_SUCCESS == status) && (MAC_SUCCESS == status_2)) {
+	if ((PHY_SUCCESS == chPageStatus) && (PHY_SUCCESS == curChStatus)) {
 
 		/*
 		 * In Nonbeacon build the association request frame is
 		 * transmitted
 		 * with unslotted CSMA-CA and frame retry.
 		 */
-		status = sendFrame(assocReqFrame, CSMA_UNSLOTTED, true);
+		phyStatus = sendFrame(assocReqFrame, CSMA_UNSLOTTED, true);
 
-		if (MAC_SUCCESS == status) {
+		if (PHY_SUCCESS == phyStatus) {
 			MAKE_MAC_BUSY();
 		} else {
 			MAC_GenMLMEAssociateConf((buffer_t *)m,
-					MAC_CHANNEL_ACCESS_FAILURE,
+					(uint8_t)MAC_CHANNEL_ACCESS_FAILURE,
 					INVALID_SHORT_ADDRESS);
 
 			/* Set radio to sleep if allowed */
@@ -279,7 +283,7 @@ void MAC_MLME_AssociateRequest(uint8_t *m)
 		}
 	} else {
 		MAC_GenMLMEAssociateConf((buffer_t *)m,
-				MAC_CHANNEL_ACCESS_FAILURE,
+				(uint8_t)MAC_CHANNEL_ACCESS_FAILURE,
 				INVALID_SHORT_ADDRESS);
 
 		/* Set radio to sleep if allowed */
@@ -302,8 +306,9 @@ void MAC_MLME_AssociateRequest(uint8_t *m)
  */
 void MAC_ProcessAssociateRequest(buffer_t *assocReq)
 {
+    qmm_status_t qmmStatus = QMM_QUEUE_FULL;
 	/* Use the frame reception buffer for association indication. */
-	MLME_AssociateInd_t *mai = (MLME_AssociateInd_t *)BMM_BUFFER_POINTER(
+	MLME_AssociateInd_t *mai = (MLME_AssociateInd_t *)MAC_BUFFER_POINTER(
 			assocReq);
 
 	/*
@@ -312,7 +317,7 @@ void MAC_ProcessAssociateRequest(buffer_t *assocReq)
 	 * association request command from a device, the command shall be
 	 * ignored.
 	 */
-	if (!macPib.mac_AssociationPermit) {
+	if ((macPib.mac_AssociationPermit) == 0U) {
 		bmm_buffer_free(assocReq);
 		return;
 	}
@@ -326,8 +331,9 @@ void MAC_ProcessAssociateRequest(buffer_t *assocReq)
 	mai->cmdcode = MLME_ASSOCIATE_INDICATION;
 
 	/* Append the MLME associate indication to the MAC-NHLE queue. */
-	qmm_queue_append(&macNhleQueue, assocReq);
+	qmmStatus = qmm_queue_append(&macNhleQueue, assocReq);
     WPAN_PostTask();
+    (void)qmmStatus;
 }
 
 #endif /* (MAC_ASSOCIATION_INDICATION_RESPONSE == 1) */
@@ -342,20 +348,20 @@ void MAC_ProcessAssociateRequest(buffer_t *assocReq)
  *
  * @param m Pointer to association response parameters
  */
-void MAC_MLME_AssociateResponse(uint8_t *m)
+void MAC_MLME_AssociateResponse(void *m)
 {
 	uint8_t frameLen;
 	uint8_t *framePtr;
 	uint8_t *tempFramePtr;
 	uint16_t fcf;
     PibValue_t pib_value;
-
+    PHY_Retval_t pibStatus = PHY_FAILURE;
+   
 	MLME_AssociateResp_t mar;
-	memcpy(&mar, BMM_BUFFER_POINTER((buffer_t *)m),
-			sizeof(MLME_AssociateResp_t));
+	(void)memcpy(((void *)&mar), MAC_BUFFER_POINTER((buffer_t *)m), sizeof(MLME_AssociateResp_t));
 
 	MAC_FrameInfo_t *assocRespFrame
-		= (MAC_FrameInfo_t *)BMM_BUFFER_POINTER((buffer_t *)m);
+		= (MAC_FrameInfo_t *)MAC_BUFFER_POINTER((buffer_t *)m);
 
 	/*
 	 * A MLME associate response can only be processed
@@ -381,7 +387,7 @@ void MAC_MLME_AssociateResponse(uint8_t *m)
 	                                                             * FCS. */
 
 	/* Update the payload field. */
-	*framePtr++ = ASSOCIATIONRESPONSE;
+	*framePtr++ = (uint8_t)ASSOCIATIONRESPONSE;
 
 	/* Add the short address allocated for the device. */
 	convert_16_bit_to_byte_array(mar.AssocShortAddress, framePtr);
@@ -403,7 +409,7 @@ void MAC_MLME_AssociateResponse(uint8_t *m)
 
 	/* Source address */
 	framePtr -= 8;
-    PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
+    pibStatus = PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
     convert_64_bit_to_byte_array(pib_value.pib_value_64bit, framePtr);
 
 
@@ -413,7 +419,7 @@ void MAC_MLME_AssociateResponse(uint8_t *m)
 
 	/* Build the Destination PAN ID. */
 	framePtr -= 2;
-    PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+    pibStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_value);
     convert_16_bit_to_byte_array(pib_value.pib_value_16bit, framePtr);
 
 	/* Set DSN. */
@@ -450,8 +456,7 @@ void MAC_MLME_AssociateResponse(uint8_t *m)
 		 * Send the comm status indication with MAC transaction
 		 * overflow.
 		 */
-		MAC_MLME_CommStatus(MAC_TRANSACTION_OVERFLOW,
-				(buffer_t *)m);
+		MAC_MLME_CommStatus((uint8_t)MAC_TRANSACTION_OVERFLOW,(buffer_t *)m);
 
 		return;
 	}
@@ -464,10 +469,10 @@ void MAC_MLME_AssociateResponse(uint8_t *m)
 	 * If an FFD does have pending data,
 	 * the MAC persistence timer needs to be started.
 	 */
-	assocRespFrame->persistenceTime
-		= macPib.mac_TransactionPersistenceTime;
+	assocRespFrame->persistenceTime = macPib.mac_TransactionPersistenceTime;
 	MAC_CheckPersistenceTimer();
     WPAN_PostTask();
+    (void)pibStatus;
 } /* MAC_MLME_AssociateResponse */
 
 #endif /* (MAC_ASSOCIATION_INDICATION_RESPONSE == 1) */
@@ -487,9 +492,8 @@ void MAC_ProcessAssociateResponse(buffer_t *assocResp)
 	uint16_t panid;
 	uint16_t shortAddr;
 
-	uint8_t status
-		= macParseData.macPayloadData.assocResponseData.
-			assocStatus;
+	uint8_t status = macParseData.macPayloadData.assocResponseData.assocStatus;
+    PHY_Retval_t pibSetStatus = PHY_FAILURE;
 
 	/* Free the buffer received for association response frame. */
 	bmm_buffer_free(assocResp);
@@ -497,7 +501,7 @@ void MAC_ProcessAssociateResponse(buffer_t *assocResp)
 	if (ASSOCIATION_SUCCESSFUL == status) {
 		/* Set the short address received in association response frame.
 		**/
-		SetTalPibInternal(macShortAddress,
+		pibSetStatus = SetPhyPibInternal(macShortAddress,
 				(void *)&(macParseData.macPayloadData.
 				assocResponseData.shortAddr));
 
@@ -521,10 +525,10 @@ void MAC_ProcessAssociateResponse(buffer_t *assocResp)
 
 		panid = macPANId_def;
 
-		SetTalPibInternal(macPANId, (void *)&panid);
+		pibSetStatus = SetPhyPibInternal(macPANId, (void *)&panid);
 
 		macPib.mac_CoordShortAddress = macCoordShortAddress_def;
-		memset((uint8_t *)&macPib.mac_CoordExtendedAddress, 0,
+		(void)memset((uint8_t *)&macPib.mac_CoordExtendedAddress, 0,
 				sizeof(macPib.mac_CoordExtendedAddress));
 		/* macPib.mac_CoordExtendedAddress = CLEAR_ADDR_64; */
 
@@ -535,12 +539,13 @@ void MAC_ProcessAssociateResponse(buffer_t *assocResp)
 	 * The MLME association request buffer is stored in mac_conf_buf_ptr,
 	 * which is reused to generate MLME association confirmation.
 	 */
-	MAC_GenMLMEAssociateConf((buffer_t *)macConfBufPtr,
+	MAC_GenMLMEAssociateConf((buffer_t *)((void*)macConfBufPtr),
 			status,
 			shortAddr);
 
 	/* Set radio to sleep if allowed */
 	MAC_SleepTrans();
+    (void)pibSetStatus;
 } /* MAC_ProcessAssociateResponse */
 
 #endif /* (MAC_ASSOCIATION_REQUEST_CONFIRM == 1) */
@@ -557,7 +562,7 @@ void MAC_ProcessAssociateResponse(buffer_t *assocResp)
 void MAC_Timer_ResponseWaitCb(void *callbackParameter)
 {
 	uint32_t responseTimeUs;
-	MAC_Retval_t timerStatus;
+	PAL_Status_t timerStatus;
 	bool status;
 
 	responseTimeUs = PHY_CONVERT_SYMBOLS_TO_US(
@@ -590,8 +595,8 @@ void MAC_Timer_ResponseWaitCb(void *callbackParameter)
 		 * confirmation
 		 * is generated using the buffer stored in mac_conf_buf_ptr.
 		 */
-		MAC_GenMLMEAssociateConf((buffer_t *)macConfBufPtr,
-				MAC_CHANNEL_ACCESS_FAILURE,
+		MAC_GenMLMEAssociateConf((buffer_t *)((void*)macConfBufPtr),
+				(uint8_t)MAC_CHANNEL_ACCESS_FAILURE,
 				INVALID_SHORT_ADDRESS);
 		return;
 	}
@@ -601,7 +606,7 @@ void MAC_Timer_ResponseWaitCb(void *callbackParameter)
 			TIMEOUT_RELATIVE,
 			&MAC_Timer_AssocresponsetimeCb, NULL,CALLBACK_SINGLE);
 
-	if (MAC_SUCCESS != timerStatus) {
+	if (PAL_SUCCESS != timerStatus) {
 		/* Timer could not be started. */
 		MAC_Timer_AssocresponsetimeCb(NULL);
 	}
@@ -622,14 +627,15 @@ void MAC_Timer_ResponseWaitCb(void *callbackParameter)
 void MAC_Timer_AssocresponsetimeCb(void *callbackParameter)
 {
 	uint16_t panid;
+    PHY_Retval_t pibSetStatus = PHY_FAILURE;
 
 	/*
 	 * Association response is not received within time, hence generate
 	 * mlme association confirm with MAC_NO_DATA using the buffer stored in
 	 * mac_conf_buf_ptr.
 	 */
-	MAC_GenMLMEAssociateConf((buffer_t *)macConfBufPtr,
-			MAC_NO_DATA,
+	MAC_GenMLMEAssociateConf((buffer_t *)((void*)macConfBufPtr),
+			(uint8_t)MAC_NO_DATA,
 			BROADCAST);
 
 	/* Restore the mac poll state in case of association failure. */
@@ -637,10 +643,10 @@ void MAC_Timer_AssocresponsetimeCb(void *callbackParameter)
 
 	/* Set the default parameters. */
 	panid = macPANId_def;
-	SetTalPibInternal(macPANId, (void *)&panid);
+	pibSetStatus = SetPhyPibInternal(macPANId, (void *)&panid);
 
 	macPib.mac_CoordShortAddress = macCoordShortAddress_def;
-	memset((uint8_t *)&macPib.mac_CoordExtendedAddress, 0,
+	(void)memset((uint8_t *)&macPib.mac_CoordExtendedAddress, 0,
 			sizeof(macPib.mac_CoordExtendedAddress));
 	/* macPib.mac_CoordExtendedAddress = CLEAR_ADDR_64; */
 
@@ -648,6 +654,7 @@ void MAC_Timer_AssocresponsetimeCb(void *callbackParameter)
 	MAC_SleepTrans();
 
 	callbackParameter = callbackParameter; /* Keep compiler happy. */
+    (void)pibSetStatus;
 }
 
 #endif /* (MAC_ASSOCIATION_REQUEST_CONFIRM == 1) */

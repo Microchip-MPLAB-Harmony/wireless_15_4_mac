@@ -98,7 +98,7 @@ uint8_t Timer_RxEnable;
 static void DoInitPib(void);
 static void FlushQueues(void);
 static uint8_t MAC_Reset(uint8_t initPib);
-static void MAC_SoftReset(uint8_t initPib);
+static void MAC_SoftReset(bool initPib);
 static void ResetGlobals(void);
 static void SendResetConf(buffer_t *bufPtr, uint8_t status);
 
@@ -116,7 +116,7 @@ static void ResetGlobals(void)
 	macSyncState = MAC_SYNC_NEVER;
 	macPollState = MAC_POLL_IDLE;
 	macLastDsn = 0;
-	memset((uint8_t *)&macLastSrcAddr, 0xFF, sizeof(macLastSrcAddr));
+	(void)memset((uint8_t *)&macLastSrcAddr, 0xFF, sizeof(macLastSrcAddr));
 	/* macLastSrcAddr = 0xFFFFFFFFFFFFFFFFULL; */
 	macRxEnabled = false;
 }
@@ -128,6 +128,8 @@ static void ResetGlobals(void)
  */
 MAC_Retval_t MAC_Init(void)
 {
+    uint64_t randomNumber; 
+    PHY_Retval_t pibSetStatus = PHY_FAILURE;
 
 #ifdef STB_ON_SAL
 	STB_Init();
@@ -138,16 +140,15 @@ MAC_Retval_t MAC_Init(void)
 	}
 
 	MAC_SoftReset(true);
-    
-    uint64_t randomNumber;    
-    if (PAL_SUCCESS != PAL_GetRandomNumber((uint8_t*)&randomNumber, sizeof(randomNumber))) {
-		return PAL_FAILURE;
+       
+    if (PAL_SUCCESS != PAL_GetRandomNumber((uint8_t*)&randomNumber, (uint16_t)sizeof(randomNumber))) {
+		return FAILURE;
 	}    
-    PHY_PibSet(macIeeeAddress,(PibValue_t *) &randomNumber);
-
+    pibSetStatus = PHY_PibSet(macIeeeAddress,(PibValue_t *) ((void *)&randomNumber));
 
 	/* Set radio to sleep if allowed */
 	MAC_SleepTrans();
+    (void)pibSetStatus;
 
 	/* Initialize the queues */
 #ifdef ENABLE_QUEUE_CAPACITY
@@ -181,11 +182,12 @@ void MAC_IdleTrans(void)
 	{
 		uint16_t defaultShortaddress = macShortAddress_def;
 		uint16_t defaultPanid = macPANId_def;
+        PHY_Retval_t pibSetStatus = PHY_FAILURE;
  
-		SetTalPibInternal(macShortAddress,
+		pibSetStatus = SetPhyPibInternal(macShortAddress,
 				(void *)&defaultShortaddress);
-
-		SetTalPibInternal(macPANId, (void *)&defaultPanid);       
+		pibSetStatus = SetPhyPibInternal(macPANId, (void *)&defaultPanid); 
+        (void)pibSetStatus;
 	}
 
 	MAC_SoftReset(true);
@@ -227,7 +229,7 @@ static void DoInitPib(void)
 
 	macPib.mac_AutoRequest = macAutoRequest_def;
 	macPib.mac_BattLifeExtPeriods = macBattLifeExtPeriods_def;
-	memset((uint8_t *)&macPib.mac_CoordExtendedAddress, 0,
+	(void)memset((uint8_t *)&macPib.mac_CoordExtendedAddress, 0,
 			sizeof(macPib.mac_CoordExtendedAddress));
 	/* mac_pib.mac_CoordExtendedAddress = (uint64_t)CLEAR_ADDR_64; */
 	macPib.mac_CoordShortAddress = macCoordShortAddress_def;
@@ -257,10 +259,10 @@ static void DoInitPib(void)
  *
  * @param m Pointer to the MLME_RESET.request given by the NHLE
  */
-void MAC_MLME_ResetRequest(uint8_t *m)
+void MAC_MLME_ResetRequest(void *m)
 {
 	MLME_ResetReq_t *mrr
-		= (MLME_ResetReq_t *)BMM_BUFFER_POINTER((buffer_t *)m);
+		= (MLME_ResetReq_t *)MAC_BUFFER_POINTER((buffer_t *)m);
 
 	/* Wakeup the radio */
 	MAC_TrxWakeup();
@@ -294,12 +296,13 @@ void MAC_MLME_ResetRequest(uint8_t *m)
  */
 static uint8_t MAC_Reset(uint8_t initPib)
 {
-	uint8_t status = MAC_DISABLE_TRX_FAILURE;
+	uint8_t status = (uint8_t)MAC_DISABLE_TRX_FAILURE;
+    bool pib = (bool)(initPib);
 
 	/* Reset TAL */
-	status = PHY_Reset(initPib);
+	status = (uint8_t)(PHY_Reset(pib));
 
-	MAC_SoftReset(initPib);
+	MAC_SoftReset(pib);
 
 	return status;
 }
@@ -313,18 +316,22 @@ static uint8_t MAC_Reset(uint8_t initPib)
  * @param init_pib Boolean indicates whether PIB attributes shall be
  * initialized or not.
  */
-static void MAC_SoftReset(uint8_t initPib)
+static void MAC_SoftReset(bool initPib)
 {
+    PHY_TrxStatus_t trxStatus;
+    MAC_Retval_t timerstatus = FAILURE;
 	ResetGlobals();
 
 	/* Set trx to PHY_TRX_OFF */
-	PHY_RxEnable(PHY_STATE_TRX_OFF);
+	trxStatus = PHY_RxEnable(PHY_STATE_TRX_OFF);
+    (void)trxStatus;
 
 	ENTER_CRITICAL_REGION();
-	MAC_TimersStop();
+	timerstatus = MAC_TimersStop();
+    (void)timerstatus;
 	LEAVE_CRITICAL_REGION();
 
-	if (initPib) {
+	if (initPib == true) {
 		DoInitPib();
 	}
 }
@@ -370,15 +377,17 @@ static void FlushQueues(void)
 static void SendResetConf(buffer_t *bufPtr, uint8_t status)
 {
 	MLME_ResetConf_t *mrc;
+    qmm_status_t  qmmStatus = QMM_QUEUE_FULL;
 
-	mrc = (MLME_ResetConf_t *)BMM_BUFFER_POINTER(bufPtr);
+	mrc = (MLME_ResetConf_t *)MAC_BUFFER_POINTER(bufPtr);
 
 	mrc->status = status;
 	mrc->cmdcode = MLME_RESET_CONFIRM;
 
 	/* Append the mlme reset confirm to the MAC-NHLE queue */
-	qmm_queue_append(&macNhleQueue, bufPtr);
+	qmmStatus = qmm_queue_append(&macNhleQueue, bufPtr);
     WPAN_PostTask();
+    (void)qmmStatus;
 }
 
 #if (MAC_COMM_STATUS_INDICATION == 1)
@@ -403,24 +412,26 @@ void MAC_MLME_CommStatus(uint8_t status,
 	 * buffer), hence the destination address is backed up in a stack
 	 * variable.
 	 */
-	MAC_FrameInfo_t *framePtr = (MAC_FrameInfo_t *)BMM_BUFFER_POINTER(bufPtr);
+	MAC_FrameInfo_t *framePtr = (MAC_FrameInfo_t *)MAC_BUFFER_POINTER(bufPtr);
     PibValue_t pib_value;
+    PHY_Retval_t pibStatus = PHY_FAILURE;
+    qmm_status_t  qmmStatus = QMM_QUEUE_FULL;
 	uint64_t destinationAddress;
-	memcpy(&destinationAddress,
+	(void)memcpy(((uint8_t *)&destinationAddress),
 			&framePtr->mpdu[PL_POS_DST_ADDR_START],
-			sizeof(uint64_t));
+			(uint8_t)sizeof(uint64_t));
 	MLME_CommStatusInd_t *csi
-		= (MLME_CommStatusInd_t *)BMM_BUFFER_POINTER(bufPtr);
+		= (MLME_CommStatusInd_t *)MAC_BUFFER_POINTER(bufPtr);
 
 	csi->cmdcode = MLME_COMM_STATUS_INDICATION;
 
-    PHY_PibGet(macPANId, (uint8_t *)&pib_value);
+    pibStatus = PHY_PibGet(macPANId, (uint8_t *)&pib_value);
 	csi->PANId = pib_value.pib_value_16bit;
 
 	csi->SrcAddrMode = FCF_LONG_ADDR;
 
 	/* Initialize the source address */
-    PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
+    pibStatus = PHY_PibGet(macIeeeAddress, (uint8_t *)&pib_value);
 	csi->SrcAddr = pib_value.pib_value_64bit;
 
 	csi->DstAddrMode = FCF_LONG_ADDR;
@@ -429,9 +440,12 @@ void MAC_MLME_CommStatus(uint8_t status,
 	csi->DstAddr = destinationAddress;
 
 	csi->status = status;
+    (void)pibStatus;
 
-	qmm_queue_append(&macNhleQueue, bufPtr);
+	qmmStatus = qmm_queue_append(&macNhleQueue, bufPtr);
     WPAN_PostTask();
+    (void)qmmStatus;
+    
 }
 
 #endif /* MAC_COMM_STATUS_INDICATION */
@@ -505,18 +519,26 @@ MAC_Retval_t MAC_TimersStop(void)
 #if (NUMBER_OF_MAC_TIMERS > 0)
 
 #if (MAC_INDIRECT_DATA_BASIC == 1)
-	PAL_TimerStop(Timer_PollWaitTime);
+    if (PAL_SUCCESS != PAL_TimerStop(Timer_PollWaitTime)) {
+		return FAILURE;
+	}
     #if (MAC_INDIRECT_DATA_FFD == 1)
-	PAL_TimerStop(Timer_DataPersistence);
+	if (PAL_SUCCESS != PAL_TimerStop(Timer_DataPersistence)) {
+		return FAILURE;
+	}
     #endif  /* (MAC_INDIRECT_DATA_FFD == 1) */
 #endif  /* (MAC_INDIRECT_DATA_BASIC == 1) */
 
 #if (MAC_SCAN_SUPPORT == 1)
-	PAL_TimerStop(Timer_ScanDuration);
+	if (PAL_SUCCESS != PAL_TimerStop(Timer_ScanDuration)) {
+		return FAILURE;
+	}
 #endif  /* MAC_SCAN_SUPPORT */
 
 #if (MAC_RX_ENABLE_SUPPORT == 1)
-	PAL_TimerStop(Timer_RxEnable);
+	if (PAL_SUCCESS != PAL_TimerStop(Timer_RxEnable)) {
+		return FAILURE;
+	}
 #endif  /* MAC_RX_ENABLE_SUPPORT */
 #endif /* (NUMBER_OF_MAC_TIMERS != 0) */
 	return MAC_SUCCESS;

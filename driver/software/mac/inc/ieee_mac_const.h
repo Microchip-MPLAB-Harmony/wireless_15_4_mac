@@ -102,7 +102,7 @@
     None 
  */
 
-#define aGTSDescPersistenceTime         (4)
+#define aGTSDescPersistenceTime         (4U)
 
 // *****************************************************************************
 /* 
@@ -116,7 +116,7 @@
     None 
  */
 
-#define aMaxBeaconOverhead              (75)
+#define aMaxBeaconOverhead              (75U)
 
 // *****************************************************************************
 /* 
@@ -143,7 +143,7 @@
     None 
  */
 
-#define aMaxLostBeacons                 (4)
+#define aMaxLostBeacons                 (4U)
 
 // *****************************************************************************
 /* 
@@ -186,7 +186,7 @@
     None 
  */
 
-#define aMaxMPDUUnsecuredOverhead       (25)
+#define aMaxMPDUUnsecuredOverhead       (25U)
 
 
 // *****************************************************************************
@@ -207,7 +207,7 @@
     None 
  */
 
-#define macAssociationPermit            (0x41)
+#define macAssociationPermit            (0x41U)
 
 // *****************************************************************************
 /* macAssociationPermit_def
@@ -235,7 +235,7 @@
     None 
  */
 
-#define macAutoRequest                  (0x42)
+#define macAutoRequest                  (0x42U)
 
 // *****************************************************************************
 /* macAutoRequest_def
@@ -263,7 +263,7 @@
     None 
  */
 
-#define macBattLifeExt                  (0x43)
+#define macBattLifeExt                  (0x43U)
 
 // *****************************************************************************
 /* macBattLifeExt_def
@@ -292,7 +292,7 @@
     None 
  */
 
-#define macBattLifeExtPeriods           (0x44)
+#define macBattLifeExtPeriods           (0x44U)
 
 // *****************************************************************************
 /* macBattLifeExtPeriods_def
@@ -318,7 +318,7 @@
     None 
  */
 
-#define macBeaconPayload                (0x45)
+#define macBeaconPayload                (0x45U)
 
 // *****************************************************************************
 /* macBeaconPayloadLength
@@ -331,7 +331,7 @@
     None 
  */
 
-#define macBeaconPayloadLength          (0x46)
+#define macBeaconPayloadLength          (0x46U)
 
 // *****************************************************************************
 /* macBeaconPayloadLength_def
@@ -360,7 +360,7 @@
     None 
  */
 
-#define macBeaconOrder                  (0x47)
+#define macBeaconOrder                  (0x47U)
 
 // *****************************************************************************
 /* macBeaconOrder_def
@@ -386,7 +386,7 @@
     None 
  */
 
-#define NON_BEACON_NWK                  (0x0F)
+#define NON_BEACON_NWK                  (0x0FU)
 
 // *****************************************************************************
 /* macBeaconTxTime
@@ -403,7 +403,7 @@
     None 
  */
 
-#define macBeaconTxTime                 (0x48)
+#define macBeaconTxTime                 (0x48U)
 
 // *****************************************************************************
 /* macBeaconTxTime_def
@@ -429,7 +429,7 @@
     None 
  */
 
-#define macBSN                          (0x49)
+#define macBSN                          (0x49U)
 
 // *****************************************************************************
 /* macCoordExtendedAddress
@@ -443,7 +443,7 @@
     None 
  */
 
-#define macCoordExtendedAddress         (0x4A)
+#define macCoordExtendedAddress         (0x4AU)
 
 // *****************************************************************************
 /* macCoordShortAddress
@@ -459,7 +459,7 @@
     None 
  */
 
-#define macCoordShortAddress            (0x4B)
+#define macCoordShortAddress            (0x4BU)
 
 // *****************************************************************************
 /* macCoordShortAddress_def
@@ -486,7 +486,7 @@
     None 
  */
 
-#define macDSN                          (0x4C)
+#define macDSN                          (0x4CU)
 
 // *****************************************************************************
 /* macGTSPermit
@@ -500,7 +500,7 @@
     None 
  */
 
-#define macGTSPermit                    (0x4D)
+#define macGTSPermit                    (0x4DU)
 
 // *****************************************************************************
 /* macGTSPermit_def
@@ -527,7 +527,7 @@
     None 
  */
 
-#define macRxOnWhenIdle                 (0x52)
+#define macRxOnWhenIdle                 (0x52U)
 
 // *****************************************************************************
 /* macRxOnWhenIdle_def
@@ -557,7 +557,7 @@
     None 
  */
 
-#define macSuperframeOrder              (0x54)
+#define macSuperframeOrder              (0x54U)
 
 // *****************************************************************************
 /* macSuperframeOrder_def
@@ -570,7 +570,7 @@
     None 
  */
 
-#define macSuperframeOrder_def          (15)
+#define macSuperframeOrder_def          (15U)
 
 // *****************************************************************************
 /* macTransactionPersistenceTime
@@ -584,7 +584,7 @@
     None 
  */
 
-#define macTransactionPersistenceTime   (0x55)
+#define macTransactionPersistenceTime   (0x55U)
 
 // *****************************************************************************
 /* macTransactionPersistenceTime_def
@@ -612,7 +612,7 @@
     None 
  */
  
-#define macAssociatedPANCoord           (0x56)
+#define macAssociatedPANCoord           (0x56U)
 
 // *****************************************************************************
 /* macAssociatedPANCoord_def
@@ -644,7 +644,7 @@
     None 
  */
 
-#define macMaxFrameTotalWaitTime        (0x58)
+#define macMaxFrameTotalWaitTime        (0x58U)
 
 // *****************************************************************************
 /* macResponseWaitTime
@@ -659,7 +659,7 @@
     None 
  */
 
-#define macResponseWaitTime             (0x5A)
+#define macResponseWaitTime             (0x5AU)
 
 // *****************************************************************************
 /* macResponseWaitTime_def
@@ -672,7 +672,7 @@
     None 
  */
 
-#define macResponseWaitTime_def         (32 * aBaseSuperframeDuration)
+#define macResponseWaitTime_def         (32U * aBaseSuperframeDuration)
 
 // *****************************************************************************
 /* macSyncSymbolOffset
@@ -689,7 +689,7 @@
     None 
  */
 
-#define macSyncSymbolOffset             (0x5B)
+#define macSyncSymbolOffset             (0x5BU)
 
 // *****************************************************************************
 /* macTimestampSupported
@@ -703,7 +703,7 @@
     None 
  */
 
-#define macTimestampSupported           (0x5C)
+#define macTimestampSupported           (0x5CU)
 
 // *****************************************************************************
 /* macSecurityEnabled
@@ -718,7 +718,7 @@
     None 
  */
 
-#define macSecurityEnabled              (0x5D)
+#define macSecurityEnabled              (0x5DU)
 
 // *****************************************************************************
 /* macSecurityEnabled
@@ -751,7 +751,7 @@
     None 
  */
 
-#define macKeyTable                     (0x71)
+#define macKeyTable                     (0x71U)
 
 // *****************************************************************************
 /* macKeyTableEntries
@@ -765,7 +765,7 @@
  */
 
 
-#define macKeyTableEntries              (0x72)
+#define macKeyTableEntries              (0x72U)
 
 // *****************************************************************************
 /* macDeviceTable
@@ -779,7 +779,7 @@
     None 
  */
 
-#define macDeviceTable                  (0x73)
+#define macDeviceTable                  (0x73U)
 
 // *****************************************************************************
 /* macDeviceTableEntries
@@ -792,7 +792,7 @@
     None 
  */
 
-#define macDeviceTableEntries           (0x74)
+#define macDeviceTableEntries           (0x74U)
 
 // *****************************************************************************
 /* macSecurityLevelTable
@@ -807,7 +807,7 @@
     None 
  */
 
-#define macSecurityLevelTable           (0x75)
+#define macSecurityLevelTable           (0x75U)
 
 // *****************************************************************************
 /* macSecurityLevelTableEntries
@@ -820,7 +820,7 @@
     None 
  */
 
-#define macSecurityLevelTableEntries    (0x76)
+#define macSecurityLevelTableEntries    (0x76U)
 
 // *****************************************************************************
 /* macFrameCounter
@@ -833,7 +833,7 @@
     None 
  */
 
-#define macFrameCounter                 (0x77)
+#define macFrameCounter                 (0x77U)
 
 // *****************************************************************************
 /* macDefaultKeySource
@@ -847,7 +847,7 @@
     None 
  */
 
-#define macDefaultKeySource             (0x7C)
+#define macDefaultKeySource             (0x7CU)
 #endif  /* MAC_SECURITY_ZIP */
 
 // *****************************************************************************
@@ -861,7 +861,7 @@
     None 
  */
 
-#define macPANCoordExtendedAddress      (0x7D)
+#define macPANCoordExtendedAddress      (0x7DU)
 
 // *****************************************************************************
 /* macPANCoordShortAddress
@@ -874,7 +874,7 @@
     None 
  */
 
-#define macPANCoordShortAddress         (0x7E)
+#define macPANCoordShortAddress         (0x7EU)
 
 // *****************************************************************************
 /* macMaxNumRxFramesDuringBackoff
@@ -890,7 +890,7 @@
     None 
  */
 
-#define macMaxNumRxFramesDuringBackoff  (0x7F)
+#define macMaxNumRxFramesDuringBackoff  (0x7FU)
 
 // *****************************************************************************
 // Section:MAC commands attributes
@@ -908,7 +908,7 @@
     None 
  */
 
-#define MLME_SCAN_TYPE_ED               (0x00)
+#define MLME_SCAN_TYPE_ED               (0x00U)
 
 // *****************************************************************************
 /* MLME_SCAN_TYPE_ACTIVE
@@ -921,7 +921,7 @@
     None 
  */
 
-#define MLME_SCAN_TYPE_ACTIVE           (0x01)
+#define MLME_SCAN_TYPE_ACTIVE           (0x01U)
 
 // *****************************************************************************
 /* MLME_SCAN_TYPE_PASSIVE
@@ -934,7 +934,7 @@
     None 
  */
 
-#define MLME_SCAN_TYPE_PASSIVE          (0x02)
+#define MLME_SCAN_TYPE_PASSIVE          (0x02U)
 
 // *****************************************************************************
 /* MLME_SCAN_TYPE_ORPHAN
@@ -947,7 +947,7 @@
     None 
  */
 
-#define MLME_SCAN_TYPE_ORPHAN           (0x03)
+#define MLME_SCAN_TYPE_ORPHAN           (0x03U)
 
 // *****************************************************************************
 /* WPAN_TXOPT_OFF
@@ -960,7 +960,7 @@
     None 
  */
 
-#define WPAN_TXOPT_OFF                  (0x00)
+#define WPAN_TXOPT_OFF                  (0x00U)
 
 // *****************************************************************************
 /* WPAN_TXOPT_ACK
@@ -973,7 +973,7 @@
     None 
  */
 
-#define WPAN_TXOPT_ACK                  (0x01)
+#define WPAN_TXOPT_ACK                  (0x01U)
 
 // *****************************************************************************
 /* WPAN_TXOPT_INDIRECT
@@ -986,7 +986,7 @@
     None 
  */
 
-#define WPAN_TXOPT_INDIRECT             (0x04)
+#define WPAN_TXOPT_INDIRECT             (0x04U)
 
 // *****************************************************************************
 /* WPAN_TXOPT_INDIRECT_ACK
@@ -999,7 +999,7 @@
     None 
  */
 
-#define WPAN_TXOPT_INDIRECT_ACK         (0x05)
+#define WPAN_TXOPT_INDIRECT_ACK         (0x05U)
 
 // *****************************************************************************
 /* WPAN_TXOPT_GTS
@@ -1012,7 +1012,7 @@
     None 
  */
 
-#define WPAN_TXOPT_GTS                  (0x02)
+#define WPAN_TXOPT_GTS                  (0x02U)
 
 // *****************************************************************************
 /* WPAN_TXOPT_GTS_ACK
@@ -1025,7 +1025,7 @@
     None 
  */
 
-#define WPAN_TXOPT_GTS_ACK              (0x03)
+#define WPAN_TXOPT_GTS_ACK              (0x03U)
 
 // *****************************************************************************
 // *****************************************************************************
@@ -1057,7 +1057,7 @@
     None 
  */
 
-#define ASSOCIATION_SUCCESSFUL          (0)
+#define ASSOCIATION_SUCCESSFUL          (0U)
 
 // *****************************************************************************
 /* PAN_AT_CAPACITY
@@ -1070,7 +1070,7 @@
     None 
  */
 
-#define PAN_AT_CAPACITY                 (1)
+#define PAN_AT_CAPACITY                 (1U)
 
 // *****************************************************************************
 /* PAN_ACCESS_DENIED
@@ -1083,7 +1083,7 @@
     None 
  */
 
-#define PAN_ACCESS_DENIED               (2)
+#define PAN_ACCESS_DENIED               (2U)
 
 // *****************************************************************************
 /* ASSOCIATION_RESERVED
@@ -1096,7 +1096,7 @@
     None 
  */
 
-#define ASSOCIATION_RESERVED            (3)
+#define ASSOCIATION_RESERVED            (3U)
 
 // *****************************************************************************
 /* NUM_SHORT_PEND_ADDR
@@ -1109,7 +1109,7 @@
     None 
  */
 
-#define NUM_SHORT_PEND_ADDR(x)          ((x) & 0x07)
+#define NUM_SHORT_PEND_ADDR(x)          ((x) & 0x07U)
 
 // *****************************************************************************
 /* NUM_LONG_PEND_ADDR
@@ -1122,7 +1122,7 @@
     None 
  */
 
-#define NUM_LONG_PEND_ADDR(x)           (((x) & 0x70) >> 4)
+#define NUM_LONG_PEND_ADDR(x)           (((x) & 0x70U) >> 4U)
 
 // *****************************************************************************
 /* CLEAR_ADDR_64
@@ -1148,7 +1148,7 @@
     None 
  */
 
-#define MAC_NO_SHORT_ADDR_VALUE         (0xFFFE)
+#define MAC_NO_SHORT_ADDR_VALUE         (0xFFFEU)
 
 // *****************************************************************************
 /* INVALID_SHORT_ADDRESS
@@ -1175,7 +1175,7 @@
     None 
  */
 
-#define BATT_LIFE_EXT_BIT_POS               (12)
+#define BATT_LIFE_EXT_BIT_POS               (12U)
 
 // *****************************************************************************
 /* PAN_COORD_BIT_POS
@@ -1188,7 +1188,7 @@
     None 
  */
 
-#define PAN_COORD_BIT_POS                   (14)
+#define PAN_COORD_BIT_POS                   (14U)
 
 // *****************************************************************************
 /* ASSOC_PERMIT_BIT_POS
@@ -1201,7 +1201,7 @@
     None 
  */
 
-#define ASSOC_PERMIT_BIT_POS                (15)
+#define ASSOC_PERMIT_BIT_POS                (15U)
 
 // *****************************************************************************
 /* ASSOC_PERMIT_BIT_POS
@@ -1215,7 +1215,7 @@
  */
 
 #ifdef MAC_SECURITY_ZIP
-#define MAX_KEY_ID_FIELD_LEN                (9)
+#define MAX_KEY_ID_FIELD_LEN                (9U)
 #endif
 
 /* === Types ================================================================ */

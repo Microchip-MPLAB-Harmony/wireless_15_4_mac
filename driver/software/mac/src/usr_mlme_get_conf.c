@@ -49,21 +49,12 @@
 /* === Prototypes ========================================================== */
 
 /* === Implementation ====================================================== */
-#if (defined __GNUC__)
 void __attribute__((weak)) USR_MLME_GetConf(uint8_t status,
 		uint8_t PIBAttribute,
 #ifdef MAC_SECURITY_ZIP
 		uint8_t PIBAttributeIndex,
 #endif  /* MAC_SECURITY_ZIP */
 		void *PIBAttributeValue)
-#else
-void USR_MLME_GetConf(uint8_t status,
-		uint8_t PIBAttribute,
-#ifdef MAC_SECURITY_ZIP
-		uint8_t PIBAttributeIndex,
-#endif  /* MAC_SECURITY_ZIP */
-		void *PIBAttributeValue)
-#endif
 {
 	/* Keep compiler happy. */
 	status = status;

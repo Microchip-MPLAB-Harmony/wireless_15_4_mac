@@ -68,60 +68,130 @@
 // *****************************************************************************
 // *****************************************************************************
 
-/*
- * Values for SPI based systems are defined in the corresponding header files
- * for these transceivers.
+// *****************************************************************************
+/* 
+ 
+   Summary:
+    This macro defines AES direction as encryption.
+ 
+   Description:
+    None
+   Remarks:
+    None 
  */
 
-/* Values for SR_AES_DIR */
 #ifndef AES_DIR_ENCRYPT
 
-/**
- * Defines AES direction as encryption
- */
-#define AES_DIR_ENCRYPT              (0)
+#define AES_DIR_ENCRYPT              (0U)
 #endif
+
+// *****************************************************************************
+/* 
+ 
+   Summary:
+    This macro defines AES direction as decryption.
+ 
+   Description:
+    None
+   Remarks:
+    None 
+ */
+
 #ifndef AES_DIR_DECRYPT
 
-/**
- * Defines AES direction as decryption
- */
-#define AES_DIR_DECRYPT              (1)
+#define AES_DIR_DECRYPT              (1U)
 #endif
 
-/* Values for SR_AES_MODE */
+// *****************************************************************************
+/* 
+ 
+   Summary:
+    This macro defines AES mode as ECB.
+ 
+   Description:
+    None
+   Remarks:
+    None 
+ */
+
 #ifndef AES_MODE_ECB
 
-/**
- * Defines AES mode as ECB
- */
 #define AES_MODE_ECB                 (0)
 #endif
 
+// *****************************************************************************
+/* 
+ 
+   Summary:
+    This macro defines AES mode as CBC.
+ 
+   Description:
+    None
+   Remarks:
+    None 
+ */
 
 #ifndef AES_MODE_CBC
-/**
- * Defines AES mode as CBC
- */
+
 #define AES_MODE_CBC                 (1)
 #endif
 
-/** AES core operation direction: Decryption (ECB) */
-#define AES_DIR_DECRYPT   (1)
 
-/** AES core operation direction: Encryption (ECB, CBC) */
-#define AES_DIR_ENCRYPT   (0)
 
-/** Set CBC mode */
+// *****************************************************************************
+/* 
+ 
+   Summary:
+    This macro This macro defines AES mode as CBC.
+ 
+   Description:
+    None
+   Remarks:
+    None 
+ */
+
 #define AES_MODE_CBC   (1)
 
-/** Set ECB mode */
+// *****************************************************************************
+/* 
+ 
+   Summary:
+    This macro This macro defines AES mode as ECB.
+ 
+   Description:
+    None
+   Remarks:
+    None 
+ */
+
 #define AES_MODE_ECB   (0)
 
-/** Set CTR mode */
+// *****************************************************************************
+/* 
+ 
+   Summary:
+    This macro This macro defines AES mode as CTR.
+ 
+   Description:
+    None
+   Remarks:
+    None 
+ */
+
 #define AES_MODE_CTR    (2)
 
-/* Nonce size. */
+// *****************************************************************************
+/* 
+ 
+   Summary:
+    This macro This macro defines Nonce size.
+ 
+   Description:
+    None
+   Remarks:
+    None 
+ */
+
 #define NONCE_SIZE              (13)
 
 
@@ -131,9 +201,19 @@
 // Types
 // *****************************************************************************
 // *****************************************************************************
-/**
- * AES status values
+
+// *****************************************************************************
+/* AES status values
+ 
+   Summary:
+    Enumeration of AES status values
+ 
+   Description:
+    None
+   Remarks:
+    None 
  */
+
 typedef enum {
 	/** AES CCM en/decryption OK */
 	AES_SUCCESS = 0,
@@ -149,40 +229,90 @@ typedef enum {
 // *****************************************************************************
 // *****************************************************************************
 
-/**
- * @brief Initialization of SAL.
- *
- * This functions initializes the SAL.
- *
- * @ingroup group_SalApi
- */
+// *****************************************************************************
+/*
+  Function:
+    void SAL_Init(void)
+
+  Summary:
+    Initialization of SAL.
+
+  Description:
+    This functions initializes the SAL.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    None
+                      
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
 void SAL_Init(void);
 
-/**
- * @brief aes set key for SAL.
- *
- * This function set the aes set key and key length for SAL.
- *
- * @param[in] key The key to be used; if NULL, use the current key
- * @param[in] key_len Length of key
- */
+// *****************************************************************************
+/*
+  Function:
+    SAL_AesStatus_t SAL_AesSetKey(uint8_t *key, uint8_t key_len)
+
+  Summary:
+    aes set key for SAL.
+
+  Description:
+    This function set the aes set key and key length for SAL.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    key     -  The key to be used; if NULL, use the current key
+    key_len -  Length of key
+                      
+  Returns:
+    returns AES_SUCCESS if key intialization successfully  otherwise AES_FAILURE
+
+  Remarks:
+    None 
+*/
 
 SAL_AesStatus_t SAL_AesSetKey(uint8_t *key, uint8_t key_len);
 
-/**
- * @brief aes ccm secure for SAL.
- *
- * This function for aes secure with CCM.
- *
- * @param[in]  buffer Input data
- * @param[in]  nonce   The nonce: Initialization Vector (IV) as used in
- *                     cryptography
- * @param[in] key The key to be used; if NULL, use the current key
- * @param[in] hdr_len Length of plaintext header (will not be encrypted)
- * @param[in] pld_len Length of payload to be encrypted; if 0, then only MIC
- *                    authentication implies
- * @param[in] aes_dir AES_DIR_ENCRYPT if secure, AES_DIR_DECRYPT if unsecure
- */
+// *****************************************************************************
+/*
+  Function:
+    SAL_AesStatus_t SAL_AesCcmSecure(uint8_t *buffer, uint8_t nonce[AES_BLOCKSIZE],
+		uint8_t hdr_len, uint8_t pld_len, uint8_t aes_dir, uint8_t mic_len, uint8_t enc_flag)
+
+  Summary:
+    aes ccm secure for SAL.
+
+  Description:
+    This function for aes secure with CCM.
+ 
+  Precondition:
+    None
+
+  Parameters:
+    buffer     -  Input data
+    nonce      -  The nonce: Initialization Vector (IV) as used in
+                  cryptography
+    key        -  The key to be used; if NULL, use the current key
+    hdr_len    -  Length of plaintext header (will not be encrypted)
+    pld_len    -  Length of payload to be encrypted; if 0, then only MIC
+                 authentication implies
+    aes_dir    -  AES_DIR_ENCRYPT if secure, AES_DIR_DECRYPT if unsecure
+                      
+  Returns:
+    returns AES_SUCCESS if AES encryption and decryption successfully otherwise AES_FAILURE
+
+  Remarks:
+    None 
+*/
 
 SAL_AesStatus_t SAL_AesCcmSecure(uint8_t *buffer,
 		uint8_t nonce[AES_BLOCKSIZE],

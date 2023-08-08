@@ -64,8 +64,6 @@
 
 /* === Externals ========================================================== */
 
-/* === Prototypes ========================================================= */
-
 // DOM-IGNORE-BEGIN
 #ifdef __cplusplus  // Provide C++ Compatibility
 
@@ -74,13 +72,36 @@
 #endif
 // DOM-IGNORE-END
 
-/**
- * @brief STB Restart
- *
- * This function re-starts the STB after power down.
- *
- * @ingroup group_StbApi
- */
+// *****************************************************************************
+// *****************************************************************************
+// Section: Prototypes
+// *****************************************************************************
+// *****************************************************************************
+
+// *****************************************************************************
+/*
+  Function:
+    void STB_Restart(void)
+
+  Summary:
+    STB Restart
+
+  Description:
+    This function re-starts the STB after power down
+ 
+  Precondition:
+    None
+
+  Parameters:
+    None
+                      
+  Returns:
+    None
+
+  Remarks:
+    None 
+*/
+
 void STB_Restart(void);
 
 //DOM-IGNORE-BEGIN
