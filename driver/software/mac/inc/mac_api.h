@@ -66,7 +66,98 @@
 #endif
 // DOM-IGNORE-END
 
-/* === Macros =============================================================== */
+// *****************************************************************************
+// *****************************************************************************
+// Section: Release Version Macros
+// *****************************************************************************
+// *****************************************************************************
+
+
+/* Major Number
+ 
+   Summary:
+    This macro holds the stack Major number 
+   Description:
+	None
+   Remarks:
+    None 
+ */
+#define MAC_MAJOR_NUM                 "1"
+
+
+/* Minor Number
+ 
+   Summary:
+    This macro holds the stack Minor number 
+   Description:
+	None
+   Remarks:
+    None 
+ */
+#define MAC_MINOR_NUM                 "0"
+
+/* Patch Number
+ 
+   Summary:
+    This macro holds the stack patch number 
+   Description:
+	None
+   Remarks:
+    None 
+ */
+#define MAC_PATCH_NUM                 "0"
+
+
+/* MAC Version
+ 
+   Summary:
+    This macro holds the MAC SW version as a String 
+   Description:
+	None
+   Remarks:
+    None 
+ */
+#if (defined RC_NUM)
+#define MAC_VER   "802.15.4-MAC v" MAC_MAJOR_NUM"." MAC_MINOR_NUM"." MAC_PATCH_NUM"-rc." RC_NUM
+#else
+#define MAC_VER   "802.15.4-MAC v" MAC_MAJOR_NUM"." MAC_MINOR_NUM"." MAC_PATCH_NUM
+#endif
+
+/* Release version information in 32-bit bitfield 
+ 
+| bit pos | field name      | meaning                        |
+|---------|-----------------|------------------------------  |
+| 0-13    | reserved        | NA                             |
+| 14-17   | build itreation | running version of this release|
+| 18-19   | qualifier       | 00 - reserved                  |
+|         |                 | 01 - Production (P)            |
+|         |                 | 10 - Engineering (E)           |
+|         |                 | 11 - reserved                  |
+| 20-23   | stack minor     | minor version                  |
+| 24-27   | stack major     | major version                  |
+| 28-31   | reserved        | NA                             |
+
+
+Example:
+  802.15.4-MAC v1.0.0 is represented as 0x01040000
+
+|0000       |0001        | 0000        | 01        | 0000           | 00000000000000|
+|-----------|------------|-------------|-----------|----------------|---------------|
+|Reserved   | Stack Major| Stack Minor | Qualifier | Build Iteration| Reserved      |
+*/
+
+ 
+/* MAC Software Version Information in 32-bit bitfield
+ 
+   Summary:
+    This macro holds MAC Software Version Information in 32-bit bitfield
+   Description:
+	None
+   Remarks:
+    None 
+*/
+#define MAC_VERSION_VALUE      (0x01040000)
+
 
 /* === Externals ============================================================ */
 
