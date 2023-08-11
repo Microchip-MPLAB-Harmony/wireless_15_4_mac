@@ -254,6 +254,10 @@ def finalizeComponent(ieee802154mac):
     pass
 #end finalizeComponent
 
+#######################################################################################
+#################### Files and paths generation callbacks #############################
+#######################################################################################  
+
 def importIncFile(component, configName, incFileEntry, firmwarePath = None):
     incFilePath  = incFileEntry[0]
     isEnabled    = incFileEntry[1][0]
@@ -277,8 +281,8 @@ def importIncFile(component, configName, incFileEntry, firmwarePath = None):
     incFileSym = component.createFileSymbol(symName, None)
     incFileSym.setSourcePath("driver/software/" + secSName + "/" + incFile)
     incFileSym.setOutputName(incFile)
-    incFileSym.setDestPath("IEEE_802154_MAC/" + secDName + "")
-    incFileSym.setProjectPath("config/" + configName + "/IEEE_802154_MAC/"+ secDName + "")
+    incFileSym.setDestPath("driver/IEEE_802154_MAC/" + secDName + "")
+    incFileSym.setProjectPath("config/" + configName + "/driver/IEEE_802154_MAC/"+ secDName + "")
     incFileSym.setType("HEADER")
     incFileSym.setOverwrite(True)
     incFileSym.setEnabled(isEnabled)
@@ -311,8 +315,8 @@ def importSrcFile(component, configName, srcFileEntry, firmwarePath = None):
     srcFileSym = component.createFileSymbol(symName, None)
     srcFileSym.setSourcePath("driver/software/" + secSName + srcFile)
     srcFileSym.setOutputName(srcFile.rsplit("/", 1)[-1])
-    srcFileSym.setDestPath("IEEE_802154_MAC/" + secDName + "")
-    srcFileSym.setProjectPath("config/" + configName + "/IEEE_802154_MAC/"+ secDName + "")
+    srcFileSym.setDestPath("driver/IEEE_802154_MAC/" + secDName + "")
+    srcFileSym.setProjectPath("config/" + configName + "/driver/IEEE_802154_MAC/"+ secDName + "")
     srcFileSym.setType("SOURCE")
     srcFileSym.setEnabled(isEnabled)
 
@@ -326,7 +330,7 @@ def setIncPath(component, configName, incPathEntry):
     callback     = incPathEntry[1][1]
     dependencies = incPathEntry[1][2]
     incPathSym = component.createSettingSymbol("IEEE_802154_MAC_INC_PATH" + incPath.replace(".", "_").replace("/", "_").upper(), None)
-    incPathSym.setValue("../src/config/" + configName + incPath + ";")
+    incPathSym.setValue("../src/config/" + configName + "/driver/" + incPath + ";")
     incPathSym.setCategory("C32")
     incPathSym.setKey("extra-include-directories")
     incPathSym.setAppend(True, ";")
@@ -335,7 +339,7 @@ def setIncPath(component, configName, incPathEntry):
     
     
     incPathSymCpp = component.createSettingSymbol("IEEE_802154_MAC_INC_PATH_CPP" + incPath.replace(".", "_").replace("/", "_").upper(), None)
-    incPathSymCpp.setValue("../src/config/" + configName + incPath + ";")
+    incPathSymCpp.setValue("../src/config/" + configName + "/driver/" + incPath + ";")
     incPathSymCpp.setCategory("C32CPP")
     incPathSymCpp.setKey("extra-include-directories")
     incPathSymCpp.setAppend(True, ";")
@@ -343,9 +347,17 @@ def setIncPath(component, configName, incPathEntry):
     incPathSymCpp.setDependencies(callback, dependencies)
 #end setIncPath
 
-#-------------------------------------------------------------------------------
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ DEPENDENCY CALLBACKS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#-------------------------------------------------------------------------------
+#######################################################################################
+#################### DEPENDENCY CALLBACKS ###################################
+#######################################################################################  
+
+
+#---------------------------------------------------------------------------------------
+#~~~~~~~~~~~~~~~ Device type configuration FFD/RFD CALLBACK ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# This callback handles for adding Preprocessor macro, handles indirect buffers for FFD
+# and Deep sleep macro configuration based on device type seletion
+#---------------------------------------------------------------------------------------
+
 def DeviceTypeConfiguration(symbol,event):
     setDeviceType = event['value']
     if setDeviceType == 0:#FFD
@@ -367,6 +379,11 @@ def DeviceTypeConfiguration(symbol,event):
         macIndirectIntegerBmmLargeBuffers.setVisible(False)
         DeepSleepEnable.setVisible(True)
         DeepSleepEnable.setValue(False)  
+        
+#-----------------------------------------------------------------------------------------------------
+#~~~~~~~~~~~~~~~ Sleep configuration CALLBACK ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# This callbacks handles for Deep sleep macro configuration and RTC support from wireless_pic32cxbz_wbz
+#-----------------------------------------------------------------------------------------------------
        
 def SleepConfiguration(symbol,event):
     sleepEnable = event['value']
@@ -389,6 +406,11 @@ def HandleSleep(sleepEnable):
         Database.setSymbolValue("pic32cx_bz2_devsupport", "ENABLE_DEEP_SLEEP", False)
         Database.setSymbolValue("pic32cx_bz2_devsupport", "SYSTEM_ENABLE_PMUMODE_SETTING", False) 
      
+#-----------------------------------------------------------------------------------------------------
+#~~~~~~~~~~~~~~~ Security Configuration CALLBACK ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# This callbacks handles for adding Security preprocessor macros, activating wolfCrypt library module
+# and set AES_CLOCK_ENABLE based on security option
+#-----------------------------------------------------------------------------------------------------
 
 def SecurityConfiguration(symbol,event):
     Securityoption = event['value']
@@ -407,7 +429,11 @@ def SecurityConfiguration(symbol,event):
         preprocessorCompiler.setEnabled(True)
         Database.deactivateComponents(['lib_wolfcrypt'])
         Database.setSymbolValue("core", "AES_CLOCK_ENABLE", False)
-        
+
+#-----------------------------------------------------------------------------------------------------
+#~~~~~~~~~~~~~~~ Security Files Config CALLBACK ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# This callbacks handles for adding Security files(SAL & STB) based on security option
+#-----------------------------------------------------------------------------------------------------     
 
 def SecurityFilesConfig(symbol,event):
     Securityoption = event['value']
@@ -415,6 +441,11 @@ def SecurityFilesConfig(symbol,event):
         symbol.setEnabled(True)        
     if Securityoption == 0:#Disabled
         symbol.setEnabled(False) 
+        
+#-----------------------------------------------------------------------------------------------------
+#~~~~~~~~~~~~~~~ macCommentBmmLarge and small Buffers Depend CALLBACKs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# This callbacks handles for adding Security files(SAL & STB) based on security option
+#-----------------------------------------------------------------------------------------------------     
 
 def macCommentBmmLargeBuffersDepend(sourceSymbol, event):
     totalMem = macConstLargeBufferSize * macIntegerBmmLargeBuffers.getValue()
@@ -442,7 +473,8 @@ def onAttachmentConnected(source, target):
           remoteComponent.getSymbolByID("trngEnableInterrupt").setReadOnly(True)
           remoteComponent.getSymbolByID("trngEnableEvent").setReadOnly(True)
           remoteComponent.getSymbolByID("TRNG_STANDBY").setReadOnly(True)         
-  
+
+#end onAttachmentConnected  
     
 def onAttachmentDisconnected(source, target):
 
@@ -456,5 +488,9 @@ def onAttachmentDisconnected(source, target):
           remoteComponent.getSymbolByID("CREATE_PHY_RTOS_TASK").setValue(True)
           remoteComponent.getSymbolByID("CREATE_PHY_RTOS_TASK").setReadOnly(False)
           
+#end onAttachmentDisconnected 
+          
 def destroyComponent(ieee802154mac):
     Database.deactivateComponents(requiredComponents)
+    
+#end destroyComponent 

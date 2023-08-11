@@ -320,6 +320,7 @@ typedef __PACKED_STRUCT mac_ds_param
 static uint16_t    macshortaddr; 
 static uint64_t    macieeeaddr;
 static uint16_t    panid;
+static MAC_Ds_Param_t param1;
 
 #if ((defined MAC_SECURITY_ZIP)  || (defined MAC_SECURITY_2006))
 static MAC_SecPib_t __attribute__ ((persistent)) macSecPibBackup;
@@ -395,10 +396,7 @@ static void MAC_ReadyToDeepSleep(void)
 
 static void MAC_WakeUpFromDeepSleep(void)
 {   
-    MAC_Ds_Param_t param1;
     uint8_t channelAfterSleep;
-        
-    (void)memset (&param1, 0, sizeof(param1)); 
     memcpy4ByteAligned(&param1,&mdsParam,((uint16_t)sizeof(mdsParam)));
     
     macPib.mac_CoordExtendedAddress = param1.mac_CoordExtAddr;
