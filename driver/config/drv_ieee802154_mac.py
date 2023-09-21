@@ -444,7 +444,7 @@ def SecurityFilesConfig(symbol,event):
         
 #-----------------------------------------------------------------------------------------------------
 #~~~~~~~~~~~~~~~ macCommentBmmLarge and small Buffers Depend CALLBACKs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# This callbacks handles for adding Security files(SAL & STB) based on security option
+# This callbacks handles bmm large and small buffers
 #-----------------------------------------------------------------------------------------------------     
 
 def macCommentBmmLargeBuffersDepend(sourceSymbol, event):

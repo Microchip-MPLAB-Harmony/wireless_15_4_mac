@@ -5,7 +5,7 @@
 
 ## Release v1.0.0
 
-The MAC core layer abstracts and implements IEEE 802.15.4-2015 compliant functionalities for Non-Beacon enabled network support.
+The MAC core layer abstracts and implements IEEE 802.15.4 compliant functionalities for Non-Beacon enabled network support.
 MAC should be responsible for following functional requirement of a standalone IEEE 802.15.4. 
 
 -	Transmission of data

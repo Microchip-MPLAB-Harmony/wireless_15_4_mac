@@ -23,7 +23,7 @@
 ##############################################################################
 
 def loadModule():
-    print("Load Module: Harmony IEEE 802.15.4 MAC Standalone Library")
+    print("Load Module: Harmony IEEE 802.15.4 MAC Standalone")
 
     pic32cx_bz2_family = {'PIC32CX1012BZ25048',
                           'PIC32CX1012BZ25032',

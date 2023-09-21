@@ -12,7 +12,7 @@ MPLAB® Harmony 3 is an extension of the MPLAB® ecosystem for creating embedded
 - [Microchip MPLAB® Harmony Pages](https://microchip-mplab-harmony.github.io/)
 
 This repository contains the MPLAB® Harmony 3 Standalone IEEE 802.15.4 Mac Layer for PIC32CX-BZ2 platform devices. 
-The MAC core layer abstracts and implements IEEE 802.15.4-2015 compliant functionalities for Non-Beacon enabled network support. Refer to
+The MAC core layer abstracts and implements IEEE 802.15.4 compliant functionalities for Non-Beacon enabled network support. Refer to
 the following links for release notes, training materials, and interface
 reference information.
 
@@ -26,7 +26,7 @@ reference information.
 | Folder     | Description                                                       |
 | -----------| ------------------------------------------------------------------|
 | config     | Standalone IEEE 802.15.4 Mac Layer module configuration file |
-| docs       | Standalone IEEE 802.15.4 Mac Layer library API documentation|
+| **[docs](docs/index.html)**    | Standalone IEEE 802.15.4 Mac Layer API documentation|
 | drivers    | Mac layer files and dependent files for pic32cxbz2 products     |
 
 
