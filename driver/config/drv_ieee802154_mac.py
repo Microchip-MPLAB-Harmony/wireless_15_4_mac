@@ -27,7 +27,7 @@
 #-------------------------------------------------------------------------------
 
 def instantiateComponent(ieee802154mac):
-    print("IEEE 802.15.4 MAC Standlone library driver component")
+    print("IEEE 802.15.4 MAC Standalone library driver component")
     configName = Variables.get("__CONFIGURATION_NAME")
     print configName
     # === Activate required components automatically

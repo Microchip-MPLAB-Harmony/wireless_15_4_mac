@@ -28,13 +28,10 @@
 
 # ========== Device type Configuration for MAC ====================
 
-
-global macDeviceConfig
 macDeviceConfig = ieee802154mac.createMenuSymbol("MAC_DEVICE_CONFIG", None)
 macDeviceConfig.setLabel("Device Type Configuration")
 macDeviceConfig.setVisible(True)
 
-global macDeviceType
 macDeviceType = ieee802154mac.createKeyValueSetSymbol("MAC_DEVICE_TYPE", macDeviceConfig)
 macDeviceType.setLabel("MAC Device Type")
 macDeviceType.addKey("FFD", "0", "FFD")
@@ -56,12 +53,10 @@ DeepSleepEnable.setDependencies(SleepConfiguration, ["DEEP_SLEEP_ENABLE"])
 
 # ========== Security Configuration for MAC ===========================
 
-global macSecurityConfig
 macSecurityConfig = ieee802154mac.createMenuSymbol("MAC_SECURITY_CONFIG", None)
 macSecurityConfig.setLabel("Security Configuration")
 macSecurityConfig.setVisible(True)
 
-global SecurityConfig
 SecurityConfig = ieee802154mac.createKeyValueSetSymbol("MAC_SECURITY_OPTION", macSecurityConfig)
 SecurityConfig.setLabel("MAC Security Config")
 SecurityConfig.addKey("DISABLED", "0", "DISABLED")
@@ -74,7 +69,6 @@ SecurityConfig.setDependencies(SecurityConfiguration,["MAC_SECURITY_OPTION"])
 
 # ========== Buffer Configuration for MAC ================================
 
-global macMenuBmm
 macMenuBmm = ieee802154mac.createMenuSymbol("MAC_MENU_BMM", None)
 macMenuBmm.setLabel("MAC Buffer Configuration")
 macMenuBmm.setVisible(True)

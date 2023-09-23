@@ -19,7 +19,7 @@ reference information.
 - [Release Notes](./release_notes.md)
 - [MPLAB® Harmony License](mplab_harmony_license.md)
 - [MPLAB® Harmony 3 Standalone IEEE 802.15.4 Mac Layer Wiki](https://github.com/Microchip-MPLAB-Harmony/wireless_15_4_mac/wiki)
-- [MPLAB® Harmony 3 Standalone IEEE 802.15.4 Mac Layer API Help](https://microchip-mplab-harmony.github.io/wireless_15_4_mac)
+- [MPLAB® Harmony 3 Standalone IEEE 802.15.4 Mac Layer API Help](docs/MPLAB_Harmony_Wireless_15_4_MAC_APIhelp.chm)
 
 # Contents Summary
 
