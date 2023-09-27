@@ -26,7 +26,7 @@ reference information.
 | Folder     | Description                                                       |
 | -----------| ------------------------------------------------------------------|
 | config     | Standalone IEEE 802.15.4 Mac Layer module configuration file |
-| **[docs](docs/index.html)**    | Standalone IEEE 802.15.4 Mac Layer API documentation|
+| docs| [Standalone IEEE 802.15.4 Mac Layer API documentation](https://onlinedocs.microchip.com/oxy/GUID-D769F037-FBC7-4D1C-9892-ADA91E643160-en-US-1/index.html)|
 | drivers    | Mac layer files and dependent files for pic32cxbz2 products     |
 
 
