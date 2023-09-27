@@ -28,7 +28,7 @@ MAC should be responsible for following functional requirement of a standalone I
 -	No issues
 
 ## Development Tools
--	MPLAB X v6.10
+-	MPLAB X v6.15
 -	MPLAB® XC32 C/C++ Compiler v4.21
 -	MPLAB® X IDE plug-ins: MPLAB® Code Configurator (MCC) v5.3.7 and above
 -	Device Pack: PIC32CX-BZ2-DFP (1.2.230)
