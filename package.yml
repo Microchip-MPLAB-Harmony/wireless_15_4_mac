@@ -4,7 +4,7 @@ package:
   type: "package"
   status: "production"
   required: false
-  version: "1.0.1"
+  version: "v1.0.1"
 
   dependencies:
     - name: "csp"

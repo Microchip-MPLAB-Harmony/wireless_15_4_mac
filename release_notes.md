@@ -3,6 +3,14 @@
 
 # Microchip PIC32CX-BZ2 Device Standalone IEEE 802.15.4 Mac Layer Release Notes
 
+## Release v1.0.1
+
+### Bug fixes
+
+- Fix of dependency version string in package.yml
+
+________________________________
+
 ## Release v1.0.0
 
 The MAC core layer abstracts and implements IEEE 802.15.4 compliant functionalities for Non-Beacon enabled network support.
