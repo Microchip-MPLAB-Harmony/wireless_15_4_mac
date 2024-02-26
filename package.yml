@@ -4,7 +4,7 @@ package:
   type: "package"
   status: "production"
   required: false
-  version: "1.0.0"
+  version: "1.0.1"
 
   dependencies:
     - name: "csp"
@@ -30,4 +30,4 @@ package:
       version: "v1.2.0"
     - name: "wireless_15_4_phy"
       type: "package"
-      version: "v1.1.0" 
+      version: "v1.1.1" 
