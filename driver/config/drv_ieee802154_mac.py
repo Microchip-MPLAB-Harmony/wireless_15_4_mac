@@ -26,20 +26,35 @@
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ IEEE 802.15.4 MAC CONFIGURATIONS ~~~~~~~~~~~~~~~~
 #-------------------------------------------------------------------------------
 
+#-------------------------------------------------------------------------------
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ COMPONENT ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#-------------------------------------------------------------------------------
+pic32cx_bz2_family = {'PIC32CX1012BZ25048',
+                      'PIC32CX1012BZ25032',
+                      'PIC32CX1012BZ24032',
+                      'WBZ451',
+                      'WBZ450',
+                      'WBZ451H',
+                      }
+                      
+global deviceName
+deviceName = Variables.get("__PROCESSOR")
+
 def instantiateComponent(ieee802154mac):
     print("IEEE 802.15.4 MAC Standalone library driver component")
     configName = Variables.get("__CONFIGURATION_NAME")
     print configName
     # === Activate required components automatically
     global requiredComponents
-    requiredComponents = [
-        "IEEE_802154_PHY",
-        "HarmonyCore",
-        "sys_time",
-        "pic32cx_bz2_devsupport",
-        "RTOS",
-        "trng"
-    ]
+    if (deviceName in pic32cx_bz2_family):
+          requiredComponents = [
+              "IEEE_802154_PHY",
+              "HarmonyCore",
+              "sys_time",
+              "pic32cx_bz2_devsupport",
+              "RTOS",
+              "trng"
+          ]
     
     conditionAlwaysInclude = [True, None, []]
     condSecurity = [False, SecurityFilesConfig, ['MAC_SECURITY_OPTION']]
@@ -395,16 +410,20 @@ def HandleSleep(sleepEnable):
         preprocessorSleepMacro = preprocessorSleepMacro + ";ENABLE_DEVICE_DEEP_SLEEP"
         preprocessorCompiler.setValue(preprocessorSleepMacro)
         preprocessorCompiler.setEnabled(True)
-        Database.setSymbolValue("pic32cx_bz2_devsupport", "ENABLE_DEEP_SLEEP", True)
-        Database.setSymbolValue("pic32cx_bz2_devsupport", "SYSTEM_ENABLE_PMUMODE_SETTING", True)
+        if (deviceName in pic32cx_bz2_family):
+            Database.sendMessage("pic32cx_bz2_devsupport", "DEEP_SLEEP_ENABLE", {"target": "pic32cx_bz2_devsupport",
+                                                        "source": "IEEE_802154_MAC","isEnabled":True})
+            Database.setSymbolValue("pic32cx_bz2_devsupport", "SYSTEM_ENABLE_PMUMODE_SETTING", True)
         
     if sleepEnable == False:
         preprocessorSleepMacro = preprocessorCompiler.getValue()
         preprocessorSleepMacro = preprocessorSleepMacro.replace(";ENABLE_DEVICE_DEEP_SLEEP","")
         preprocessorCompiler.setValue(preprocessorSleepMacro)
-        preprocessorCompiler.setEnabled(True) 
-        Database.setSymbolValue("pic32cx_bz2_devsupport", "ENABLE_DEEP_SLEEP", False)
-        Database.setSymbolValue("pic32cx_bz2_devsupport", "SYSTEM_ENABLE_PMUMODE_SETTING", False) 
+        preprocessorCompiler.setEnabled(True)
+        if (deviceName in pic32cx_bz2_family):
+            Database.sendMessage("pic32cx_bz2_devsupport", "DEEP_SLEEP_ENABLE", {"target": "pic32cx_bz2_devsupport",
+                                                        "source": "IEEE_802154_MAC","isEnabled":False})
+            Database.setSymbolValue("pic32cx_bz2_devsupport", "SYSTEM_ENABLE_PMUMODE_SETTING", False) 
      
 #-----------------------------------------------------------------------------------------------------
 #~~~~~~~~~~~~~~~ Security Configuration CALLBACK ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -457,6 +476,11 @@ def macCommentBmmSmallBuffersDepend(sourceSymbol, event):
 
 #end dependency callbacks
 
+def handleMessage(messageID, args):
+    pass
+    
+# end handle message
+
 def onAttachmentConnected(source, target):
     localComponent = source["component"]
     remoteComponent = target["component"]
@@ -467,12 +491,13 @@ def onAttachmentConnected(source, target):
           remoteComponent.getSymbolByID("CREATE_PHY_RTOS_TASK").setValue(False)
           remoteComponent.getSymbolByID("CREATE_PHY_RTOS_TASK").setReadOnly(True)  
 
-    remoteComponent = Database.getComponentByID("trng")
-    if (remoteComponent):
-          print('Printing TRNG remoteComponent Value')
-          remoteComponent.getSymbolByID("trngEnableInterrupt").setReadOnly(True)
-          remoteComponent.getSymbolByID("trngEnableEvent").setReadOnly(True)
-          remoteComponent.getSymbolByID("TRNG_STANDBY").setReadOnly(True)         
+    if (deviceName in pic32cx_bz2_family):
+          remoteComponent = Database.getComponentByID("trng")
+          if (remoteComponent):
+               print('Printing TRNG remoteComponent Value')
+               remoteComponent.getSymbolByID("trngEnableInterrupt").setReadOnly(True)
+               remoteComponent.getSymbolByID("trngEnableEvent").setReadOnly(True)
+               remoteComponent.getSymbolByID("TRNG_STANDBY").setReadOnly(True)         
 
 #end onAttachmentConnected  
     
@@ -491,6 +516,7 @@ def onAttachmentDisconnected(source, target):
 #end onAttachmentDisconnected 
           
 def destroyComponent(ieee802154mac):
-    Database.deactivateComponents(requiredComponents)
+    for component in requiredComponents:
+         Database.deactivateComponents([component])
     
 #end destroyComponent 
