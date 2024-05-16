@@ -413,7 +413,6 @@ def HandleSleep(sleepEnable):
         if (deviceName in pic32cx_bz2_family):
             Database.sendMessage("pic32cx_bz2_devsupport", "DEEP_SLEEP_ENABLE", {"target": "pic32cx_bz2_devsupport",
                                                         "source": "IEEE_802154_MAC","isEnabled":True})
-            Database.setSymbolValue("pic32cx_bz2_devsupport", "SYSTEM_ENABLE_PMUMODE_SETTING", True)
         
     if sleepEnable == False:
         preprocessorSleepMacro = preprocessorCompiler.getValue()
@@ -423,7 +422,6 @@ def HandleSleep(sleepEnable):
         if (deviceName in pic32cx_bz2_family):
             Database.sendMessage("pic32cx_bz2_devsupport", "DEEP_SLEEP_ENABLE", {"target": "pic32cx_bz2_devsupport",
                                                         "source": "IEEE_802154_MAC","isEnabled":False})
-            Database.setSymbolValue("pic32cx_bz2_devsupport", "SYSTEM_ENABLE_PMUMODE_SETTING", False) 
      
 #-----------------------------------------------------------------------------------------------------
 #~~~~~~~~~~~~~~~ Security Configuration CALLBACK ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
