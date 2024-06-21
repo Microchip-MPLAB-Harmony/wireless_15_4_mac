@@ -3,6 +3,22 @@
 
 # Microchip PIC32CX-BZ2 Device Standalone IEEE 802.15.4 Mac Layer Release Notes
 
+## Release v1.1.0
+
+### New Features
+-	Support for WBZ451H high power module
+
+### Known Issues
+- None
+
+## Development Tools
+- [MPLAB X v6.20 or later](https://www.microchip.com/mplab/mplab-x-ide)
+- [MPLAB® XC32 C/C++ Compiler v4.40 or later](https://www.microchip.com/mplab/compilers)
+-  MPLAB® X IDE plug-ins: MPLAB® Code Configurator (MCC) v5.5.0 and above
+-  Device Pack: PIC32CX-BZ2-DFP (1.4.243)
+
+________________________________
+
 ## Release v1.0.1
 
 ### Bug fixes

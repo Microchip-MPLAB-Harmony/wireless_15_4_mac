@@ -1,19 +1,3188 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <keywords publicationid="GUID-D769F037-FBC7-4D1C-9892-ADA91E643160"
           language="en-US"
-          version="1"
-          documenttitle="MPLAB Harmony Wireless IEEE 802.15.4 MAC API Reference Manual"
+          version="2"
+          documenttitle="MPLAB® Harmony Wireless 15.4 MAC API Reference Manual"
           pubtype="Online Reference"
           pubsubtype=""
           pubuserguidesubtype=""
           pubproducthierarchy=""
           devices="WBZ451, WBZ450, PIC32CX-BZ2"
-          revisiondate="22/08/2023 00:00:00"
-          revisionletter="1"
+          revisiondate="01/04/2024 00:00:00"
+          revisionletter="B"
           isbn=""
           pubid=""
           reachid=""
           description=""
-          lastmodified="20/09/2023 06:01:50"
-          covertitle="MPLAB Harmony Wireless 15.4 MAC API Reference Manual"
-          frontcover=""/>
+          lastmodified="02/04/2024 10:45:21"
+          covertitle="MPLAB® Harmony Wireless 15.4 MAC API Reference Manual"
+          frontcover="">
+   <keyworditem topicid="GUID-3B42A74C-CE23-4B77-BE4B-0C834F03DD40"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MAC_Retval_t Enum</register>
+      <title>MAC_Retval_t Enum</title>
+      <bitfield/>
+      <keyword>WBZ451;MAC_Retval_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3B42A74C-CE23-4B77-BE4B-0C834F03DD40"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MAC_Retval_t Enum</register>
+      <title>MAC_Retval_t Enum</title>
+      <bitfield/>
+      <keyword>WBZ450;MAC_Retval_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3B42A74C-CE23-4B77-BE4B-0C834F03DD40"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MAC_Retval_t Enum</register>
+      <title>MAC_Retval_t Enum</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MAC_Retval_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3B42A74C-CE23-4B77-BE4B-0C834F03DD40"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MAC_Retval_t Enum</register>
+      <title>MAC_Retval_t Enum</title>
+      <bitfield/>
+      <keyword>MAC_Retval_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-893F9DE0-4874-4596-ABC4-89D1190E6776"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>FrameMsgtype_t Enum</register>
+      <title>FrameMsgtype_t Enum</title>
+      <bitfield/>
+      <keyword>WBZ451;FrameMsgtype_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-893F9DE0-4874-4596-ABC4-89D1190E6776"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>FrameMsgtype_t Enum</register>
+      <title>FrameMsgtype_t Enum</title>
+      <bitfield/>
+      <keyword>WBZ450;FrameMsgtype_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-893F9DE0-4874-4596-ABC4-89D1190E6776"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>FrameMsgtype_t Enum</register>
+      <title>FrameMsgtype_t Enum</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;FrameMsgtype_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-893F9DE0-4874-4596-ABC4-89D1190E6776"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>FrameMsgtype_t Enum</register>
+      <title>FrameMsgtype_t Enum</title>
+      <bitfield/>
+      <keyword>FrameMsgtype_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5D8203AA-B1C6-4D55-8BFC-BE321253884B"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MAC_FrameInfo_t Struct</register>
+      <title>MAC_FrameInfo_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MAC_FrameInfo_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5D8203AA-B1C6-4D55-8BFC-BE321253884B"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MAC_FrameInfo_t Struct</register>
+      <title>MAC_FrameInfo_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MAC_FrameInfo_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5D8203AA-B1C6-4D55-8BFC-BE321253884B"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MAC_FrameInfo_t Struct</register>
+      <title>MAC_FrameInfo_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MAC_FrameInfo_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5D8203AA-B1C6-4D55-8BFC-BE321253884B"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MAC_FrameInfo_t Struct</register>
+      <title>MAC_FrameInfo_t Struct</title>
+      <bitfield/>
+      <keyword>MAC_FrameInfo_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-719C321A-300A-4C02-99B0-7B4728EE3012"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>AddressField_t Union</register>
+      <title>AddressField_t Union</title>
+      <bitfield/>
+      <keyword>WBZ451;AddressField_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-719C321A-300A-4C02-99B0-7B4728EE3012"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>AddressField_t Union</register>
+      <title>AddressField_t Union</title>
+      <bitfield/>
+      <keyword>WBZ450;AddressField_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-719C321A-300A-4C02-99B0-7B4728EE3012"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>AddressField_t Union</register>
+      <title>AddressField_t Union</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;AddressField_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-719C321A-300A-4C02-99B0-7B4728EE3012"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>AddressField_t Union</register>
+      <title>AddressField_t Union</title>
+      <bitfield/>
+      <keyword>AddressField_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-C9A75E93-7AAF-4CF4-98C0-F38236FDC9D0"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>WPAN_AddrSpec_t Struct</register>
+      <title>WPAN_AddrSpec_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;WPAN_AddrSpec_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-C9A75E93-7AAF-4CF4-98C0-F38236FDC9D0"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>WPAN_AddrSpec_t Struct</register>
+      <title>WPAN_AddrSpec_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;WPAN_AddrSpec_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-C9A75E93-7AAF-4CF4-98C0-F38236FDC9D0"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>WPAN_AddrSpec_t Struct</register>
+      <title>WPAN_AddrSpec_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;WPAN_AddrSpec_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-C9A75E93-7AAF-4CF4-98C0-F38236FDC9D0"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>WPAN_AddrSpec_t Struct</register>
+      <title>WPAN_AddrSpec_t Struct</title>
+      <bitfield/>
+      <keyword>WPAN_AddrSpec_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6CDFD822-C8E8-4A7A-B88A-2B3DF36FB15A"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>WPAN_Pandescriptor_t Struct</register>
+      <title>WPAN_Pandescriptor_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;WPAN_Pandescriptor_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6CDFD822-C8E8-4A7A-B88A-2B3DF36FB15A"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>WPAN_Pandescriptor_t Struct</register>
+      <title>WPAN_Pandescriptor_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;WPAN_Pandescriptor_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6CDFD822-C8E8-4A7A-B88A-2B3DF36FB15A"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>WPAN_Pandescriptor_t Struct</register>
+      <title>WPAN_Pandescriptor_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;WPAN_Pandescriptor_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6CDFD822-C8E8-4A7A-B88A-2B3DF36FB15A"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>WPAN_Pandescriptor_t Struct</register>
+      <title>WPAN_Pandescriptor_t Struct</title>
+      <bitfield/>
+      <keyword>WPAN_Pandescriptor_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-AB1981FF-1DF3-4040-85B4-A870E8039F42"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MCPS_DataReq_t Struct</register>
+      <title>MCPS_DataReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MCPS_DataReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-AB1981FF-1DF3-4040-85B4-A870E8039F42"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MCPS_DataReq_t Struct</register>
+      <title>MCPS_DataReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MCPS_DataReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-AB1981FF-1DF3-4040-85B4-A870E8039F42"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MCPS_DataReq_t Struct</register>
+      <title>MCPS_DataReq_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MCPS_DataReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-AB1981FF-1DF3-4040-85B4-A870E8039F42"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MCPS_DataReq_t Struct</register>
+      <title>MCPS_DataReq_t Struct</title>
+      <bitfield/>
+      <keyword>MCPS_DataReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-1DC88716-DDA5-4DAF-83EB-0EC4950F4317"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MCPS_DataInd_t Struct</register>
+      <title>MCPS_DataInd_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MCPS_DataInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-1DC88716-DDA5-4DAF-83EB-0EC4950F4317"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MCPS_DataInd_t Struct</register>
+      <title>MCPS_DataInd_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MCPS_DataInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-1DC88716-DDA5-4DAF-83EB-0EC4950F4317"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MCPS_DataInd_t Struct</register>
+      <title>MCPS_DataInd_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MCPS_DataInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-1DC88716-DDA5-4DAF-83EB-0EC4950F4317"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MCPS_DataInd_t Struct</register>
+      <title>MCPS_DataInd_t Struct</title>
+      <bitfield/>
+      <keyword>MCPS_DataInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-691D6813-52BA-4D55-A009-6EE650D39D7B"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MCPS_DataConf_t Struct</register>
+      <title>MCPS_DataConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MCPS_DataConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-691D6813-52BA-4D55-A009-6EE650D39D7B"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MCPS_DataConf_t Struct</register>
+      <title>MCPS_DataConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MCPS_DataConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-691D6813-52BA-4D55-A009-6EE650D39D7B"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MCPS_DataConf_t Struct</register>
+      <title>MCPS_DataConf_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MCPS_DataConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-691D6813-52BA-4D55-A009-6EE650D39D7B"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MCPS_DataConf_t Struct</register>
+      <title>MCPS_DataConf_t Struct</title>
+      <bitfield/>
+      <keyword>MCPS_DataConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6EA6F506-9534-40FA-B839-08EDB7700B89"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MCPS_PurgeReq_t Struct</register>
+      <title>MCPS_PurgeReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MCPS_PurgeReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6EA6F506-9534-40FA-B839-08EDB7700B89"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MCPS_PurgeReq_t Struct</register>
+      <title>MCPS_PurgeReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MCPS_PurgeReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6EA6F506-9534-40FA-B839-08EDB7700B89"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MCPS_PurgeReq_t Struct</register>
+      <title>MCPS_PurgeReq_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MCPS_PurgeReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6EA6F506-9534-40FA-B839-08EDB7700B89"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MCPS_PurgeReq_t Struct</register>
+      <title>MCPS_PurgeReq_t Struct</title>
+      <bitfield/>
+      <keyword>MCPS_PurgeReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A1859395-3F1D-41FB-8CE6-B1C0C348DD33"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MCPS_PurgeConf_t Struct</register>
+      <title>MCPS_PurgeConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MCPS_PurgeConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A1859395-3F1D-41FB-8CE6-B1C0C348DD33"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MCPS_PurgeConf_t Struct</register>
+      <title>MCPS_PurgeConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MCPS_PurgeConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A1859395-3F1D-41FB-8CE6-B1C0C348DD33"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MCPS_PurgeConf_t Struct</register>
+      <title>MCPS_PurgeConf_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MCPS_PurgeConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A1859395-3F1D-41FB-8CE6-B1C0C348DD33"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MCPS_PurgeConf_t Struct</register>
+      <title>MCPS_PurgeConf_t Struct</title>
+      <bitfield/>
+      <keyword>MCPS_PurgeConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-731F35C1-239B-4774-A465-3B08640ED577"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_AssociateReq_t Struct</register>
+      <title>MLME_AssociateReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_AssociateReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-731F35C1-239B-4774-A465-3B08640ED577"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_AssociateReq_t Struct</register>
+      <title>MLME_AssociateReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_AssociateReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-731F35C1-239B-4774-A465-3B08640ED577"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_AssociateReq_t Struct</register>
+      <title>MLME_AssociateReq_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_AssociateReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-731F35C1-239B-4774-A465-3B08640ED577"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_AssociateReq_t Struct</register>
+      <title>MLME_AssociateReq_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_AssociateReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-CB4E3ACD-73D3-4BDD-B6C7-C1A541C087F4"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_AssociateInd_t Struct</register>
+      <title>MLME_AssociateInd_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_AssociateInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-CB4E3ACD-73D3-4BDD-B6C7-C1A541C087F4"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_AssociateInd_t Struct</register>
+      <title>MLME_AssociateInd_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_AssociateInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-CB4E3ACD-73D3-4BDD-B6C7-C1A541C087F4"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_AssociateInd_t Struct</register>
+      <title>MLME_AssociateInd_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_AssociateInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-CB4E3ACD-73D3-4BDD-B6C7-C1A541C087F4"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_AssociateInd_t Struct</register>
+      <title>MLME_AssociateInd_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_AssociateInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-002F2D37-A737-4207-80D5-A320D5D1A47B"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_AssociateResp_t Struct</register>
+      <title>MLME_AssociateResp_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_AssociateResp_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-002F2D37-A737-4207-80D5-A320D5D1A47B"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_AssociateResp_t Struct</register>
+      <title>MLME_AssociateResp_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_AssociateResp_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-002F2D37-A737-4207-80D5-A320D5D1A47B"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_AssociateResp_t Struct</register>
+      <title>MLME_AssociateResp_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_AssociateResp_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-002F2D37-A737-4207-80D5-A320D5D1A47B"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_AssociateResp_t Struct</register>
+      <title>MLME_AssociateResp_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_AssociateResp_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-0887C355-149E-4800-B09C-1EBAED16B4B7"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_AssociateConf_t Struct</register>
+      <title>MLME_AssociateConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_AssociateConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-0887C355-149E-4800-B09C-1EBAED16B4B7"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_AssociateConf_t Struct</register>
+      <title>MLME_AssociateConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_AssociateConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-0887C355-149E-4800-B09C-1EBAED16B4B7"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_AssociateConf_t Struct</register>
+      <title>MLME_AssociateConf_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_AssociateConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-0887C355-149E-4800-B09C-1EBAED16B4B7"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_AssociateConf_t Struct</register>
+      <title>MLME_AssociateConf_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_AssociateConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-96A90910-A0DD-485B-BA7B-380AAC28C2C4"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_DisassociateReq_t Struct</register>
+      <title>MLME_DisassociateReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_DisassociateReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-96A90910-A0DD-485B-BA7B-380AAC28C2C4"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_DisassociateReq_t Struct</register>
+      <title>MLME_DisassociateReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_DisassociateReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-96A90910-A0DD-485B-BA7B-380AAC28C2C4"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_DisassociateReq_t Struct</register>
+      <title>MLME_DisassociateReq_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_DisassociateReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-96A90910-A0DD-485B-BA7B-380AAC28C2C4"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_DisassociateReq_t Struct</register>
+      <title>MLME_DisassociateReq_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_DisassociateReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-BE05A639-FD80-401F-B0A3-9891A599D15A"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_DisassociateInd_t Struct</register>
+      <title>MLME_DisassociateInd_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_DisassociateInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-BE05A639-FD80-401F-B0A3-9891A599D15A"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_DisassociateInd_t Struct</register>
+      <title>MLME_DisassociateInd_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_DisassociateInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-BE05A639-FD80-401F-B0A3-9891A599D15A"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_DisassociateInd_t Struct</register>
+      <title>MLME_DisassociateInd_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_DisassociateInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-BE05A639-FD80-401F-B0A3-9891A599D15A"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_DisassociateInd_t Struct</register>
+      <title>MLME_DisassociateInd_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_DisassociateInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6D2BC9BD-E280-4A3B-B0EC-7624B632DE6E"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_DisassociateConf_t Struct</register>
+      <title>MLME_DisassociateConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_DisassociateConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6D2BC9BD-E280-4A3B-B0EC-7624B632DE6E"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_DisassociateConf_t Struct</register>
+      <title>MLME_DisassociateConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_DisassociateConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6D2BC9BD-E280-4A3B-B0EC-7624B632DE6E"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_DisassociateConf_t Struct</register>
+      <title>MLME_DisassociateConf_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_DisassociateConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6D2BC9BD-E280-4A3B-B0EC-7624B632DE6E"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_DisassociateConf_t Struct</register>
+      <title>MLME_DisassociateConf_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_DisassociateConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-AE37E670-1EBF-4535-BBEF-B436AFCEF5C3"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_BeaconNotifyInd_t Struct</register>
+      <title>MLME_BeaconNotifyInd_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_BeaconNotifyInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-AE37E670-1EBF-4535-BBEF-B436AFCEF5C3"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_BeaconNotifyInd_t Struct</register>
+      <title>MLME_BeaconNotifyInd_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_BeaconNotifyInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-AE37E670-1EBF-4535-BBEF-B436AFCEF5C3"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_BeaconNotifyInd_t Struct</register>
+      <title>MLME_BeaconNotifyInd_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_BeaconNotifyInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-AE37E670-1EBF-4535-BBEF-B436AFCEF5C3"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_BeaconNotifyInd_t Struct</register>
+      <title>MLME_BeaconNotifyInd_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_BeaconNotifyInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-428D7848-385F-4322-B095-D87DE2BEE86A"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_OrphanInd_t Struct</register>
+      <title>MLME_OrphanInd_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_OrphanInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-428D7848-385F-4322-B095-D87DE2BEE86A"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_OrphanInd_t Struct</register>
+      <title>MLME_OrphanInd_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_OrphanInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-428D7848-385F-4322-B095-D87DE2BEE86A"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_OrphanInd_t Struct</register>
+      <title>MLME_OrphanInd_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_OrphanInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-428D7848-385F-4322-B095-D87DE2BEE86A"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_OrphanInd_t Struct</register>
+      <title>MLME_OrphanInd_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_OrphanInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-B17D2D05-4D7E-4553-8999-4435720C51D7"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_OrphanResp_t Struct</register>
+      <title>MLME_OrphanResp_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_OrphanResp_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-B17D2D05-4D7E-4553-8999-4435720C51D7"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_OrphanResp_t Struct</register>
+      <title>MLME_OrphanResp_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_OrphanResp_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-B17D2D05-4D7E-4553-8999-4435720C51D7"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_OrphanResp_t Struct</register>
+      <title>MLME_OrphanResp_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_OrphanResp_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-B17D2D05-4D7E-4553-8999-4435720C51D7"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_OrphanResp_t Struct</register>
+      <title>MLME_OrphanResp_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_OrphanResp_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-BB52F853-19ED-4D81-AEA7-4A674EAAD534"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_ResetReq_t Struct</register>
+      <title>MLME_ResetReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_ResetReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-BB52F853-19ED-4D81-AEA7-4A674EAAD534"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_ResetReq_t Struct</register>
+      <title>MLME_ResetReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_ResetReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-BB52F853-19ED-4D81-AEA7-4A674EAAD534"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_ResetReq_t Struct</register>
+      <title>MLME_ResetReq_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_ResetReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-BB52F853-19ED-4D81-AEA7-4A674EAAD534"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_ResetReq_t Struct</register>
+      <title>MLME_ResetReq_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_ResetReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-C388202E-CB47-41FA-8D69-6577D801DCF1"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_ResetConf_t Struct</register>
+      <title>MLME_ResetConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_ResetConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-C388202E-CB47-41FA-8D69-6577D801DCF1"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_ResetConf_t Struct</register>
+      <title>MLME_ResetConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_ResetConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-C388202E-CB47-41FA-8D69-6577D801DCF1"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_ResetConf_t Struct</register>
+      <title>MLME_ResetConf_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_ResetConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-C388202E-CB47-41FA-8D69-6577D801DCF1"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_ResetConf_t Struct</register>
+      <title>MLME_ResetConf_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_ResetConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-32C73BBC-6485-452A-B39A-6D0F3045F892"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_GetReq_t Struct</register>
+      <title>MLME_GetReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_GetReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-32C73BBC-6485-452A-B39A-6D0F3045F892"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_GetReq_t Struct</register>
+      <title>MLME_GetReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_GetReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-32C73BBC-6485-452A-B39A-6D0F3045F892"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_GetReq_t Struct</register>
+      <title>MLME_GetReq_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_GetReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-32C73BBC-6485-452A-B39A-6D0F3045F892"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_GetReq_t Struct</register>
+      <title>MLME_GetReq_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_GetReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-0881EB63-182F-414F-A9FD-986F54E18416"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_GetConf_t Struct</register>
+      <title>MLME_GetConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_GetConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-0881EB63-182F-414F-A9FD-986F54E18416"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_GetConf_t Struct</register>
+      <title>MLME_GetConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_GetConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-0881EB63-182F-414F-A9FD-986F54E18416"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_GetConf_t Struct</register>
+      <title>MLME_GetConf_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_GetConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-0881EB63-182F-414F-A9FD-986F54E18416"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_GetConf_t Struct</register>
+      <title>MLME_GetConf_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_GetConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3F4F4529-64C9-4EAF-99C9-B04743748F15"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_SetReq_t Struct</register>
+      <title>MLME_SetReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_SetReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3F4F4529-64C9-4EAF-99C9-B04743748F15"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_SetReq_t Struct</register>
+      <title>MLME_SetReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_SetReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3F4F4529-64C9-4EAF-99C9-B04743748F15"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_SetReq_t Struct</register>
+      <title>MLME_SetReq_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_SetReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3F4F4529-64C9-4EAF-99C9-B04743748F15"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_SetReq_t Struct</register>
+      <title>MLME_SetReq_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_SetReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3CF37567-2923-4CE9-B0E0-4CE33EFE20E5"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_SetConf_t Struct</register>
+      <title>MLME_SetConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_SetConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3CF37567-2923-4CE9-B0E0-4CE33EFE20E5"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_SetConf_t Struct</register>
+      <title>MLME_SetConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_SetConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3CF37567-2923-4CE9-B0E0-4CE33EFE20E5"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_SetConf_t Struct</register>
+      <title>MLME_SetConf_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_SetConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3CF37567-2923-4CE9-B0E0-4CE33EFE20E5"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_SetConf_t Struct</register>
+      <title>MLME_SetConf_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_SetConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A47361AC-4261-4762-AA50-973421A1AE4A"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_RxEnableReq_t Struct</register>
+      <title>MLME_RxEnableReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_RxEnableReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A47361AC-4261-4762-AA50-973421A1AE4A"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_RxEnableReq_t Struct</register>
+      <title>MLME_RxEnableReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_RxEnableReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A47361AC-4261-4762-AA50-973421A1AE4A"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_RxEnableReq_t Struct</register>
+      <title>MLME_RxEnableReq_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_RxEnableReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A47361AC-4261-4762-AA50-973421A1AE4A"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_RxEnableReq_t Struct</register>
+      <title>MLME_RxEnableReq_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_RxEnableReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-38E28C90-BD3B-4F05-9513-58A45B4ADBCB"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_RxEnableConf_t Struct</register>
+      <title>MLME_RxEnableConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_RxEnableConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-38E28C90-BD3B-4F05-9513-58A45B4ADBCB"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_RxEnableConf_t Struct</register>
+      <title>MLME_RxEnableConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_RxEnableConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-38E28C90-BD3B-4F05-9513-58A45B4ADBCB"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_RxEnableConf_t Struct</register>
+      <title>MLME_RxEnableConf_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_RxEnableConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-38E28C90-BD3B-4F05-9513-58A45B4ADBCB"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_RxEnableConf_t Struct</register>
+      <title>MLME_RxEnableConf_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_RxEnableConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-17887408-5595-4723-B8AC-824F25263BC5"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_ScanReq_t Struct</register>
+      <title>MLME_ScanReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_ScanReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-17887408-5595-4723-B8AC-824F25263BC5"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_ScanReq_t Struct</register>
+      <title>MLME_ScanReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_ScanReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-17887408-5595-4723-B8AC-824F25263BC5"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_ScanReq_t Struct</register>
+      <title>MLME_ScanReq_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_ScanReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-17887408-5595-4723-B8AC-824F25263BC5"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_ScanReq_t Struct</register>
+      <title>MLME_ScanReq_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_ScanReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-802375C5-88EC-47E1-A5FA-6CEF4D0B49D2"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_ScanConf_t Struct</register>
+      <title>MLME_ScanConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_ScanConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-802375C5-88EC-47E1-A5FA-6CEF4D0B49D2"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_ScanConf_t Struct</register>
+      <title>MLME_ScanConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_ScanConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-802375C5-88EC-47E1-A5FA-6CEF4D0B49D2"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_ScanConf_t Struct</register>
+      <title>MLME_ScanConf_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_ScanConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-802375C5-88EC-47E1-A5FA-6CEF4D0B49D2"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_ScanConf_t Struct</register>
+      <title>MLME_ScanConf_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_ScanConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-E11A100F-6F67-4F11-A89D-5D00AAA892B1"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_CommStatusInd_t Struct</register>
+      <title>MLME_CommStatusInd_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_CommStatusInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-E11A100F-6F67-4F11-A89D-5D00AAA892B1"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_CommStatusInd_t Struct</register>
+      <title>MLME_CommStatusInd_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_CommStatusInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-E11A100F-6F67-4F11-A89D-5D00AAA892B1"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_CommStatusInd_t Struct</register>
+      <title>MLME_CommStatusInd_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_CommStatusInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-E11A100F-6F67-4F11-A89D-5D00AAA892B1"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_CommStatusInd_t Struct</register>
+      <title>MLME_CommStatusInd_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_CommStatusInd_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5DFB736D-6F3C-47BB-80B1-C68405DF3764"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_StartReq_t Struct</register>
+      <title>MLME_StartReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_StartReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5DFB736D-6F3C-47BB-80B1-C68405DF3764"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_StartReq_t Struct</register>
+      <title>MLME_StartReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_StartReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5DFB736D-6F3C-47BB-80B1-C68405DF3764"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_StartReq_t Struct</register>
+      <title>MLME_StartReq_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_StartReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5DFB736D-6F3C-47BB-80B1-C68405DF3764"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_StartReq_t Struct</register>
+      <title>MLME_StartReq_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_StartReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-41ADF517-7FF3-46DA-9A9C-CCFAB3C314E3"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_StartConf_t Struct</register>
+      <title>MLME_StartConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_StartConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-41ADF517-7FF3-46DA-9A9C-CCFAB3C314E3"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_StartConf_t Struct</register>
+      <title>MLME_StartConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_StartConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-41ADF517-7FF3-46DA-9A9C-CCFAB3C314E3"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_StartConf_t Struct</register>
+      <title>MLME_StartConf_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_StartConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-41ADF517-7FF3-46DA-9A9C-CCFAB3C314E3"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_StartConf_t Struct</register>
+      <title>MLME_StartConf_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_StartConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-E273156F-6FAD-44F6-A322-6F6E20022F7F"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_PollReq_t Struct</register>
+      <title>MLME_PollReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_PollReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-E273156F-6FAD-44F6-A322-6F6E20022F7F"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_PollReq_t Struct</register>
+      <title>MLME_PollReq_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_PollReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-E273156F-6FAD-44F6-A322-6F6E20022F7F"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_PollReq_t Struct</register>
+      <title>MLME_PollReq_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_PollReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-E273156F-6FAD-44F6-A322-6F6E20022F7F"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_PollReq_t Struct</register>
+      <title>MLME_PollReq_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_PollReq_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3CEE2E8F-4C5C-413F-935A-BCE5F34E75A4"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MLME_PollConf_t Struct</register>
+      <title>MLME_PollConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MLME_PollConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3CEE2E8F-4C5C-413F-935A-BCE5F34E75A4"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MLME_PollConf_t Struct</register>
+      <title>MLME_PollConf_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MLME_PollConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3CEE2E8F-4C5C-413F-935A-BCE5F34E75A4"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MLME_PollConf_t Struct</register>
+      <title>MLME_PollConf_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MLME_PollConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3CEE2E8F-4C5C-413F-935A-BCE5F34E75A4"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MLME_PollConf_t Struct</register>
+      <title>MLME_PollConf_t Struct</title>
+      <bitfield/>
+      <keyword>MLME_PollConf_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6454F181-8F48-4BE6-AF1F-C9A5D573B36B"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>ScanResultList_t Union</register>
+      <title>ScanResultList_t Union</title>
+      <bitfield/>
+      <keyword>WBZ451;ScanResultList_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6454F181-8F48-4BE6-AF1F-C9A5D573B36B"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>ScanResultList_t Union</register>
+      <title>ScanResultList_t Union</title>
+      <bitfield/>
+      <keyword>WBZ450;ScanResultList_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6454F181-8F48-4BE6-AF1F-C9A5D573B36B"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>ScanResultList_t Union</register>
+      <title>ScanResultList_t Union</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;ScanResultList_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6454F181-8F48-4BE6-AF1F-C9A5D573B36B"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>ScanResultList_t Union</register>
+      <title>ScanResultList_t Union</title>
+      <bitfield/>
+      <keyword>ScanResultList_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5060778C-C4BF-4EB9-B908-462FE6E65ADB"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MAC_Pib_t Struct</register>
+      <title>MAC_Pib_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ451;MAC_Pib_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5060778C-C4BF-4EB9-B908-462FE6E65ADB"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MAC_Pib_t Struct</register>
+      <title>MAC_Pib_t Struct</title>
+      <bitfield/>
+      <keyword>WBZ450;MAC_Pib_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5060778C-C4BF-4EB9-B908-462FE6E65ADB"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MAC_Pib_t Struct</register>
+      <title>MAC_Pib_t Struct</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MAC_Pib_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5060778C-C4BF-4EB9-B908-462FE6E65ADB"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MAC_Pib_t Struct</register>
+      <title>MAC_Pib_t Struct</title>
+      <bitfield/>
+      <keyword>MAC_Pib_t</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5C5F77E5-098C-42C6-ADB0-61CF0FAF1BCD"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>WPAN_Init Function</register>
+      <title>WPAN_Init Function</title>
+      <bitfield/>
+      <keyword>WBZ451;WPAN_Init</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5C5F77E5-098C-42C6-ADB0-61CF0FAF1BCD"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>WPAN_Init Function</register>
+      <title>WPAN_Init Function</title>
+      <bitfield/>
+      <keyword>WBZ450;WPAN_Init</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5C5F77E5-098C-42C6-ADB0-61CF0FAF1BCD"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>WPAN_Init Function</register>
+      <title>WPAN_Init Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;WPAN_Init</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5C5F77E5-098C-42C6-ADB0-61CF0FAF1BCD"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>WPAN_Init Function</register>
+      <title>WPAN_Init Function</title>
+      <bitfield/>
+      <keyword>WPAN_Init</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-1A6C9289-EEB1-4913-A363-9B561B259530"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>WPAN_Task Function</register>
+      <title>WPAN_Task Function</title>
+      <bitfield/>
+      <keyword>WBZ451;WPAN_Task</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-1A6C9289-EEB1-4913-A363-9B561B259530"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>WPAN_Task Function</register>
+      <title>WPAN_Task Function</title>
+      <bitfield/>
+      <keyword>WBZ450;WPAN_Task</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-1A6C9289-EEB1-4913-A363-9B561B259530"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>WPAN_Task Function</register>
+      <title>WPAN_Task Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;WPAN_Task</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-1A6C9289-EEB1-4913-A363-9B561B259530"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>WPAN_Task Function</register>
+      <title>WPAN_Task Function</title>
+      <bitfield/>
+      <keyword>WPAN_Task</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-E48D2F16-7917-4A45-894C-7B80A33B71C8"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_ResetReq Function</register>
+      <title>WPAN_MLME_ResetReq Function</title>
+      <bitfield/>
+      <keyword>WBZ451;WPAN_MLME_ResetReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-E48D2F16-7917-4A45-894C-7B80A33B71C8"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_ResetReq Function</register>
+      <title>WPAN_MLME_ResetReq Function</title>
+      <bitfield/>
+      <keyword>WBZ450;WPAN_MLME_ResetReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-E48D2F16-7917-4A45-894C-7B80A33B71C8"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_ResetReq Function</register>
+      <title>WPAN_MLME_ResetReq Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;WPAN_MLME_ResetReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-E48D2F16-7917-4A45-894C-7B80A33B71C8"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_ResetReq Function</register>
+      <title>WPAN_MLME_ResetReq Function</title>
+      <bitfield/>
+      <keyword>WPAN_MLME_ResetReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-44AA5421-9434-403B-8152-A8E4021BC3DD"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_ResetConf callback Function</register>
+      <title>USR_MLME_ResetConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ451;USR_MLME_ResetConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-44AA5421-9434-403B-8152-A8E4021BC3DD"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_ResetConf callback Function</register>
+      <title>USR_MLME_ResetConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ450;USR_MLME_ResetConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-44AA5421-9434-403B-8152-A8E4021BC3DD"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_ResetConf callback Function</register>
+      <title>USR_MLME_ResetConf callback Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;USR_MLME_ResetConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-44AA5421-9434-403B-8152-A8E4021BC3DD"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>USR_MLME_ResetConf callback Function</register>
+      <title>USR_MLME_ResetConf callback Function</title>
+      <bitfield/>
+      <keyword>USR_MLME_ResetConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A33C8D52-8A11-44AC-909C-7777B56AB41A"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_SetReq Function</register>
+      <title>WPAN_MLME_SetReq Function</title>
+      <bitfield/>
+      <keyword>WBZ451;WPAN_MLME_SetReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A33C8D52-8A11-44AC-909C-7777B56AB41A"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_SetReq Function</register>
+      <title>WPAN_MLME_SetReq Function</title>
+      <bitfield/>
+      <keyword>WBZ450;WPAN_MLME_SetReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A33C8D52-8A11-44AC-909C-7777B56AB41A"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_SetReq Function</register>
+      <title>WPAN_MLME_SetReq Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;WPAN_MLME_SetReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A33C8D52-8A11-44AC-909C-7777B56AB41A"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_SetReq Function</register>
+      <title>WPAN_MLME_SetReq Function</title>
+      <bitfield/>
+      <keyword>WPAN_MLME_SetReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-02EC4650-C25C-4942-9FD5-2B069ED9B88B"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_SetConf callback Function</register>
+      <title>USR_MLME_SetConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ451;USR_MLME_SetConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-02EC4650-C25C-4942-9FD5-2B069ED9B88B"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_SetConf callback Function</register>
+      <title>USR_MLME_SetConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ450;USR_MLME_SetConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-02EC4650-C25C-4942-9FD5-2B069ED9B88B"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_SetConf callback Function</register>
+      <title>USR_MLME_SetConf callback Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;USR_MLME_SetConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-02EC4650-C25C-4942-9FD5-2B069ED9B88B"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>USR_MLME_SetConf callback Function</register>
+      <title>USR_MLME_SetConf callback Function</title>
+      <bitfield/>
+      <keyword>USR_MLME_SetConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3437A75F-F875-46A5-8B65-705340A0E015"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_GetReq Function</register>
+      <title>WPAN_MLME_GetReq Function</title>
+      <bitfield/>
+      <keyword>WBZ451;WPAN_MLME_GetReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3437A75F-F875-46A5-8B65-705340A0E015"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_GetReq Function</register>
+      <title>WPAN_MLME_GetReq Function</title>
+      <bitfield/>
+      <keyword>WBZ450;WPAN_MLME_GetReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3437A75F-F875-46A5-8B65-705340A0E015"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_GetReq Function</register>
+      <title>WPAN_MLME_GetReq Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;WPAN_MLME_GetReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3437A75F-F875-46A5-8B65-705340A0E015"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_GetReq Function</register>
+      <title>WPAN_MLME_GetReq Function</title>
+      <bitfield/>
+      <keyword>WPAN_MLME_GetReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A899D464-DAA9-4B1A-B70F-2FA6E5C4EEB3"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_GetConf callback Function</register>
+      <title>USR_MLME_GetConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ451;USR_MLME_GetConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A899D464-DAA9-4B1A-B70F-2FA6E5C4EEB3"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_GetConf callback Function</register>
+      <title>USR_MLME_GetConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ450;USR_MLME_GetConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A899D464-DAA9-4B1A-B70F-2FA6E5C4EEB3"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_GetConf callback Function</register>
+      <title>USR_MLME_GetConf callback Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;USR_MLME_GetConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A899D464-DAA9-4B1A-B70F-2FA6E5C4EEB3"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>USR_MLME_GetConf callback Function</register>
+      <title>USR_MLME_GetConf callback Function</title>
+      <bitfield/>
+      <keyword>USR_MLME_GetConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-B509C8FA-73E4-41DD-919F-053955BEB0FA"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_ScanReq Function</register>
+      <title>WPAN_MLME_ScanReq Function</title>
+      <bitfield/>
+      <keyword>WBZ451;WPAN_MLME_ScanReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-B509C8FA-73E4-41DD-919F-053955BEB0FA"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_ScanReq Function</register>
+      <title>WPAN_MLME_ScanReq Function</title>
+      <bitfield/>
+      <keyword>WBZ450;WPAN_MLME_ScanReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-B509C8FA-73E4-41DD-919F-053955BEB0FA"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_ScanReq Function</register>
+      <title>WPAN_MLME_ScanReq Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;WPAN_MLME_ScanReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-B509C8FA-73E4-41DD-919F-053955BEB0FA"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_ScanReq Function</register>
+      <title>WPAN_MLME_ScanReq Function</title>
+      <bitfield/>
+      <keyword>WPAN_MLME_ScanReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-23961FA1-BC0C-4920-A921-4EEC1F257DF6"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_ScanConf callback Function</register>
+      <title>USR_MLME_ScanConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ451;USR_MLME_ScanConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-23961FA1-BC0C-4920-A921-4EEC1F257DF6"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_ScanConf callback Function</register>
+      <title>USR_MLME_ScanConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ450;USR_MLME_ScanConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-23961FA1-BC0C-4920-A921-4EEC1F257DF6"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_ScanConf callback Function</register>
+      <title>USR_MLME_ScanConf callback Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;USR_MLME_ScanConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-23961FA1-BC0C-4920-A921-4EEC1F257DF6"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>USR_MLME_ScanConf callback Function</register>
+      <title>USR_MLME_ScanConf callback Function</title>
+      <bitfield/>
+      <keyword>USR_MLME_ScanConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-F06E1F1E-B885-41E1-BC72-68CDC78EF002"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_StartReq Function</register>
+      <title>WPAN_MLME_StartReq Function</title>
+      <bitfield/>
+      <keyword>WBZ451;WPAN_MLME_StartReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-F06E1F1E-B885-41E1-BC72-68CDC78EF002"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_StartReq Function</register>
+      <title>WPAN_MLME_StartReq Function</title>
+      <bitfield/>
+      <keyword>WBZ450;WPAN_MLME_StartReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-F06E1F1E-B885-41E1-BC72-68CDC78EF002"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_StartReq Function</register>
+      <title>WPAN_MLME_StartReq Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;WPAN_MLME_StartReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-F06E1F1E-B885-41E1-BC72-68CDC78EF002"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_StartReq Function</register>
+      <title>WPAN_MLME_StartReq Function</title>
+      <bitfield/>
+      <keyword>WPAN_MLME_StartReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-CFF9F342-F6F1-4A80-A8BD-CFD7E88A5B67"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_StartConf callback Function</register>
+      <title>USR_MLME_StartConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ451;USR_MLME_StartConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-CFF9F342-F6F1-4A80-A8BD-CFD7E88A5B67"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_StartConf callback Function</register>
+      <title>USR_MLME_StartConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ450;USR_MLME_StartConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-CFF9F342-F6F1-4A80-A8BD-CFD7E88A5B67"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_StartConf callback Function</register>
+      <title>USR_MLME_StartConf callback Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;USR_MLME_StartConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-CFF9F342-F6F1-4A80-A8BD-CFD7E88A5B67"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>USR_MLME_StartConf callback Function</register>
+      <title>USR_MLME_StartConf callback Function</title>
+      <bitfield/>
+      <keyword>USR_MLME_StartConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-874B7D32-43B7-4092-AEDF-D600FDD95170"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_AssociateReq Function</register>
+      <title>WPAN_MLME_AssociateReq Function</title>
+      <bitfield/>
+      <keyword>WBZ451;WPAN_MLME_AssociateReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-874B7D32-43B7-4092-AEDF-D600FDD95170"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_AssociateReq Function</register>
+      <title>WPAN_MLME_AssociateReq Function</title>
+      <bitfield/>
+      <keyword>WBZ450;WPAN_MLME_AssociateReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-874B7D32-43B7-4092-AEDF-D600FDD95170"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_AssociateReq Function</register>
+      <title>WPAN_MLME_AssociateReq Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;WPAN_MLME_AssociateReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-874B7D32-43B7-4092-AEDF-D600FDD95170"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_AssociateReq Function</register>
+      <title>WPAN_MLME_AssociateReq Function</title>
+      <bitfield/>
+      <keyword>WPAN_MLME_AssociateReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3E9A6E9D-4B4A-4C44-95AB-9697C6854F85"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_AssociateConf callback Function</register>
+      <title>USR_MLME_AssociateConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ451;USR_MLME_AssociateConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3E9A6E9D-4B4A-4C44-95AB-9697C6854F85"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_AssociateConf callback Function</register>
+      <title>USR_MLME_AssociateConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ450;USR_MLME_AssociateConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3E9A6E9D-4B4A-4C44-95AB-9697C6854F85"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_AssociateConf callback Function</register>
+      <title>USR_MLME_AssociateConf callback Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;USR_MLME_AssociateConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3E9A6E9D-4B4A-4C44-95AB-9697C6854F85"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>USR_MLME_AssociateConf callback Function</register>
+      <title>USR_MLME_AssociateConf callback Function</title>
+      <bitfield/>
+      <keyword>USR_MLME_AssociateConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-BBCEC43E-A5E9-4BA8-9190-18537871CF38"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_AssociateResp Function</register>
+      <title>WPAN_MLME_AssociateResp Function</title>
+      <bitfield/>
+      <keyword>WBZ451;WPAN_MLME_AssociateResp</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-BBCEC43E-A5E9-4BA8-9190-18537871CF38"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_AssociateResp Function</register>
+      <title>WPAN_MLME_AssociateResp Function</title>
+      <bitfield/>
+      <keyword>WBZ450;WPAN_MLME_AssociateResp</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-BBCEC43E-A5E9-4BA8-9190-18537871CF38"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_AssociateResp Function</register>
+      <title>WPAN_MLME_AssociateResp Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;WPAN_MLME_AssociateResp</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-BBCEC43E-A5E9-4BA8-9190-18537871CF38"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_AssociateResp Function</register>
+      <title>WPAN_MLME_AssociateResp Function</title>
+      <bitfield/>
+      <keyword>WPAN_MLME_AssociateResp</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6175DA83-63D9-4558-AF54-8D26E5FAB62A"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_AssociateInd callback Function</register>
+      <title>USR_MLME_AssociateInd callback Function</title>
+      <bitfield/>
+      <keyword>WBZ451;USR_MLME_AssociateInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6175DA83-63D9-4558-AF54-8D26E5FAB62A"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_AssociateInd callback Function</register>
+      <title>USR_MLME_AssociateInd callback Function</title>
+      <bitfield/>
+      <keyword>WBZ450;USR_MLME_AssociateInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6175DA83-63D9-4558-AF54-8D26E5FAB62A"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_AssociateInd callback Function</register>
+      <title>USR_MLME_AssociateInd callback Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;USR_MLME_AssociateInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6175DA83-63D9-4558-AF54-8D26E5FAB62A"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>USR_MLME_AssociateInd callback Function</register>
+      <title>USR_MLME_AssociateInd callback Function</title>
+      <bitfield/>
+      <keyword>USR_MLME_AssociateInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-54BDDC9E-02B9-44FF-9DE0-753E12D96FD8"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_DisassociateReq Function</register>
+      <title>WPAN_MLME_DisassociateReq Function</title>
+      <bitfield/>
+      <keyword>WBZ451;WPAN_MLME_DisassociateReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-54BDDC9E-02B9-44FF-9DE0-753E12D96FD8"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_DisassociateReq Function</register>
+      <title>WPAN_MLME_DisassociateReq Function</title>
+      <bitfield/>
+      <keyword>WBZ450;WPAN_MLME_DisassociateReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-54BDDC9E-02B9-44FF-9DE0-753E12D96FD8"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_DisassociateReq Function</register>
+      <title>WPAN_MLME_DisassociateReq Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;WPAN_MLME_DisassociateReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-54BDDC9E-02B9-44FF-9DE0-753E12D96FD8"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_DisassociateReq Function</register>
+      <title>WPAN_MLME_DisassociateReq Function</title>
+      <bitfield/>
+      <keyword>WPAN_MLME_DisassociateReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-46B983E5-AD18-4C30-A938-60E6D39594E0"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_DisassociateConf callback Function</register>
+      <title>USR_MLME_DisassociateConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ451;USR_MLME_DisassociateConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-46B983E5-AD18-4C30-A938-60E6D39594E0"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_DisassociateConf callback Function</register>
+      <title>USR_MLME_DisassociateConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ450;USR_MLME_DisassociateConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-46B983E5-AD18-4C30-A938-60E6D39594E0"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_DisassociateConf callback Function</register>
+      <title>USR_MLME_DisassociateConf callback Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;USR_MLME_DisassociateConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-46B983E5-AD18-4C30-A938-60E6D39594E0"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>USR_MLME_DisassociateConf callback Function</register>
+      <title>USR_MLME_DisassociateConf callback Function</title>
+      <bitfield/>
+      <keyword>USR_MLME_DisassociateConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A4275CCB-6BF5-409B-A6DA-E965AE3A5935"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_DisassociateInd callback Function</register>
+      <title>USR_MLME_DisassociateInd callback Function</title>
+      <bitfield/>
+      <keyword>WBZ451;USR_MLME_DisassociateInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A4275CCB-6BF5-409B-A6DA-E965AE3A5935"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_DisassociateInd callback Function</register>
+      <title>USR_MLME_DisassociateInd callback Function</title>
+      <bitfield/>
+      <keyword>WBZ450;USR_MLME_DisassociateInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A4275CCB-6BF5-409B-A6DA-E965AE3A5935"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_DisassociateInd callback Function</register>
+      <title>USR_MLME_DisassociateInd callback Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;USR_MLME_DisassociateInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-A4275CCB-6BF5-409B-A6DA-E965AE3A5935"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>USR_MLME_DisassociateInd callback Function</register>
+      <title>USR_MLME_DisassociateInd callback Function</title>
+      <bitfield/>
+      <keyword>USR_MLME_DisassociateInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-B4684D7F-3E09-4D26-A45B-17843F107F93"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_PollReq Function</register>
+      <title>WPAN_MLME_PollReq Function</title>
+      <bitfield/>
+      <keyword>WBZ451;WPAN_MLME_PollReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-B4684D7F-3E09-4D26-A45B-17843F107F93"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_PollReq Function</register>
+      <title>WPAN_MLME_PollReq Function</title>
+      <bitfield/>
+      <keyword>WBZ450;WPAN_MLME_PollReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-B4684D7F-3E09-4D26-A45B-17843F107F93"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_PollReq Function</register>
+      <title>WPAN_MLME_PollReq Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;WPAN_MLME_PollReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-B4684D7F-3E09-4D26-A45B-17843F107F93"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_PollReq Function</register>
+      <title>WPAN_MLME_PollReq Function</title>
+      <bitfield/>
+      <keyword>WPAN_MLME_PollReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-D4CBDBBD-37CF-448E-8F8C-2F429B363338"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_PollConf callback Function</register>
+      <title>USR_MLME_PollConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ451;USR_MLME_PollConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-D4CBDBBD-37CF-448E-8F8C-2F429B363338"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_PollConf callback Function</register>
+      <title>USR_MLME_PollConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ450;USR_MLME_PollConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-D4CBDBBD-37CF-448E-8F8C-2F429B363338"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_PollConf callback Function</register>
+      <title>USR_MLME_PollConf callback Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;USR_MLME_PollConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-D4CBDBBD-37CF-448E-8F8C-2F429B363338"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>USR_MLME_PollConf callback Function</register>
+      <title>USR_MLME_PollConf callback Function</title>
+      <bitfield/>
+      <keyword>USR_MLME_PollConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-AB56B4B4-C121-434F-9F04-B2D6815A2C5D"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>WPAN_MCPS_Datareq Function</register>
+      <title>WPAN_MCPS_Datareq Function</title>
+      <bitfield/>
+      <keyword>WBZ451;WPAN_MCPS_Datareq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-AB56B4B4-C121-434F-9F04-B2D6815A2C5D"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>WPAN_MCPS_Datareq Function</register>
+      <title>WPAN_MCPS_Datareq Function</title>
+      <bitfield/>
+      <keyword>WBZ450;WPAN_MCPS_Datareq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-AB56B4B4-C121-434F-9F04-B2D6815A2C5D"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>WPAN_MCPS_Datareq Function</register>
+      <title>WPAN_MCPS_Datareq Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;WPAN_MCPS_Datareq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-AB56B4B4-C121-434F-9F04-B2D6815A2C5D"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>WPAN_MCPS_Datareq Function</register>
+      <title>WPAN_MCPS_Datareq Function</title>
+      <bitfield/>
+      <keyword>WPAN_MCPS_Datareq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-8DE2481C-46C5-439C-A20B-3828D7CCAA32"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>USR_MCPS_DataConf callback Function</register>
+      <title>USR_MCPS_DataConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ451;USR_MCPS_DataConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-8DE2481C-46C5-439C-A20B-3828D7CCAA32"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>USR_MCPS_DataConf callback Function</register>
+      <title>USR_MCPS_DataConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ450;USR_MCPS_DataConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-8DE2481C-46C5-439C-A20B-3828D7CCAA32"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>USR_MCPS_DataConf callback Function</register>
+      <title>USR_MCPS_DataConf callback Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;USR_MCPS_DataConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-8DE2481C-46C5-439C-A20B-3828D7CCAA32"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>USR_MCPS_DataConf callback Function</register>
+      <title>USR_MCPS_DataConf callback Function</title>
+      <bitfield/>
+      <keyword>USR_MCPS_DataConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-FA859A36-6D24-4253-9687-9AE118A09C84"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>USR_MCPS_DataInd callback Function</register>
+      <title>USR_MCPS_DataInd callback Function</title>
+      <bitfield/>
+      <keyword>WBZ451;USR_MCPS_DataInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-FA859A36-6D24-4253-9687-9AE118A09C84"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>USR_MCPS_DataInd callback Function</register>
+      <title>USR_MCPS_DataInd callback Function</title>
+      <bitfield/>
+      <keyword>WBZ450;USR_MCPS_DataInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-FA859A36-6D24-4253-9687-9AE118A09C84"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>USR_MCPS_DataInd callback Function</register>
+      <title>USR_MCPS_DataInd callback Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;USR_MCPS_DataInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-FA859A36-6D24-4253-9687-9AE118A09C84"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>USR_MCPS_DataInd callback Function</register>
+      <title>USR_MCPS_DataInd callback Function</title>
+      <bitfield/>
+      <keyword>USR_MCPS_DataInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6B2A5252-89FC-4B6F-9084-FBD3CFE5C425"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>WPAN_MCPS_PurgeReq Function</register>
+      <title>WPAN_MCPS_PurgeReq Function</title>
+      <bitfield/>
+      <keyword>WBZ451;WPAN_MCPS_PurgeReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6B2A5252-89FC-4B6F-9084-FBD3CFE5C425"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>WPAN_MCPS_PurgeReq Function</register>
+      <title>WPAN_MCPS_PurgeReq Function</title>
+      <bitfield/>
+      <keyword>WBZ450;WPAN_MCPS_PurgeReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6B2A5252-89FC-4B6F-9084-FBD3CFE5C425"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>WPAN_MCPS_PurgeReq Function</register>
+      <title>WPAN_MCPS_PurgeReq Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;WPAN_MCPS_PurgeReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-6B2A5252-89FC-4B6F-9084-FBD3CFE5C425"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>WPAN_MCPS_PurgeReq Function</register>
+      <title>WPAN_MCPS_PurgeReq Function</title>
+      <bitfield/>
+      <keyword>WPAN_MCPS_PurgeReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-0396B8BE-9E1D-471A-BED3-35784CFE0C2F"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>USR_MCPS_PurgeConf callback Function</register>
+      <title>USR_MCPS_PurgeConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ451;USR_MCPS_PurgeConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-0396B8BE-9E1D-471A-BED3-35784CFE0C2F"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>USR_MCPS_PurgeConf callback Function</register>
+      <title>USR_MCPS_PurgeConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ450;USR_MCPS_PurgeConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-0396B8BE-9E1D-471A-BED3-35784CFE0C2F"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>USR_MCPS_PurgeConf callback Function</register>
+      <title>USR_MCPS_PurgeConf callback Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;USR_MCPS_PurgeConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-0396B8BE-9E1D-471A-BED3-35784CFE0C2F"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>USR_MCPS_PurgeConf callback Function</register>
+      <title>USR_MCPS_PurgeConf callback Function</title>
+      <bitfield/>
+      <keyword>USR_MCPS_PurgeConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-9D37CED5-A262-492D-A49A-F4C81FE8643C"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_BeaconNotifyInd callback Function</register>
+      <title>USR_MLME_BeaconNotifyInd callback Function</title>
+      <bitfield/>
+      <keyword>WBZ451;USR_MLME_BeaconNotifyInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-9D37CED5-A262-492D-A49A-F4C81FE8643C"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_BeaconNotifyInd callback Function</register>
+      <title>USR_MLME_BeaconNotifyInd callback Function</title>
+      <bitfield/>
+      <keyword>WBZ450;USR_MLME_BeaconNotifyInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-9D37CED5-A262-492D-A49A-F4C81FE8643C"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_BeaconNotifyInd callback Function</register>
+      <title>USR_MLME_BeaconNotifyInd callback Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;USR_MLME_BeaconNotifyInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-9D37CED5-A262-492D-A49A-F4C81FE8643C"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>USR_MLME_BeaconNotifyInd callback Function</register>
+      <title>USR_MLME_BeaconNotifyInd callback Function</title>
+      <bitfield/>
+      <keyword>USR_MLME_BeaconNotifyInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5D096751-E6A0-4345-A02A-CF32C2599CF0"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_OrphanResp Function</register>
+      <title>WPAN_MLME_OrphanResp Function</title>
+      <bitfield/>
+      <keyword>WBZ451;WPAN_MLME_OrphanResp</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5D096751-E6A0-4345-A02A-CF32C2599CF0"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_OrphanResp Function</register>
+      <title>WPAN_MLME_OrphanResp Function</title>
+      <bitfield/>
+      <keyword>WBZ450;WPAN_MLME_OrphanResp</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5D096751-E6A0-4345-A02A-CF32C2599CF0"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_OrphanResp Function</register>
+      <title>WPAN_MLME_OrphanResp Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;WPAN_MLME_OrphanResp</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-5D096751-E6A0-4345-A02A-CF32C2599CF0"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_OrphanResp Function</register>
+      <title>WPAN_MLME_OrphanResp Function</title>
+      <bitfield/>
+      <keyword>WPAN_MLME_OrphanResp</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-FAE3C695-2193-4956-8460-14DCE23D0BBB"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_OrphanInd callback Function</register>
+      <title>USR_MLME_OrphanInd callback Function</title>
+      <bitfield/>
+      <keyword>WBZ451;USR_MLME_OrphanInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-FAE3C695-2193-4956-8460-14DCE23D0BBB"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_OrphanInd callback Function</register>
+      <title>USR_MLME_OrphanInd callback Function</title>
+      <bitfield/>
+      <keyword>WBZ450;USR_MLME_OrphanInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-FAE3C695-2193-4956-8460-14DCE23D0BBB"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_OrphanInd callback Function</register>
+      <title>USR_MLME_OrphanInd callback Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;USR_MLME_OrphanInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-FAE3C695-2193-4956-8460-14DCE23D0BBB"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>USR_MLME_OrphanInd callback Function</register>
+      <title>USR_MLME_OrphanInd callback Function</title>
+      <bitfield/>
+      <keyword>USR_MLME_OrphanInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-BC4F0ACF-ACB4-4AE1-9ACE-1B763BA599D3"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_CommStatusInd callback Function</register>
+      <title>USR_MLME_CommStatusInd callback Function</title>
+      <bitfield/>
+      <keyword>WBZ451;USR_MLME_CommStatusInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-BC4F0ACF-ACB4-4AE1-9ACE-1B763BA599D3"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_CommStatusInd callback Function</register>
+      <title>USR_MLME_CommStatusInd callback Function</title>
+      <bitfield/>
+      <keyword>WBZ450;USR_MLME_CommStatusInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-BC4F0ACF-ACB4-4AE1-9ACE-1B763BA599D3"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_CommStatusInd callback Function</register>
+      <title>USR_MLME_CommStatusInd callback Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;USR_MLME_CommStatusInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-BC4F0ACF-ACB4-4AE1-9ACE-1B763BA599D3"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>USR_MLME_CommStatusInd callback Function</register>
+      <title>USR_MLME_CommStatusInd callback Function</title>
+      <bitfield/>
+      <keyword>USR_MLME_CommStatusInd</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-46FD057C-039F-4A30-A491-D7F659FFAD69"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_RxEnableReq Function</register>
+      <title>WPAN_MLME_RxEnableReq Function</title>
+      <bitfield/>
+      <keyword>WBZ451;WPAN_MLME_RxEnableReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-46FD057C-039F-4A30-A491-D7F659FFAD69"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_RxEnableReq Function</register>
+      <title>WPAN_MLME_RxEnableReq Function</title>
+      <bitfield/>
+      <keyword>WBZ450;WPAN_MLME_RxEnableReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-46FD057C-039F-4A30-A491-D7F659FFAD69"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_RxEnableReq Function</register>
+      <title>WPAN_MLME_RxEnableReq Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;WPAN_MLME_RxEnableReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-46FD057C-039F-4A30-A491-D7F659FFAD69"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>WPAN_MLME_RxEnableReq Function</register>
+      <title>WPAN_MLME_RxEnableReq Function</title>
+      <bitfield/>
+      <keyword>WPAN_MLME_RxEnableReq</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-631A25C6-F3EE-4A61-A4AC-67F8B988F9DB"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_RxEnableConf callback Function</register>
+      <title>USR_MLME_RxEnableConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ451;USR_MLME_RxEnableConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-631A25C6-F3EE-4A61-A4AC-67F8B988F9DB"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_RxEnableConf callback Function</register>
+      <title>USR_MLME_RxEnableConf callback Function</title>
+      <bitfield/>
+      <keyword>WBZ450;USR_MLME_RxEnableConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-631A25C6-F3EE-4A61-A4AC-67F8B988F9DB"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>USR_MLME_RxEnableConf callback Function</register>
+      <title>USR_MLME_RxEnableConf callback Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;USR_MLME_RxEnableConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-631A25C6-F3EE-4A61-A4AC-67F8B988F9DB"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>USR_MLME_RxEnableConf callback Function</register>
+      <title>USR_MLME_RxEnableConf callback Function</title>
+      <bitfield/>
+      <keyword>USR_MLME_RxEnableConf</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3B828C15-8319-40E2-9B07-BFC9AA68D9D2"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MAC_ReadyToSleep Function</register>
+      <title>MAC_ReadyToSleep Function</title>
+      <bitfield/>
+      <keyword>WBZ451;MAC_ReadyToSleep</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3B828C15-8319-40E2-9B07-BFC9AA68D9D2"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MAC_ReadyToSleep Function</register>
+      <title>MAC_ReadyToSleep Function</title>
+      <bitfield/>
+      <keyword>WBZ450;MAC_ReadyToSleep</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3B828C15-8319-40E2-9B07-BFC9AA68D9D2"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MAC_ReadyToSleep Function</register>
+      <title>MAC_ReadyToSleep Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MAC_ReadyToSleep</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-3B828C15-8319-40E2-9B07-BFC9AA68D9D2"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MAC_ReadyToSleep Function</register>
+      <title>MAC_ReadyToSleep Function</title>
+      <bitfield/>
+      <keyword>MAC_ReadyToSleep</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-60D77ADC-0A40-4826-8C33-18DC43750ADF"
+                nocomponent="true"
+                parent="">
+      <device>WBZ451</device>
+      <module/>
+      <component/>
+      <register>MAC_Wakeup Function</register>
+      <title>MAC_Wakeup Function</title>
+      <bitfield/>
+      <keyword>WBZ451;MAC_Wakeup</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-60D77ADC-0A40-4826-8C33-18DC43750ADF"
+                nocomponent="true"
+                parent="">
+      <device>WBZ450</device>
+      <module/>
+      <component/>
+      <register>MAC_Wakeup Function</register>
+      <title>MAC_Wakeup Function</title>
+      <bitfield/>
+      <keyword>WBZ450;MAC_Wakeup</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-60D77ADC-0A40-4826-8C33-18DC43750ADF"
+                nocomponent="true"
+                parent="">
+      <device>PIC32CX-BZ2</device>
+      <module/>
+      <component/>
+      <register>MAC_Wakeup Function</register>
+      <title>MAC_Wakeup Function</title>
+      <bitfield/>
+      <keyword>PIC32CX-BZ2;MAC_Wakeup</keyword>
+   </keyworditem>
+   <keyworditem topicid="GUID-60D77ADC-0A40-4826-8C33-18DC43750ADF"
+                nocomponent="true"
+                parent="">
+      <device/>
+      <module/>
+      <component/>
+      <register>MAC_Wakeup Function</register>
+      <title>MAC_Wakeup Function</title>
+      <bitfield/>
+      <keyword>MAC_Wakeup</keyword>
+   </keyworditem>
+</keywords>
