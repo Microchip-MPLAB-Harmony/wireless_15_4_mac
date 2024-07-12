@@ -34,7 +34,7 @@ pic32cx_bz2_family = {'PIC32CX1012BZ25048',
                       'PIC32CX1012BZ24032',
                       'WBZ451',
                       'WBZ450',
-                      'WBZ451H',
+                      'WBZ451H'
                       }
                       
 global deviceName
