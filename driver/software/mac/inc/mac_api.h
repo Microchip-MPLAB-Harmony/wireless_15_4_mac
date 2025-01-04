@@ -18,7 +18,7 @@
 
 // DOM-IGNORE-BEGIN
 /*******************************************************************************
-* Copyright (C) 2023 Microchip Technology Inc. and its subsidiaries.
+* Copyright (C) 2025 Microchip Technology Inc. and its subsidiaries.
 *
 * Subject to your compliance with these terms, you may use Microchip software
 * and any derivatives exclusively with Microchip products. It is your
@@ -2572,7 +2572,69 @@ uint32_t MAC_ReadyToSleep(void);
 void MAC_Wakeup(void);
 
 #endif
+#if (MAC_INDIRECT_DATA_FFD == 1)
 
+// *****************************************************************************
+/*
+  Function:
+    USR_MLME_PollInd(uint8_t srcAddrMode,uint16_t srcPanid,AddressField_t srcAddr,
+           uint8_t ppduLinkQuality,uint8_t sequenceNumber,uint8_t frameRSSI);
+
+  Summary:
+    Callback function that must be implemented by application (NHLE) for MAC
+    service MLME-POLL.indication.
+
+  Description:
+    This function implemented by application (NHLE) for MAC
+    service MLME-POLL.indication.
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    srcAddrMode       - Address Mode of the source address.
+    srcPanid          - PAN identifier to be used by device.
+    srcAddr           - source address.
+    mpduLinkQuality   - LQI measured during reception of the MPDU..
+    sequenceNumber    - The DSN(Device sequence number) of the received data frame
+    frameRSSI         - The RSSI of the received data frame.
+    
+  Returns:
+    None.
+
+  Example:
+    <code>
+    void USR_MLME_PollInd(uint8_t srcAddrMode,
+            uint16_t srcPanid,
+            AddressField_t srcAddr,
+            uint8_t mpduLinkQuality,
+            uint8_t sequenceNumber,
+            uint8_t frameRSSI);
+
+    {
+        srcAddrMode = srcAddrMode;
+        srcPanid = srcPanid;
+        srcAddr = srcAddr;
+        mpduLinkQuality = mpduLinkQuality;
+        sequenceNumber = sequenceNumber;
+        frameRSSI = frameRSSI;
+    }
+    </code>
+
+  Remarks:
+    There is weak function for this callback. User has to define own implementation 
+    for required operation on the reception of particular callback.
+
+*/
+
+void USR_MLME_PollInd(uint8_t srcAddrMode,
+            uint16_t srcPanid,
+            AddressField_t srcAddr,
+            uint8_t ppduLinkQuality,
+            uint8_t sequenceNumber,
+            uint8_t frameRSSI);
+
+#endif
 //DOM-IGNORE-BEGIN
 #ifdef __cplusplus
 }

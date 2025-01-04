@@ -13,7 +13,7 @@
 
 //DOM-IGNORE-BEGIN
 /*******************************************************************************
-* Copyright (C) 2023 Microchip Technology Inc. and its subsidiaries.
+* Copyright (C) 2025 Microchip Technology Inc. and its subsidiaries.
 *
 * Subject to your compliance with these terms, you may use Microchip software
 * and any derivatives exclusively with Microchip products. It is your
@@ -1217,7 +1217,44 @@
 #ifdef MAC_SECURITY_ZIP
 #define MAX_KEY_ID_FIELD_LEN                (9U)
 #endif
+        
+// *****************************************************************************
+/* macFrameRssi
 
+   Summary:
+    This macro holds mac frame rssi value.
+
+   Description:
+    None
+   Remarks:
+    None 
+ */
+        
+#define macFrameRssi                    (0xF1U)
+
+// *****************************************************************************
+/* macEnableDefFramePending
+
+   Summary:
+    This macro holds mac frame pending bit field.
+   Description:
+    None
+   Remarks:
+    None 
+ */        
+#define macEnableDefFramePending             (0xF2U)
+        
+// *****************************************************************************
+/* mac_EnableDefaultFramePending
+
+   Summary:
+    This macro holds mac default frame pending bit field.
+   Description:
+    None
+   Remarks:
+    None 
+ */          
+#define mac_EnableDefaultFramePending           (true)
 /* === Types ================================================================ */
 
 /* === Externals ============================================================ */

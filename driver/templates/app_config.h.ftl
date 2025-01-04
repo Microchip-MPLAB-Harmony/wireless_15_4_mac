@@ -15,7 +15,7 @@
 
 // DOM-IGNORE-BEGIN
 /*******************************************************************************
-* Copyright (C) 2023 Microchip Technology Inc. and its subsidiaries.
+* Copyright (C) 2025 Microchip Technology Inc. and its subsidiaries.
 *
 * Subject to your compliance with these terms, you may use Microchip software
 * and any derivatives exclusively with Microchip products. It is your
@@ -73,7 +73,7 @@
 #define NUMBER_OF_SMALL_STACK_BUFS	(${IEEE_802154_PHY.PHY_INTEGER_BMMSMALLBUFFERS}U+NUMBER_OF_SMALL_MAC_BUFS)
 
 /** Defines the number of additional large buffers used by the application */
-#define NUMBER_OF_LARGE_APP_BUFS    (4U)
+#define NUMBER_OF_LARGE_APP_BUFS    (0U)
 
 /** Defines the number of additional small buffers used by the application */
 #define NUMBER_OF_SMALL_APP_BUFS    (0U)

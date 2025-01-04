@@ -1,6 +1,6 @@
 # coding: utf-8
 ##############################################################################
-# Copyright (C) 2023 Microchip Technology Inc. and its subsidiaries.
+# Copyright (C) 2025 Microchip Technology Inc. and its subsidiaries.
 #
 # Subject to your compliance with these terms, you may use Microchip software
 # and any derivatives exclusively with Microchip products. It is your
@@ -31,18 +31,21 @@ def loadModule():
                           'WBZ451',
                           'WBZ450',
                           'WBZ451H'
-                          } 
-                          
+                          }
+    pic32cx_bz3_family = {'PIC32CX5109BZ31048',
+                          'PIC32CX5109BZ31032',
+                          'WBZ351',
+                          'WBZ350'
+                          }
     processor = Variables.get('__PROCESSOR') 
     
     print('processor={}'.format(processor))
-                          
-    if (processor in pic32cx_bz2_family):                      
-        ieee802154mac  = Module.CreateComponent('IEEE_802154_MAC', 'IEEE 802.15.4 MAC', 'Wireless/Drivers/IEEE 802.15.4', 'driver/config/drv_ieee802154_mac.py')
-        ieee802154mac.setDisplayType('Standalone MAC Driver')
-        ieee802154mac.addDependency('ieee802154phyDependency', 'IEEE 802.15.4 PHY', 'IEEE 802.15.4 PHY', True, True)
-        ieee802154mac.addDependency('HarmonyCoreDependency', 'Core Service', 'Core', True, True)
-        ieee802154mac.addDependency('SysTimeDependency', 'SYS_TIME', 'SYS_TIME', True, True)
-        ieee802154mac.addDependency('FreeRtosDependency', 'RTOS', 'RTOS', True, True)
-        ieee802154mac.addDependency('DeviceSupportDependency', 'Device_Support', 'Device_Support', True, True)
-        ieee802154mac.addCapability('ieee802154mac_Capability', 'IEEE 802.15.4 MAC', True)
+
+    ieee802154mac  = Module.CreateComponent('IEEE_802154_MAC', 'IEEE 802.15.4 MAC', 'Wireless/Drivers/IEEE 802.15.4', 'driver/config/drv_ieee802154_mac.py')
+    ieee802154mac.setDisplayType('Standalone MAC Driver')
+    ieee802154mac.addDependency('ieee802154phyDependency', 'IEEE 802.15.4 PHY', 'IEEE 802.15.4 PHY', True, True)
+    ieee802154mac.addDependency('HarmonyCoreDependency', 'Core Service', 'Core', True, True)
+    ieee802154mac.addDependency('SysTimeDependency', 'SYS_TIME', 'SYS_TIME', True, True)
+    ieee802154mac.addDependency('FreeRtosDependency', 'RTOS', 'RTOS', True, True)
+    ieee802154mac.addDependency('DeviceSupportDependency', 'Device_Support', 'Device_Support', True, True)
+    ieee802154mac.addCapability('ieee802154mac_Capability', 'IEEE 802.15.4 MAC', True)

@@ -4,9 +4,9 @@ package:
   type: "package"
   status: "production"
   required: false
-  version: "v1.1.0"
+  version: "v1.2.0"
 
   dependencies:
     - name: "wireless_15_4_phy"
       type: "package"
-      version: "v1.3.0" 
+      version: "v1.4.0-rc.1" 

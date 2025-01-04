@@ -12,7 +12,7 @@
 
 //DOM-IGNORE-BEGIN
 /*******************************************************************************
-* Copyright (C) 2023 Microchip Technology Inc. and its subsidiaries.
+* Copyright (C) 2025 Microchip Technology Inc. and its subsidiaries.
 *
 * Subject to your compliance with these terms, you may use Microchip software
 * and any derivatives exclusively with Microchip products. It is your
@@ -107,6 +107,15 @@ bool macRxEnabled;
  */
 uint8_t macLastDsn;
 uint64_t macLastSrcAddr;
+
+/*
+ * Variable to hold the last received RSSI of the frame.
+ * In PHY RX frame callback, this frame RSSI value will be updated, whenever a
+ * PHY frame is received.
+ * When next frame is received, this value will be overwritten with new frame 
+ * RSSI value.
+ */
+uint8_t frameRSSI = UINT8_MAX;
 
 #if (MAC_START_REQUEST_CONFIRM == 1)
 

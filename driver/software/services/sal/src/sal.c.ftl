@@ -12,7 +12,7 @@
 
 //DOM-IGNORE-BEGIN
 /*******************************************************************************
-* Copyright (C) 2023 Microchip Technology Inc. and its subsidiaries.
+* Copyright (C) 2025 Microchip Technology Inc. and its subsidiaries.
 *
 * Subject to your compliance with these terms, you may use Microchip software
 * and any derivatives exclusively with Microchip products. It is your
@@ -40,19 +40,32 @@
 #include <string.h>
 #include "sal.h"
 #include "definitions.h"
-#include "wolfssl/wolfcrypt/port/pic32/crypt_wolfcryptcb.h"
 #include "configuration.h"
+<#if DEVICE_SOC_FAMILY_TYPE == "bz2">
+#include "wolfssl/wolfcrypt/port/pic32/crypt_wolfcryptcb.h"
 #include "wolfcrypt/aes.h"
+</#if>
+
+<#if DEVICE_SOC_FAMILY_TYPE == "bz3">
+#include "config\default\driver\security\sxsymcrypt\keyref_api.h"
+#include "config\default\driver\security\sxsymcrypt\aead_api.h"
+</#if>
 
 /* === Macros ============================================================== */
 
 /* === Types =============================================================== */
 
 /* === Globals ============================================================= */
-
+<#if DEVICE_SOC_FAMILY_TYPE == "bz2">
 /* aes structure in which to store the supplied key */
 static struct Aes aes;
+</#if>
 
+<#if DEVICE_SOC_FAMILY_TYPE == "bz3">
+/* aead structure in which to store the supplied key and data*/
+static struct sxaead aead;
+static struct sxkeyref keyref;
+</#if>
 /* === Implementation ====================================================== */
 
 /**
@@ -77,18 +90,30 @@ void SAL_Init(void)
  */
 SAL_AesStatus_t SAL_AesSetKey(uint8_t *key, uint8_t key_len)
 {
+<#if DEVICE_SOC_FAMILY_TYPE == "bz2">
     int status = 0;
     SAL_AesStatus_t aesStatus = AES_FAILURE;
     
-	if (key != NULL && key_len > 0U) {
-		/* Setup key. */
-		status = wc_AesCcmSetKey(&aes, key, key_len);
+    if (key != NULL && key_len > 0U) {
+        /* Setup key. */
+        status = wc_AesCcmSetKey(&aes, key, key_len);
     }
     
     if(status == 0)
     {
         aesStatus = AES_SUCCESS;
     }
+</#if>
+
+<#if DEVICE_SOC_FAMILY_TYPE == "bz3">
+    SAL_AesStatus_t aesStatus = AES_SUCCESS;
+    
+    /* Enable Silex/BA457 Clock */
+    SX_CLK_ENABLE();
+    keyref = SX_KEYREF_LOAD_MATERIAL(key_len,(const char *) key);
+    /* Disable Silex/BA457 Clock */
+    SX_CLK_DISABLE();
+</#if>
 
 	return aesStatus;
 }
@@ -116,11 +141,12 @@ SAL_AesStatus_t SAL_AesCcmSecure(uint8_t *buffer,
 		uint8_t aes_dir, uint8_t mic_len, uint8_t enc_flag)
 { 
     uint8_t *plain_text = NULL;
+    int status = 0;
+    SAL_AesStatus_t aesCcmStatus = AES_FAILURE;
+<#if DEVICE_SOC_FAMILY_TYPE == "bz2">
     uint8_t plainTextLen = 0U;
     uint8_t *mic = buffer + hdr_len + pld_len;
     uint8_t *authData = buffer;
-    int status = 0;
-    SAL_AesStatus_t aesCcmStatus = AES_FAILURE;
     
     if(enc_flag > 0U)
     {
@@ -141,6 +167,76 @@ SAL_AesStatus_t SAL_AesCcmSecure(uint8_t *buffer,
                    mic,(uint32_t)mic_len,
                    authData, (uint32_t)hdr_len);
     }
+</#if>
+
+<#if DEVICE_SOC_FAMILY_TYPE == "bz3">
+    uint8_t fed_sz = 0;
+    uint8_t next_sz = 0;
+
+    plain_text = buffer + hdr_len;
+    /* Enable Silex/BA457 Clock */
+    SX_CLK_ENABLE();
+    
+    // Initializations required for AEAD CCM operation
+    if(aes_dir == AES_DIR_ENCRYPT)
+        status = SX_AEAD_CREATE_AESCCM_ENC(&aead, &keyref, (const char *)nonce, NONCE_SIZE, mic_len, hdr_len, pld_len);
+    else
+        status = SX_AEAD_CREATE_AESCCM_DEC(&aead, &keyref, (const char *)nonce, NONCE_SIZE, mic_len, hdr_len, pld_len);
+    if (status)
+        return status;
+    
+    // Initialization required for AAD
+    status = SX_AEAD_FEED_AAD(&aead, (const char *)buffer, hdr_len);
+    if (status)
+        return status;
+    
+    if(pld_len >= AES_BLOCKSIZE)
+        next_sz = AES_BLOCKSIZE;
+    else
+        next_sz = pld_len;
+    do
+    {
+      //Adds next chunk of data to be encrypted or decrypted
+      status = SX_AEAD_CRYPT(&aead, (const char *)plain_text, next_sz, (char *)plain_text);
+      if (status)
+        return status;
+      fed_sz += next_sz;
+      plain_text = plain_text + next_sz;
+      if(pld_len - fed_sz > AES_BLOCKSIZE)
+        next_sz = AES_BLOCKSIZE;
+      else
+        next_sz = pld_len - fed_sz;
+
+      // state handling for Intermediary and last chunks
+      if(fed_sz < pld_len)
+      {
+        status = SX_AEAD_SAVE_STATE(&aead);
+        if (status)
+            return status;
+        status = SX_AEAD_WAIT(&aead);
+        if (status)
+            return status;
+        status = SX_AEAD_RESUME_STATE(&aead);
+        if (status)
+            return status;
+       }
+    }while(fed_sz < pld_len);
+    
+    // Starts AEAD encryption and tag computation
+    if(aes_dir == AES_DIR_ENCRYPT)
+        status = SX_AEAD_PRODUCE_TAG(&aead,(char *)(buffer+(hdr_len+pld_len)));
+    else
+        status = SX_AEAD_VERIFY_TAG(&aead,(char *)(buffer+(hdr_len+pld_len)));
+    if (status)
+        return status;
+    status = SX_AEAD_WAIT(&aead);
+    if (status)
+        return status;
+    
+    /* Disable Silex/BA457 Clock */
+    SX_CLK_DISABLE();
+</#if>
+
     if(status == 0)
     {
        aesCcmStatus = AES_SUCCESS; 

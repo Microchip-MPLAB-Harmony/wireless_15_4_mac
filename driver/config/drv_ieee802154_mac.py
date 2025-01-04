@@ -1,6 +1,6 @@
 # coding: utf-8
 ##############################################################################
-# Copyright (C) 2023 Microchip Technology Inc. and its subsidiaries.
+# Copyright (C) 2025 Microchip Technology Inc. and its subsidiaries.
 #
 # Subject to your compliance with these terms, you may use Microchip software
 # and any derivatives exclusively with Microchip products. It is your
@@ -36,7 +36,13 @@ pic32cx_bz2_family = {'PIC32CX1012BZ25048',
                       'WBZ450',
                       'WBZ451H'
                       }
-                      
+
+pic32cx_bz3_family = {'PIC32CX5109BZ31048',
+                      'PIC32CX5109BZ31032',
+                      'WBZ351',
+                      'WBZ350'
+                      }
+
 global deviceName
 deviceName = Variables.get("__PROCESSOR")
 
@@ -46,15 +52,16 @@ def instantiateComponent(ieee802154mac):
     print configName
     # === Activate required components automatically
     global requiredComponents
-    if (deviceName in pic32cx_bz2_family):
-          requiredComponents = [
+    requiredComponents = [
               "IEEE_802154_PHY",
               "HarmonyCore",
               "sys_time",
-              "pic32cx_bz2_devsupport",
-              "RTOS",
-              "trng"
+              "RTOS"
           ]
+    if (deviceName in pic32cx_bz2_family):
+          requiredComponents.extend(["pic32cx_bz2_devsupport","trng"])
+    elif (deviceName in pic32cx_bz3_family):
+          requiredComponents.extend(["pic32cx_bz3_devsupport"])
     
     conditionAlwaysInclude = [True, None, []]
     condSecurity = [False, SecurityFilesConfig, ['MAC_SECURITY_OPTION']]
@@ -152,6 +159,7 @@ def instantiateComponent(ieee802154mac):
         ["mac/src/usr_mlme_get_conf.c", conditionAlwaysInclude],
         ["mac/src/usr_mlme_orphan_ind.c", conditionAlwaysInclude],
         ["mac/src/usr_mlme_poll_conf.c", conditionAlwaysInclude],
+        ["mac/src/usr_mlme_poll_ind.c", conditionAlwaysInclude],
         ["mac/src/usr_mlme_reset_conf.c", conditionAlwaysInclude],
         ["mac/src/usr_mlme_rx_enable_conf.c", conditionAlwaysInclude],  
         ["mac/src/usr_mlme_scan_conf.c", conditionAlwaysInclude],
@@ -166,21 +174,12 @@ def instantiateComponent(ieee802154mac):
     srcStb = [
         ["stb/src/stb.c", condSecurity]
     ]
-    
-    # === SAL services Source Files
-
-    srcServices = [
-        ["services/sal/pic32cx_bz2/src/sal.c", condSecurity]
-    ]
 
     # === Import the source files
     for srcFileEntry in srcMac:
         importSrcFile(ieee802154mac, configName, srcFileEntry)
     for srcFileEntry in srcStb:
         importSrcFile(ieee802154mac, configName, srcFileEntry)
-    for srcFileEntry in srcServices:
-        importSrcFile(ieee802154mac, configName, srcFileEntry)
-
 
     # === Include path setting
     includePathsMac = [
@@ -197,13 +196,25 @@ def instantiateComponent(ieee802154mac):
     
     for incPathEntry in includePathsMacSecurity:
         setIncPath(ieee802154mac, configName, incPathEntry)
-        
+
+    #Soc type symbol for FTL
+    global deviceSocFamilyType
+    deviceSocFamilyType = ieee802154mac.createStringSymbol("DEVICE_SOC_FAMILY_TYPE",None)
+    deviceSocFamilyType.setLabel("Device Role")
+    deviceSocFamilyType.setVisible(False)
+    if deviceName in pic32cx_bz2_family:
+        deviceSocFamilyType.setDefaultValue("bz2")
+    elif deviceName in pic32cx_bz3_family:
+        deviceSocFamilyType.setDefaultValue("bz3")
+
     global preprocessorCompiler
     # === Compiler macros
     preprocessorCompiler = ieee802154mac.createSettingSymbol("IEEE802154MAC_XC32_PREPRECESSOR", None)
     preprocessorCompiler.setCategory("C32")
     preprocessorCompiler.setKey("preprocessor-macros")
     preprocessorCompiler.setValue("ENABLE_TSTAMP;FFD")
+    preprocessorCompiler.setAppend(True, ";")
+    preprocessorCompiler.setEnabled(True)
          
 
     # === File templates processing
@@ -248,6 +259,17 @@ def instantiateComponent(ieee802154mac):
     macInitC.setOutputName('core.LIST_SYSTEM_INIT_C_APP_INITIALIZE_DATA')
     macInitC.setSourcePath('driver/templates/system/system_initialize_middleware.c.ftl')
     macInitC.setMarkup(True)
+    
+    global macSalC
+    macSalC = ieee802154mac.createFileSymbol('IEEE802154MAC_SAL_C', None)
+    macSalC.setType('SOURCE')
+    macSalC.setOutputName('sal.c')
+    macSalC.setSourcePath('driver/software/services/sal/src/sal.c.ftl')
+    macSalC.setDestPath('driver/IEEE_802154_MAC/services/sal/src')
+    macSalC.setProjectPath('config/'+configName+'/driver/IEEE_802154_MAC/services/sal/src/sal.c')    
+    macSalC.setOverwrite(True)
+    macSalC.setMarkup(True)
+    macSalC.setEnabled(False)
 
     # === Treat warnings as errors
     macWarnAsErr = ieee802154mac.createSettingSymbol("IEEE802154MAC_GCC_WARN_ERROR", None)
@@ -379,7 +401,6 @@ def DeviceTypeConfiguration(symbol,event):
         preprocessorMacro = preprocessorCompiler.getValue()
         preprocessorMacro = preprocessorMacro + ";FFD"
         preprocessorCompiler.setValue(preprocessorMacro)
-        preprocessorCompiler.setEnabled(True)
         macIndirectIntegerBmmLargeBuffers.setVisible(True)       
         DeepSleepEnable.setVisible(False)
         DeepSleepEnable.setValue(False)
@@ -390,7 +411,6 @@ def DeviceTypeConfiguration(symbol,event):
         preprocessorMacro = preprocessorCompiler.getValue()
         preprocessorMacro = preprocessorMacro.replace(";FFD","")
         preprocessorCompiler.setValue(preprocessorMacro)
-        preprocessorCompiler.setEnabled(True)  
         macIndirectIntegerBmmLargeBuffers.setVisible(False)
         DeepSleepEnable.setVisible(True)
         DeepSleepEnable.setValue(False)  
@@ -399,7 +419,7 @@ def DeviceTypeConfiguration(symbol,event):
 #~~~~~~~~~~~~~~~ Sleep configuration CALLBACK ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # This callbacks handles for Deep sleep macro configuration and RTC support from wireless_pic32cxbz_wbz
 #-----------------------------------------------------------------------------------------------------
-       
+
 def SleepConfiguration(symbol,event):
     sleepEnable = event['value']
     HandleSleep(sleepEnable)
@@ -409,24 +429,28 @@ def HandleSleep(sleepEnable):
         preprocessorSleepMacro = preprocessorCompiler.getValue()
         preprocessorSleepMacro = preprocessorSleepMacro + ";ENABLE_DEVICE_DEEP_SLEEP"
         preprocessorCompiler.setValue(preprocessorSleepMacro)
-        preprocessorCompiler.setEnabled(True)
         if (deviceName in pic32cx_bz2_family):
             Database.sendMessage("pic32cx_bz2_devsupport", "DEEP_SLEEP_ENABLE", {"target": "pic32cx_bz2_devsupport",
                                                         "source": "IEEE_802154_MAC","isEnabled":True})
-        
+        elif (deviceName in pic32cx_bz3_family):
+            Database.sendMessage("pic32cx_bz3_devsupport", "DEEP_SLEEP_ENABLE", {"target": "pic32cx_bz3_devsupport",
+                                                        "source": "IEEE_802154_MAC","isEnabled":True})
+            
     if sleepEnable == False:
         preprocessorSleepMacro = preprocessorCompiler.getValue()
         preprocessorSleepMacro = preprocessorSleepMacro.replace(";ENABLE_DEVICE_DEEP_SLEEP","")
         preprocessorCompiler.setValue(preprocessorSleepMacro)
-        preprocessorCompiler.setEnabled(True)
         if (deviceName in pic32cx_bz2_family):
             Database.sendMessage("pic32cx_bz2_devsupport", "DEEP_SLEEP_ENABLE", {"target": "pic32cx_bz2_devsupport",
                                                         "source": "IEEE_802154_MAC","isEnabled":False})
-     
+        elif (deviceName in pic32cx_bz3_family):
+            Database.sendMessage("pic32cx_bz3_devsupport", "DEEP_SLEEP_ENABLE", {"target": "pic32cx_bz3_devsupport",
+                                                        "source": "IEEE_802154_MAC","isEnabled":False})
+
 #-----------------------------------------------------------------------------------------------------
 #~~~~~~~~~~~~~~~ Security Configuration CALLBACK ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# This callbacks handles for adding Security preprocessor macros, activating wolfCrypt library module
-# and set AES_CLOCK_ENABLE based on security option
+# This callbacks handles for adding Security preprocessor macros,
+# set AES_CLOCK_ENABLE based on security option
 #-----------------------------------------------------------------------------------------------------
 
 def SecurityConfiguration(symbol,event):
@@ -435,17 +459,17 @@ def SecurityConfiguration(symbol,event):
         preprocessorSecurity = preprocessorCompiler.getValue()
         preprocessorSecurity = preprocessorSecurity + ";MAC_SECURITY_ZIP;MAC_SECURITY_2006;STB_ON_SAL"
         preprocessorCompiler.setValue(preprocessorSecurity)
-        preprocessorCompiler.setEnabled(True)      
-        Database.activateComponents(['lib_wolfcrypt']) 
-        Database.setSymbolValue("core", "AES_CLOCK_ENABLE", True)
+        if (deviceName in pic32cx_bz2_family):        
+            Database.activateComponents(['lib_wolfcrypt']) 
+            Database.setSymbolValue("core", "AES_CLOCK_ENABLE", True)
                   
     if Securityoption == 0:#Disabled
         preprocessorSecurity = preprocessorCompiler.getValue()
         preprocessorSecurity = preprocessorSecurity.replace(";MAC_SECURITY_ZIP;MAC_SECURITY_2006;STB_ON_SAL","")
         preprocessorCompiler.setValue(preprocessorSecurity)
-        preprocessorCompiler.setEnabled(True)
-        Database.deactivateComponents(['lib_wolfcrypt'])
-        Database.setSymbolValue("core", "AES_CLOCK_ENABLE", False)
+        if (deviceName in pic32cx_bz2_family):
+            Database.deactivateComponents(['lib_wolfcrypt'])        
+            Database.setSymbolValue("core", "AES_CLOCK_ENABLE", False)
 
 #-----------------------------------------------------------------------------------------------------
 #~~~~~~~~~~~~~~~ Security Files Config CALLBACK ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -455,9 +479,11 @@ def SecurityConfiguration(symbol,event):
 def SecurityFilesConfig(symbol,event):
     Securityoption = event['value']
     if Securityoption == 1:#Enabled
-        symbol.setEnabled(True)        
+        symbol.setEnabled(True)
+        macSalC.setEnabled(True)
     if Securityoption == 0:#Disabled
         symbol.setEnabled(False) 
+        macSalC.setEnabled(False)
         
 #-----------------------------------------------------------------------------------------------------
 #~~~~~~~~~~~~~~~ macCommentBmmLarge and small Buffers Depend CALLBACKs ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -490,12 +516,12 @@ def onAttachmentConnected(source, target):
           remoteComponent.getSymbolByID("CREATE_PHY_RTOS_TASK").setReadOnly(True)  
 
     if (deviceName in pic32cx_bz2_family):
-          remoteComponent = Database.getComponentByID("trng")
-          if (remoteComponent):
-               print('Printing TRNG remoteComponent Value')
-               remoteComponent.getSymbolByID("trngEnableInterrupt").setReadOnly(True)
-               remoteComponent.getSymbolByID("trngEnableEvent").setReadOnly(True)
-               remoteComponent.getSymbolByID("TRNG_STANDBY").setReadOnly(True)         
+        remoteComponent = Database.getComponentByID("trng")
+        if (remoteComponent):
+              print('Printing TRNG remoteComponent Value')
+              remoteComponent.getSymbolByID("trngEnableInterrupt").setReadOnly(True)
+              remoteComponent.getSymbolByID("trngEnableEvent").setReadOnly(True)
+              remoteComponent.getSymbolByID("TRNG_STANDBY").setReadOnly(True)         
 
 #end onAttachmentConnected  
     

@@ -12,7 +12,7 @@
 
 //DOM-IGNORE-BEGIN
 /*******************************************************************************
-* Copyright (C) 2023 Microchip Technology Inc. and its subsidiaries.
+* Copyright (C) 2025 Microchip Technology Inc. and its subsidiaries.
 *
 * Subject to your compliance with these terms, you may use Microchip software
 * and any derivatives exclusively with Microchip products. It is your
@@ -77,7 +77,7 @@
 /* === Globals ============================================================= */
 
 /* === Prototypes ========================================================== */
-
+NullDataFrameHandler TxNullDataFrameHandler;
 static bool ParseMpdu(MAC_FrameInfo_t *rxFramePtr);
 static bool ProcessDataIndNotTransient(buffer_t *b_ptr,
 		MAC_FrameInfo_t *f_ptr);
@@ -244,8 +244,16 @@ void MAC_ProcessPhyDataInd(void *msg)
 					MAC_ProcessDataRequest(bufPtr);
 					processedPhyDataIndication = true;
 				} else {
-					MAC_HandleTxNullDataFrame();
+                    if(TxNullDataFrameHandler != NULL){
+                        TxNullDataFrameHandler();
+                    }
 				}
+                USR_MLME_PollInd(macParseData.srcAddrMode,
+                            macParseData.srcPanid,
+                            macParseData.srcAddr,
+                            macParseData.ppduLinkQuality,
+                            macParseData.sequenceNumber,
+                            frameRSSI); //AMAR
 
 #endif  /*  (MAC_INDIRECT_DATA_FFD == 1) */
 				break;
@@ -483,8 +491,16 @@ static bool ProcessDataIndNotTransient(buffer_t *b_ptr, MAC_FrameInfo_t *f_ptr)
 					MAC_ProcessDataRequest(b_ptr);
 					processedInNotTransient = true;
 				} else {
-					MAC_HandleTxNullDataFrame();
+                    if(TxNullDataFrameHandler != NULL){
+                        TxNullDataFrameHandler();
+                    }
 				}
+                USR_MLME_PollInd(macParseData.srcAddrMode,
+                            macParseData.srcPanid,
+                            macParseData.srcAddr,
+                            macParseData.ppduLinkQuality,
+                            macParseData.sequenceNumber,
+                            frameRSSI);
 				break;
 #endif /* (MAC_INDIRECT_DATA_FFD == 1) */
 
@@ -627,8 +643,16 @@ static bool ProcessDataIndNotTransient(buffer_t *b_ptr, MAC_FrameInfo_t *f_ptr)
 						processedInNotTransient
 							= true;
 					} else {
-						MAC_HandleTxNullDataFrame();
+                        if(TxNullDataFrameHandler != NULL){
+                            TxNullDataFrameHandler();
+                        }
 					}
+                    USR_MLME_PollInd(macParseData.srcAddrMode,
+                            macParseData.srcPanid,
+                            macParseData.srcAddr,
+                            macParseData.ppduLinkQuality,
+                            macParseData.sequenceNumber,
+                            frameRSSI);
 					break;
 #endif /* (MAC_INDIRECT_DATA_FFD == 1) */
 
@@ -1025,7 +1049,7 @@ void PHY_RxFrameCallback(PHY_FrameInfo_t *rxFrame)
     {
         (void)memcpy(macRxFrame->mpdu, rxFrame->mpdu, frameLen);
     }
-    
+    frameRSSI = rxFrame->mpdu[frameLen + LQI_LEN + ED_VAL_LEN]; 
     macRxFrame->msgType = (FrameMsgtype_t)PHY_DATA_INDICATION;
       
 	if (NULL == rxFrame->buffer_header) {
