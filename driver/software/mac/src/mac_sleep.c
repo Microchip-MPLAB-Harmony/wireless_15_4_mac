@@ -2,11 +2,11 @@
   MAC Source
 
   File Name:
-    mac.c
+    mac_sleep.c
   Summary:
-    Runs the MAC scheduler
+    Handles the sleep feature
   Description:
-    This module runs the MAC scheduler.
+    This module handles the sleep feature.
 
  *******************************************************************************/
 
