@@ -1019,7 +1019,7 @@ static bool ParseMpdu(MAC_FrameInfo_t *rxFramePtr)
  * @param frame Pointer to recived frame
  */
 
-void PHY_RxFrameCallback(PHY_FrameInfo_t *rxFrame)
+void MAC_RxFrameCallback(PHY_FrameInfo_t *rxFrame)
 {
     buffer_t *buffer_header;
 	MAC_FrameInfo_t *macRxFrame;

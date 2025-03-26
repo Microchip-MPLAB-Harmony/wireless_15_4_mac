@@ -2570,8 +2570,42 @@ uint32_t MAC_ReadyToSleep(void);
 
 */
 void MAC_Wakeup(void);
-
 #endif
+
+// *****************************************************************************
+/*
+  Function:
+    void MAC_ReadyToDeepSleep(void)
+
+  Summary:
+    MAC Params to Backup RAM before Deep Sleep
+  Description:
+    This function implements the pre sleep functionalities. If device is going to 
+    Deep sleep, then this function must be called before device sleep to 
+    store the system RAM parameters to BackUp RAM.
+
+
+  Precondition:
+    WPAN_Init() should have been called before calling this function. 
+
+  Parameters:
+    None.     
+
+  Returns:
+    None.
+
+  Example:
+    <code>
+    MAC_ReadyToDeepSleep();
+    </code>
+
+  Remarks:
+    None.
+
+*/
+
+void MAC_ReadyToDeepSleep(void);
+
 #if (MAC_INDIRECT_DATA_FFD == 1)
 
 // *****************************************************************************

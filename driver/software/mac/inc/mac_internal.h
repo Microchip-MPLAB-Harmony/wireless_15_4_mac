@@ -896,6 +896,12 @@ MAC_Retval_t MAC_TimersInit(void);
 
 MAC_Retval_t MAC_TimersStop(void);
 
+void MAC_TxDoneCallback(PHY_Retval_t status, PHY_FrameInfo_t *frame);
+
+void MAC_RxFrameCallback(PHY_FrameInfo_t *rxFrame);
+
+void MAC_EdEndCallback(uint8_t energyLevel);
+
 #if (MAC_INDIRECT_DATA_FFD == 1)
 
 /*

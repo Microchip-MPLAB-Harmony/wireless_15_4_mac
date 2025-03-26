@@ -15,7 +15,7 @@
 
 //DOM-IGNORE-BEGIN
 /*******************************************************************************
-* Copyright (C) 2024 Microchip Technology Inc. and its subsidiaries.
+* Copyright (C) 2025 Microchip Technology Inc. and its subsidiaries.
 *
 * Subject to your compliance with these terms, you may use Microchip software
 * and any derivatives exclusively with Microchip products. It is your
@@ -1034,10 +1034,9 @@ void MAC_MLME_ScanRequest(void *m)
  *
  * This function is a callback function from the TAL after ED scan
  * is performed on a specified channel.
- *
  * @param energy_level Maximum energy on the channel
  */
-void PHY_EdEndCallback(uint8_t energyLevel)
+void MAC_EdEndCallback(uint8_t energyLevel)
 {
 	MAKE_MAC_NOT_BUSY();
 

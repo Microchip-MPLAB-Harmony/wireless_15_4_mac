@@ -28,6 +28,15 @@
 
 # ========== Device type Configuration for MAC ====================
 
+global maclibraryGen
+maclibraryGen = ieee802154mac.createKeyValueSetSymbol("MAC_LIBRARY_GENERATION",None)
+maclibraryGen.setLabel("Mac Generation")
+maclibraryGen.addKey("Source","Source","Source")
+maclibraryGen.addKey("Library","Library","Library")
+maclibraryGen.setDefaultValue(0)
+maclibraryGen.setVisible(True)
+maclibraryGen.setDependencies(libGenConfiguration,["MAC_LIBRARY_GENERATION"])
+
 macDeviceConfig = ieee802154mac.createMenuSymbol("MAC_DEVICE_CONFIG", None)
 macDeviceConfig.setLabel("Device Type Configuration")
 macDeviceConfig.setVisible(True)
@@ -78,7 +87,7 @@ macIntegerBmmLargeBuffers = ieee802154mac.createIntegerSymbol("MAC_INTEGER_BMMLA
 macIntegerBmmLargeBuffers.setLabel("Large Buffers")
 macIntegerBmmLargeBuffers.setMin(6)
 macIntegerBmmLargeBuffers.setMax(50)
-macIntegerBmmLargeBuffers.setDefaultValue(6)
+macIntegerBmmLargeBuffers.setDefaultValue(10)
 
 
 global macIndirectIntegerBmmLargeBuffers
@@ -100,9 +109,9 @@ macCommentBmmLargeBuffers.setDependencies(macCommentBmmLargeBuffersDepend, ["MAC
 global macIntegerBmmSmallBuffers
 macIntegerBmmSmallBuffers = ieee802154mac.createIntegerSymbol("MAC_INTEGER_BMMSMALLBUFFERS", macMenuBmm)
 macIntegerBmmSmallBuffers.setLabel("Small Buffers")
-macIntegerBmmSmallBuffers.setMin(2)
+macIntegerBmmSmallBuffers.setMin(3)
 macIntegerBmmSmallBuffers.setMax(50)
-macIntegerBmmSmallBuffers.setDefaultValue(2)
+macIntegerBmmSmallBuffers.setDefaultValue(3)
 
 global macCommentBmmSmallBuffers
 macCommentBmmSmallBuffers = ieee802154mac.createCommentSymbol("MAC_COMMENT_BMMSMALLBUFFERS", macIntegerBmmSmallBuffers)

@@ -9,4 +9,4 @@ package:
   dependencies:
     - name: "wireless_15_4_phy"
       type: "package"
-      version: "v1.4.0-rc.1" 
+      version: "v1.4.0-rc.2" 

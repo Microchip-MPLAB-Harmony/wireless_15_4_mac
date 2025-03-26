@@ -363,14 +363,14 @@ MAC_Retval_t MAC_MLME_Set(uint8_t attribute, PibValue_t *attributeValue,
 		break;
     
     case macEnableDefFramePending:
-        macPib.mac_EnableDefFramePending = attributeValue->pib_value_bool;
+		macPib.mac_EnableDefFramePending = attributeValue->pib_value_bool;
         if(macPib.mac_EnableDefFramePending){
             TxNullDataFrameHandler = (NullDataFrameHandler)&MAC_HandleTxNullDataFrame;
         }
         else{
             TxNullDataFrameHandler = NULL;
         }
-        break;
+		break;
 #endif /* (MAC_INDIRECT_DATA_FFD == 1) */
 	case macCoordExtendedAddress:
 		macPib.mac_CoordExtendedAddress
@@ -778,8 +778,8 @@ MAC_Retval_t MAC_MLME_Get(uint8_t attribute, PibValue_t *attributeValue)
 #endif  /* (MAC_START_REQUEST_CONFIRM == 1) */
 
     case macFrameRssi:
-        attributeValue->pib_value_8bit = frameRSSI;
-        break;
+		attributeValue->pib_value_8bit = frameRSSI;
+		break;
         
 #if (MAC_INDIRECT_DATA_FFD == 1)
 	case macTransactionPersistenceTime:
@@ -788,8 +788,8 @@ MAC_Retval_t MAC_MLME_Get(uint8_t attribute, PibValue_t *attributeValue)
 				sizeof(uint16_t));
 		break;
     case macEnableDefFramePending:
-        attributeValue->pib_value_bool = macPib.mac_EnableDefFramePending;
-        break;
+		attributeValue->pib_value_bool = macPib.mac_EnableDefFramePending;
+		break;
 #endif /* (MAC_INDIRECT_DATA_FFD == 1) */
 
 #ifdef PROMISCUOUS_MODE

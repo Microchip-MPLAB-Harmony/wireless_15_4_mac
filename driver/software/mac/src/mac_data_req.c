@@ -12,7 +12,7 @@
 
 //DOM-IGNORE-BEGIN
 /*******************************************************************************
-* Copyright (C) 2023 Microchip Technology Inc. and its subsidiaries.
+* Copyright (C) 2025 Microchip Technology Inc. and its subsidiaries.
 *
 * Subject to your compliance with these terms, you may use Microchip software
 * and any derivatives exclusively with Microchip products. It is your
@@ -74,6 +74,7 @@
 static buffer_t *buildNullDataFrame(void);
 static uint8_t findLongBuffer(void *buf, void *long_addr);
 static uint8_t findShortBuffer(void *buf, void *shortAddr);
+extern NullDataFrameHandler TxNullDataFrameHandler;
 
 #endif  /*  (MAC_INDIRECT_DATA_FFD == 1)*/
 
@@ -548,7 +549,9 @@ void MAC_ProcessDataRequest(buffer_t *msg)
 	**/
 
 	if (NULL == bufPtrNextData) {
-		MAC_HandleTxNullDataFrame();
+        if(TxNullDataFrameHandler != NULL) {
+            TxNullDataFrameHandler();
+            }
 		return;
 	} else {
 		/* Indirect data found and to be sent. */
@@ -567,7 +570,9 @@ void MAC_ProcessDataRequest(buffer_t *msg)
 				convert_byte_array_to_16_bit(&transmitFrame->
 				mpdu[PL_POS_DST_PAN_ID_START])
 				) {
-			MAC_HandleTxNullDataFrame();
+                    if(TxNullDataFrameHandler != NULL) {
+                    TxNullDataFrameHandler();
+                    }
 			return;
 		} else {
 			/*
