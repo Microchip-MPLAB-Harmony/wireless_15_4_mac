@@ -1,6 +1,6 @@
 # coding: utf-8
 ##############################################################################
-# Copyright (C) 2023 Microchip Technology Inc. and its subsidiaries.
+# Copyright (C) 2025 Microchip Technology Inc. and its subsidiaries.
 #
 # Subject to your compliance with these terms, you may use Microchip software
 # and any derivatives exclusively with Microchip products. It is your
@@ -27,15 +27,6 @@
 #
 
 # ========== Device type Configuration for MAC ====================
-
-global maclibraryGen
-maclibraryGen = ieee802154mac.createKeyValueSetSymbol("MAC_LIBRARY_GENERATION",None)
-maclibraryGen.setLabel("Mac Generation")
-maclibraryGen.addKey("Source","Source","Source")
-maclibraryGen.addKey("Library","Library","Library")
-maclibraryGen.setDefaultValue(0)
-maclibraryGen.setVisible(True)
-maclibraryGen.setDependencies(libGenConfiguration,["MAC_LIBRARY_GENERATION"])
 
 macDeviceConfig = ieee802154mac.createMenuSymbol("MAC_DEVICE_CONFIG", None)
 macDeviceConfig.setLabel("Device Type Configuration")

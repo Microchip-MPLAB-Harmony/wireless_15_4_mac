@@ -108,15 +108,6 @@ bool macRxEnabled;
 uint8_t macLastDsn;
 uint64_t macLastSrcAddr;
 
-/*
- * Variable to hold the last received RSSI of the frame.
- * In PHY RX frame callback, this frame RSSI value will be updated, whenever a
- * PHY frame is received.
- * When next frame is received, this value will be overwritten with new frame 
- * RSSI value.
- */
-uint8_t frameRSSI = UINT8_MAX;
-
 #if (MAC_START_REQUEST_CONFIRM == 1)
 
 /**
@@ -201,7 +192,10 @@ PHY_FrameInfo_t phyTxFrameInfo;
 
 
 /* === Prototypes =========================================================== */
-
+#ifdef ENABLE_DEVICE_DEEP_SLEEP
+static void MAC_ReadyToDeepSleep(void);
+static void MAC_WakeUpFromDeepSleep(void);
+#endif
 /* === Implementation ======================================================= */
 
 /**
@@ -277,7 +271,9 @@ uint32_t MAC_ReadyToSleep(void)
 		sleepTime = 0;
 	} else {
 		sleepTime = READY_TO_SLEEP;
+#ifdef ENABLE_DEVICE_DEEP_SLEEP
         MAC_ReadyToDeepSleep();
+#endif
 	}
 	return sleepTime;
 }
@@ -299,9 +295,159 @@ PHY_Retval_t sendFrame(MAC_FrameInfo_t *macFrame, PHY_CSMAMode_t csmaType, bool 
     return phyStatus;
 }
 
-void __attribute__((weak)) MAC_ReadyToDeepSleep(void)
+
+#ifdef ENABLE_DEVICE_DEEP_SLEEP
+
+typedef __PACKED_STRUCT mac_ds_param
 {
-	
+    uint64_t mac_CoordExtAddr;  
+    uint64_t mac_ieee_addr; 
+    uint32_t mac_CoordShtAddr; 
+    uint32_t mac_short_addr;
+    uint32_t panid;
+    uint32_t mac_max_frame_total_wait_time;
+    uint32_t mac_response_wait_time; 
+    uint32_t mac_state;  
+    uint32_t mac_radio_sleep_state; 
+    uint32_t mac_poll_state; 
+    uint32_t mac_associated_PAN_coord;   
+    uint32_t mac_auto_request; 
+    uint32_t mac_batt_life_ext_periods; 
+    uint32_t mac_dsn; 
+    uint32_t phy_current_channel;
+}MAC_Ds_Param_t;
+
+static uint16_t    macshortaddr; 
+static uint64_t    macieeeaddr;
+static uint16_t    panid;
+static MAC_Ds_Param_t param1;
+
+#if ((defined MAC_SECURITY_ZIP)  || (defined MAC_SECURITY_2006))
+static MAC_SecPib_t __attribute__ ((persistent)) macSecPibBackup;
+#endif
+
+static MAC_Ds_Param_t __attribute__((persistent)) mdsParam;
+
+static void memcpy4ByteAligned(void* outbuf, void* inbuf, uint16_t length)
+{
+  static uint16_t mod_size;
+  static uint16_t size;
+  static uint16_t k;
+  uint32_t* src = (uint32_t* )inbuf;
+  uint32_t* dst = (uint32_t* )outbuf;
+
+  mod_size = (length % 4U);
+  // total_length is in multiple of 4
+  if (mod_size != 0U)
+  {
+    size  = length + 4U - mod_size; 
+  }
+  else 
+  {
+    size  = length;
+  }
+
+  size  = size >> 2;
+  for (k = 0; k < size; k++)
+  {
+      *dst = *src;
+      src++;
+      dst++;
+  }
 }
+
+static void MAC_ReadyToDeepSleep(void)
+{  
+    MAC_Ds_Param_t param;
+    PHY_Retval_t pibStatus = PHY_FAILURE;
+        
+    param.mac_CoordExtAddr = macPib.mac_CoordExtendedAddress;
+    param.mac_CoordShtAddr = macPib.mac_CoordShortAddress;
+    param.mac_max_frame_total_wait_time = macPib.mac_MaxFrameTotalWaitTime;
+    param.mac_response_wait_time = macPib.mac_ResponseWaitTime;    
+    param.mac_state =  (uint32_t)macState;      
+    param.mac_poll_state = (uint32_t)macPollState;
+    param.mac_radio_sleep_state = (uint32_t)macRadioSleepState;    
+    param.mac_associated_PAN_coord = macPib.mac_AssociatedPANCoord;
+    param.mac_auto_request = macPib.mac_AutoRequest;      
+    param.mac_batt_life_ext_periods = macPib.mac_BattLifeExtPeriods;
+    param.mac_dsn = macPib.mac_DSN;
+            
+    pibStatus = PHY_PibGet(macPANId, (uint8_t *)&panid);
+    param.panid = (uint32_t)panid;
+    
+    pibStatus = PHY_PibGet(macShortAddress, (uint8_t *)&macshortaddr);
+    param.mac_short_addr = (uint32_t)macshortaddr;
+    
+    pibStatus = PHY_PibGet(macIeeeAddress, (uint8_t *)&macieeeaddr);
+    param.mac_ieee_addr = macieeeaddr;
+    
+    uint8_t channelBeforeSleep;
+    pibStatus = PHY_PibGet(phyCurrentChannel, &channelBeforeSleep);
+    param.phy_current_channel = (uint32_t)channelBeforeSleep; 
+        
+    memcpy4ByteAligned(&mdsParam,&param,((uint16_t)sizeof(mdsParam))); 
+#if ((defined MAC_SECURITY_ZIP)  || (defined MAC_SECURITY_2006))   
+    memcpy4ByteAligned(&macSecPibBackup, &macSecPib, ((uint16_t)sizeof(macSecPib)) );
+#endif
+    (void)pibStatus;
+    
+} 
+
+static void MAC_WakeUpFromDeepSleep(void)
+{   
+    uint8_t channelAfterSleep;
+    memcpy4ByteAligned(&param1,&mdsParam,((uint16_t)sizeof(mdsParam)));
+    
+    macPib.mac_CoordExtendedAddress = param1.mac_CoordExtAddr;
+    macieeeaddr = param1.mac_ieee_addr;    
+    macPib.mac_CoordShortAddress = (uint16_t)param1.mac_CoordShtAddr;
+    macshortaddr = (uint16_t)param1.mac_short_addr;
+    macPib.mac_MaxFrameTotalWaitTime = (uint16_t)param1.mac_max_frame_total_wait_time;
+    macPib.mac_ResponseWaitTime = (uint16_t)param1.mac_response_wait_time;   
+    macState = (MAC_State_t)param1.mac_state;      
+    macPollState = (MAC_PollState_t)param1.mac_poll_state ;
+    macRadioSleepState = (MAC_RadioSleepState_t)param1.mac_radio_sleep_state;   
+    macPib.mac_AssociatedPANCoord = (uint8_t)param1.mac_associated_PAN_coord;
+    macPib.mac_AutoRequest = (uint8_t)param1.mac_auto_request;       
+    macPib.mac_BattLifeExtPeriods = (uint8_t)param1.mac_batt_life_ext_periods;
+    macPib.mac_DSN = (uint8_t)param1.mac_dsn;      
+    channelAfterSleep = (uint8_t)param1.phy_current_channel;
+    panid = (uint16_t)param1.panid;
+    
+    PibValue_t pibValue;
+    PHY_Retval_t pibStatus = PHY_FAILURE;
+       
+    pibValue.pib_value_8bit = channelAfterSleep;
+    pibStatus = SetPhyPibInternal(phyCurrentChannel, &pibValue);
+    
+    pibValue.pib_value_16bit = macshortaddr;
+    pibStatus = SetPhyPibInternal(macShortAddress, &pibValue);  
+    
+    pibValue.pib_value_64bit = macieeeaddr;
+    pibStatus = SetPhyPibInternal(macIeeeAddress, &pibValue);
+    
+    pibValue.pib_value_16bit = panid;
+    pibStatus = SetPhyPibInternal(macPANId, &pibValue);
+
+#if ((defined MAC_SECURITY_ZIP)  || (defined MAC_SECURITY_2006))   
+    memcpy4ByteAligned(&macSecPib, &macSecPibBackup, ((uint16_t)sizeof(macSecPibBackup)) );
+#endif
+    (void)pibStatus;
+
+}
+
+/*
+ * @brief MAC Wakeup Callback Function from application
+ *
+ */
+void MAC_Wakeup(void)
+{
+    /* Retrieve MAC Parameters from Retention RAM after Deepsleep wakeup*/
+    MAC_WakeUpFromDeepSleep();
+}
+
+#endif
+
 
 /* EOF */

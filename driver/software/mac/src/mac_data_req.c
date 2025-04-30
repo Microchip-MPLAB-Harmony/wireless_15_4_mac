@@ -74,7 +74,6 @@
 static buffer_t *buildNullDataFrame(void);
 static uint8_t findLongBuffer(void *buf, void *long_addr);
 static uint8_t findShortBuffer(void *buf, void *shortAddr);
-extern NullDataFrameHandler TxNullDataFrameHandler;
 
 #endif  /*  (MAC_INDIRECT_DATA_FFD == 1)*/
 
@@ -549,9 +548,7 @@ void MAC_ProcessDataRequest(buffer_t *msg)
 	**/
 
 	if (NULL == bufPtrNextData) {
-        if(TxNullDataFrameHandler != NULL) {
-            TxNullDataFrameHandler();
-            }
+		MAC_HandleTxNullDataFrame();
 		return;
 	} else {
 		/* Indirect data found and to be sent. */
@@ -570,9 +567,7 @@ void MAC_ProcessDataRequest(buffer_t *msg)
 				convert_byte_array_to_16_bit(&transmitFrame->
 				mpdu[PL_POS_DST_PAN_ID_START])
 				) {
-                    if(TxNullDataFrameHandler != NULL) {
-                    TxNullDataFrameHandler();
-                    }
+			MAC_HandleTxNullDataFrame();
 			return;
 		} else {
 			/*

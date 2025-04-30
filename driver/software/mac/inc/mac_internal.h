@@ -502,9 +502,6 @@ typedef struct mac_pib_tag {
 	/** Holds the maximum time (in superframe periods) that a indirect
 	 * transaction is stored by a PAN coordinator. */
 	uint16_t mac_TransactionPersistenceTime;
-    
-    /** Holds the frame pending. */
-    bool mac_EnableDefFramePending;
 #endif /* (MAC_INDIRECT_DATA_FFD == 1) */
 
 	/** Holds the 16 bit short address of the coordinator with which the
@@ -661,8 +658,6 @@ extern MAC_PollState_t macPollState;
 extern MAC_Pib_t macPib;
 extern MAC_FrameInfo_t *macFrameInfo;
 extern PHY_FrameInfo_t phyTxFrameInfo;
-extern uint8_t frameRSSI;
-typedef void(*NullDataFrameHandler)(void);
 
 // *****************************************************************************
 // *****************************************************************************
@@ -895,12 +890,6 @@ PHY_Retval_t sendFrame(MAC_FrameInfo_t *macFrame, PHY_CSMAMode_t csmaType, bool 
 MAC_Retval_t MAC_TimersInit(void);
 
 MAC_Retval_t MAC_TimersStop(void);
-
-void MAC_TxDoneCallback(PHY_Retval_t status, PHY_FrameInfo_t *frame);
-
-void MAC_RxFrameCallback(PHY_FrameInfo_t *rxFrame);
-
-void MAC_EdEndCallback(uint8_t energyLevel);
 
 #if (MAC_INDIRECT_DATA_FFD == 1)
 

@@ -1034,9 +1034,10 @@ void MAC_MLME_ScanRequest(void *m)
  *
  * This function is a callback function from the TAL after ED scan
  * is performed on a specified channel.
+ *
  * @param energy_level Maximum energy on the channel
  */
-void MAC_EdEndCallback(uint8_t energyLevel)
+void PHY_EdEndCallback(uint8_t energyLevel)
 {
 	MAKE_MAC_NOT_BUSY();
 

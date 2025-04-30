@@ -151,9 +151,7 @@ static const uint8_t mac_SecPibSize[] = {
 
 /* Size constants for Private PIB attributes */
 static const uint8_t private_PibSize[] = {
-	DEF_UINT64_T_SIZE,            /* 0xF0: macIeeeAddress */
-    DEF_UINT8_T_SIZE,             /* 0xF1: macFrameRssi */
-    DEF_UINT8_T_SIZE             /* 0xF2: macEnableDefFramePending */
+	DEF_UINT64_T_SIZE            /* 0xF0: macIeeeAddress */
 #ifdef TEST_HARNESS
 	,
 	0,                          /* 0xF1: Unused */
@@ -169,8 +167,6 @@ static const uint8_t private_PibSize[] = {
 
 /* Update this one the arry private_pib_size is updated. */
 #define MIN_PRIVATE_PIB_ATTRIBUTE_ID            (macIeeeAddress)
-
-extern NullDataFrameHandler TxNullDataFrameHandler;
 
 /* === Prototypes ========================================================== */
 
@@ -360,16 +356,6 @@ MAC_Retval_t MAC_MLME_Set(uint8_t attribute, PibValue_t *attributeValue,
 	case macTransactionPersistenceTime:
 		macPib.mac_TransactionPersistenceTime
 			= attributeValue->pib_value_16bit;
-		break;
-    
-    case macEnableDefFramePending:
-		macPib.mac_EnableDefFramePending = attributeValue->pib_value_bool;
-        if(macPib.mac_EnableDefFramePending){
-            TxNullDataFrameHandler = (NullDataFrameHandler)&MAC_HandleTxNullDataFrame;
-        }
-        else{
-            TxNullDataFrameHandler = NULL;
-        }
 		break;
 #endif /* (MAC_INDIRECT_DATA_FFD == 1) */
 	case macCoordExtendedAddress:
@@ -777,18 +763,11 @@ MAC_Retval_t MAC_MLME_Get(uint8_t attribute, PibValue_t *attributeValue)
 		break;
 #endif  /* (MAC_START_REQUEST_CONFIRM == 1) */
 
-    case macFrameRssi:
-		attributeValue->pib_value_8bit = frameRSSI;
-		break;
-        
 #if (MAC_INDIRECT_DATA_FFD == 1)
 	case macTransactionPersistenceTime:
 		(void)memcpy(&attributeValue->pib_value_16bit,
 				&macPib.mac_TransactionPersistenceTime,
 				sizeof(uint16_t));
-		break;
-    case macEnableDefFramePending:
-		attributeValue->pib_value_bool = macPib.mac_EnableDefFramePending;
 		break;
 #endif /* (MAC_INDIRECT_DATA_FFD == 1) */
 

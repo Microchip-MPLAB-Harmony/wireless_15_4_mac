@@ -46,9 +46,6 @@ pic32cx_bz3_family = {'PIC32CX5109BZ31048',
 global deviceName
 deviceName = Variables.get("__PROCESSOR")
 
-global srcFiles
-srcFiles = []
-
 def instantiateComponent(ieee802154mac):
     print("IEEE 802.15.4 MAC Standalone library driver component")
     configName = Variables.get("__CONFIGURATION_NAME")
@@ -66,9 +63,7 @@ def instantiateComponent(ieee802154mac):
     elif (deviceName in pic32cx_bz3_family):
           requiredComponents.extend(["pic32cx_bz3_devsupport"])
     
-    global conditionAlwaysInclude
     conditionAlwaysInclude = [True, None, []]
-    global condSecurity
     condSecurity = [False, SecurityFilesConfig, ['MAC_SECURITY_OPTION']]
 
     global macConstLargeBufferSize
@@ -127,7 +122,6 @@ def instantiateComponent(ieee802154mac):
 
     # # === Source files
     
-    global srcMac
     srcMac = [
         ["mac/src/mac.c", conditionAlwaysInclude],
         ["mac/src/mac_api.c", conditionAlwaysInclude],
@@ -151,14 +145,8 @@ def instantiateComponent(ieee802154mac):
         ["mac/src/mac_security.c", conditionAlwaysInclude],
         ["mac/src/mac_start.c", conditionAlwaysInclude],
         ["mac/src/mac_sync.c", conditionAlwaysInclude],
-        ["mac/src/mac_tx_coord_realignment_command.c", conditionAlwaysInclude],         
-        
-    ]
-    
-    global usrCalbback
-    usrCalbback = [
-        ["mac/src/mac_phy_callbacks.c", conditionAlwaysInclude],
         ["mac/src/mac_task.c", conditionAlwaysInclude],
+        ["mac/src/mac_tx_coord_realignment_command.c", conditionAlwaysInclude],
         ["mac/src/usr_mcps_data_conf.c", conditionAlwaysInclude],
         ["mac/src/usr_mcps_data_ind.c", conditionAlwaysInclude],
         ["mac/src/usr_mcps_purge_conf.c", conditionAlwaysInclude],
@@ -171,14 +159,13 @@ def instantiateComponent(ieee802154mac):
         ["mac/src/usr_mlme_get_conf.c", conditionAlwaysInclude],
         ["mac/src/usr_mlme_orphan_ind.c", conditionAlwaysInclude],
         ["mac/src/usr_mlme_poll_conf.c", conditionAlwaysInclude],
-        ["mac/src/usr_mlme_poll_ind.c", conditionAlwaysInclude],
         ["mac/src/usr_mlme_reset_conf.c", conditionAlwaysInclude],
         ["mac/src/usr_mlme_rx_enable_conf.c", conditionAlwaysInclude],  
         ["mac/src/usr_mlme_scan_conf.c", conditionAlwaysInclude],
         ["mac/src/usr_mlme_set_conf.c", conditionAlwaysInclude],
         ["mac/src/usr_mlme_start_conf.c", conditionAlwaysInclude],
-        ["mac/src/usr_mlme_sync_loss_ind.c", conditionAlwaysInclude],
-    
+        ["mac/src/usr_mlme_sync_loss_ind.c", conditionAlwaysInclude],         
+        
     ]
     
     # === STB Source Files
@@ -188,24 +175,10 @@ def instantiateComponent(ieee802154mac):
     ]
 
     # === Import the source files
-    if maclibraryGen.getValue() == 0:
-        for srcFileEntry in srcMac:
-            srcFileEntry[1] = conditionAlwaysInclude
-            srcFiles.append(importSrcFile(ieee802154mac, configName, srcFileEntry))
-    else:
-        for srcFileEntry in srcMac:
-            srcFileEntry[1] = condSecurity
-            srcFiles.append(importSrcFile(ieee802154mac, configName, srcFileEntry))
-            
+    for srcFileEntry in srcMac:
+        importSrcFile(ieee802154mac, configName, srcFileEntry)
     for srcFileEntry in srcStb:
         importSrcFile(ieee802154mac, configName, srcFileEntry)
-    
-    for srcFileEntry in usrCalbback:
-        importSrcFile(ieee802154mac, configName, srcFileEntry)
-        
-    global macDeepSleepCFile
-    macDeepSleepCFile = importSrcFile(ieee802154mac,configName,["mac/src/mac_sleep.c",condSecurity])
-
 
     # === Include path setting
     includePathsMac = [
@@ -232,27 +205,13 @@ def instantiateComponent(ieee802154mac):
         deviceSocFamilyType.setDefaultValue("bz2")
     elif deviceName in pic32cx_bz3_family:
         deviceSocFamilyType.setDefaultValue("bz3")
-    
-    global macffdLibraryEnable
-    macffdLibraryEnable = ieee802154mac.createLibrarySymbol("MAC_FFD_LIB_ENABLE",None)
-    macffdLibraryEnable.setDestPath("/driver/lib")
-    macffdLibraryEnable.setSourcePath("/driver/software/mac/lib/lib-ieee802154_mac_ffd.a")
-    macffdLibraryEnable.setOutputName("lib-ieee802154_mac_ffd.a")
-    macffdLibraryEnable.setEnabled(False)
-    
-    global macrfdLibraryEnable
-    macrfdLibraryEnable = ieee802154mac.createLibrarySymbol("MAC_RFD_LIB_ENABLE",None)
-    macrfdLibraryEnable.setDestPath("/driver/lib")
-    macrfdLibraryEnable.setSourcePath("/driver/software/mac/lib/lib-ieee802154_mac_rfd.a")
-    macrfdLibraryEnable.setOutputName("lib-ieee802154_mac_rfd.a")
-    macrfdLibraryEnable.setEnabled(False)
 
     global preprocessorCompiler
     # === Compiler macros
     preprocessorCompiler = ieee802154mac.createSettingSymbol("IEEE802154MAC_XC32_PREPRECESSOR", None)
     preprocessorCompiler.setCategory("C32")
     preprocessorCompiler.setKey("preprocessor-macros")
-    preprocessorCompiler.setValue("ENABLE_TSTAMP;TEST_HARNESS;FFD")
+    preprocessorCompiler.setValue("ENABLE_TSTAMP;FFD")
     preprocessorCompiler.setAppend(True, ";")
     preprocessorCompiler.setEnabled(True)
          
@@ -399,7 +358,6 @@ def importSrcFile(component, configName, srcFileEntry, firmwarePath = None):
 
     if callback and dependencies:
         srcFileSym.setDependencies(callback, dependencies)
-    return srcFileSym
 #end importSrcFile
 
 def setIncPath(component, configName, incPathEntry):
@@ -429,39 +387,7 @@ def setIncPath(component, configName, incPathEntry):
 #################### DEPENDENCY CALLBACKS ###################################
 #######################################################################################  
 
-#---------------------------------------------------------------------------------------
-#~~~~~~~~~~~~~~~ Library Generation Configuration ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# This callback handles the MAC Library Generation
-#---------------------------------------------------------------------------------------
 
-def libGenConfiguration(symbol,event):
-    libgen = event['value']
-    remotesymbol = event["symbol"]
-    symbolID = event["id"]
-    value = event["value"]
-    localComponent = symbol.getComponent()
-    devicetype = localComponent.getSymbolByID("MAC_DEVICE_TYPE").getValue()
-    secSymbol = localComponent.getSymbolByID("MAC_SECURITY_OPTION")
-    
-    if libgen == 0:#src
-        for file in srcFiles:
-            file.setEnabled(True)
-        macrfdLibraryEnable.setEnabled(False)
-        macffdLibraryEnable.setEnabled(False)
-        secSymbol.setReadOnly(False)
-          
-    elif libgen == 1:#lib
-        secSymbol.setReadOnly(True)
-        for file in srcFiles:
-            file.setEnabled(False)
-        if devicetype == 0:
-            macffdLibraryEnable.setEnabled(True)
-            macrfdLibraryEnable.setEnabled(False)
-        elif devicetype == 1:
-            macrfdLibraryEnable.setEnabled(True)
-            macffdLibraryEnable.setEnabled(False)
-            
-            
 #---------------------------------------------------------------------------------------
 #~~~~~~~~~~~~~~~ Device type configuration FFD/RFD CALLBACK ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # This callback handles for adding Preprocessor macro, handles indirect buffers for FFD
@@ -470,13 +396,6 @@ def libGenConfiguration(symbol,event):
 
 def DeviceTypeConfiguration(symbol,event):
     setDeviceType = event['value']
-    remotesymbol = event["symbol"]
-    symbolID = event["id"]
-    value = event["value"]
-    localComponent = symbol.getComponent()
-    libgen = localComponent.getSymbolByID("MAC_LIBRARY_GENERATION").getValue()
-    secSymbol = localComponent.getSymbolByID("MAC_SECURITY_OPTION")
-    
     if setDeviceType == 0:#FFD
         preprocessorMacro = preprocessorCompiler.getValue()
         preprocessorMacro = preprocessorMacro + ";FFD"
@@ -486,18 +405,7 @@ def DeviceTypeConfiguration(symbol,event):
         DeepSleepEnable.setVisible(False)
         DeepSleepEnable.setValue(False)
         HandleSleep(False)
-        if libgen == 0:
-            macrfdLibraryEnable.setEnabled(False)
-            macffdLibraryEnable.setEnabled(False)
-            secSymbol.setReadOnly(False)
-            for file in srcFiles:
-                file.setEnabled(True)
-        elif libgen == 1:
-            macrfdLibraryEnable.setEnabled(False)
-            macffdLibraryEnable.setEnabled(True)
-            secSymbol.setReadOnly(True)
-            for file in srcFiles:
-                file.setEnabled(False)
+        
         
     if setDeviceType == 1:#RFD
         preprocessorMacro = preprocessorCompiler.getValue()
@@ -506,19 +414,7 @@ def DeviceTypeConfiguration(symbol,event):
         preprocessorCompiler.setAppend(False, ";")
         macIndirectIntegerBmmLargeBuffers.setVisible(False)
         DeepSleepEnable.setVisible(True)
-        DeepSleepEnable.setValue(False) 
-        if libgen == 0:
-            macrfdLibraryEnable.setEnabled(False)
-            macffdLibraryEnable.setEnabled(False)
-            secSymbol.setReadOnly(False)
-            for file in srcFiles:
-                file.setEnabled(True)
-        elif libgen == 1:
-            macrfdLibraryEnable.setEnabled(True)
-            macffdLibraryEnable.setEnabled(False)
-            secSymbol.setReadOnly(True)
-            for file in srcFiles:
-                file.setEnabled(False)        
+        DeepSleepEnable.setValue(False)  
         
 #-----------------------------------------------------------------------------------------------------
 #~~~~~~~~~~~~~~~ Sleep configuration CALLBACK ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -535,7 +431,6 @@ def HandleSleep(sleepEnable):
         preprocessorSleepMacro = preprocessorSleepMacro + ";ENABLE_DEVICE_DEEP_SLEEP"
         preprocessorCompiler.setValue(preprocessorSleepMacro)
         preprocessorCompiler.setAppend(False, ";")
-        macDeepSleepCFile.setEnabled(True)
         if (deviceName in pic32cx_bz2_family):
             Database.sendMessage("pic32cx_bz2_devsupport", "DEEP_SLEEP_ENABLE", {"target": "pic32cx_bz2_devsupport",
                                                         "source": "IEEE_802154_MAC","isEnabled":True})
@@ -548,7 +443,6 @@ def HandleSleep(sleepEnable):
         preprocessorSleepMacro = preprocessorSleepMacro.replace(";ENABLE_DEVICE_DEEP_SLEEP","")
         preprocessorCompiler.setValue(preprocessorSleepMacro)
         preprocessorCompiler.setAppend(False, ";")
-        macDeepSleepCFile.setEnabled(False)
         if (deviceName in pic32cx_bz2_family):
             Database.sendMessage("pic32cx_bz2_devsupport", "DEEP_SLEEP_ENABLE", {"target": "pic32cx_bz2_devsupport",
                                                         "source": "IEEE_802154_MAC","isEnabled":False})

@@ -93,8 +93,6 @@ uint8_t Timer_RxEnable;
 #endif  /* MAC_RX_ENABLE_SUPPORT */
 #endif /* (NUMBER_OF_MAC_TIMERS != 0) */
 
-extern NullDataFrameHandler TxNullDataFrameHandler;
-
 /* === Prototypes ========================================================== */
 
 static void DoInitPib(void);
@@ -227,14 +225,6 @@ static void DoInitPib(void)
 #if (MAC_INDIRECT_DATA_FFD == 1)
 	macPib.mac_TransactionPersistenceTime
 		= macTransactionPersistenceTime_def;
-    
-    macPib.mac_EnableDefFramePending = mac_EnableDefaultFramePending;
-    if(macPib.mac_EnableDefFramePending){
-        TxNullDataFrameHandler = (NullDataFrameHandler)&MAC_HandleTxNullDataFrame;
-    }
-    else{
-        TxNullDataFrameHandler = NULL;
-    }
 #endif /* (MAC_INDIRECT_DATA_FFD == 1) */
 
 	macPib.mac_AutoRequest = macAutoRequest_def;

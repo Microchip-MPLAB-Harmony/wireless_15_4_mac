@@ -269,25 +269,10 @@ static void MAC_ProcessPhyTxStatus(MAC_Retval_t txStatus, MAC_FrameInfo_t *frame
 		if (MAC_AWAIT_ASSOC_RESPONSE != macPollState) {
 			if (DATAREQUEST == frame->msgType) {
 				/* Explicit poll caused by MLME-POLL.request */
-				if (MAC_SUCCESS == txStatus) {
+				if (MAC_FRAME_PENDING != txStatus) {
 					/* Reuse the poll request buffer for
 					 * poll confirmation */
 					MLME_PollConf_t *mpc
-						= (MLME_PollConf_t *) MAC_BUFFER_POINTER ((buffer_t *)((void*)macConfBufPtr));
-                    qmm_status_t  qmmStatus;
-
-					mpc->cmdcode = MLME_POLL_CONFIRM;
-					mpc->status = (uint8_t)MAC_NO_DATA;
-					qmmStatus = qmm_queue_append(&macNhleQueue, (buffer_t *)((void*)macConfBufPtr));
-
-					/* Set radio to sleep if allowed */
-					MAC_SleepTrans();
-                    WPAN_PostTask();
-                    (void)qmmStatus;
-					return;
-				}
-                else if(MAC_FRAME_PENDING != txStatus){
-                    MLME_PollConf_t *mpc
 						= (MLME_PollConf_t *) MAC_BUFFER_POINTER ((buffer_t *)((void*)macConfBufPtr));
                     qmm_status_t  qmmStatus;
 
@@ -300,7 +285,7 @@ static void MAC_ProcessPhyTxStatus(MAC_Retval_t txStatus, MAC_FrameInfo_t *frame
                     WPAN_PostTask();
                     (void)qmmStatus;
 					return;
-                }
+				}
 
 				/* Wait for data reception */
 				macPollState = MAC_POLL_EXPLICIT;
@@ -467,7 +452,7 @@ static void MAC_ProcessPhyTxStatus(MAC_Retval_t txStatus, MAC_FrameInfo_t *frame
  * @param status Status of transmission
  * @param frame Specifies pointer to the transmitted frame
  */
-void MAC_TxDoneCallback(PHY_Retval_t status, PHY_FrameInfo_t *frame)
+void PHY_TxDoneCallback(PHY_Retval_t status, PHY_FrameInfo_t *frame)
 {
 	/* Frame transmission completed, set dispatcher to not busy */
 	MAKE_MAC_NOT_BUSY();
