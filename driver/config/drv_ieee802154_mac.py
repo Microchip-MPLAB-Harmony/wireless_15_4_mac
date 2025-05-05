@@ -42,6 +42,16 @@ pic32cx_bz3_family = {'PIC32CX5109BZ31048',
                       'WBZ351',
                       'WBZ350'
                       }
+pic32cx_bz6_family = {'PIC32CX2051BZ62132',
+                      'PIC32CX2051BZ62064',
+                      'PIC32CX2051BZ66048',
+                      'WBZ653',
+                      'WBZ652',
+                      'WBZ651',
+                      'PIC32WM_BZ6204',
+                      'PIC32WM_BZ6203',
+                      'PIC32WM_BZ6602'
+                      }
 
 global deviceName
 deviceName = Variables.get("__PROCESSOR")
@@ -62,7 +72,9 @@ def instantiateComponent(ieee802154mac):
           requiredComponents.extend(["pic32cx_bz2_devsupport","trng"])
     elif (deviceName in pic32cx_bz3_family):
           requiredComponents.extend(["pic32cx_bz3_devsupport"])
-    
+    elif (deviceName in pic32cx_bz6_family):
+          requiredComponents.extend(["pic32cx_bz6_devsupport"])
+
     conditionAlwaysInclude = [True, None, []]
     condSecurity = [False, SecurityFilesConfig, ['MAC_SECURITY_OPTION']]
 
@@ -205,6 +217,8 @@ def instantiateComponent(ieee802154mac):
         deviceSocFamilyType.setDefaultValue("bz2")
     elif deviceName in pic32cx_bz3_family:
         deviceSocFamilyType.setDefaultValue("bz3")
+    elif deviceName in pic32cx_bz6_family:
+        deviceSocFamilyType.setDefaultValue("bz6")
 
     global preprocessorCompiler
     # === Compiler macros
@@ -437,6 +451,9 @@ def HandleSleep(sleepEnable):
         elif (deviceName in pic32cx_bz3_family):
             Database.sendMessage("pic32cx_bz3_devsupport", "DEEP_SLEEP_ENABLE", {"target": "pic32cx_bz3_devsupport",
                                                         "source": "IEEE_802154_MAC","isEnabled":True})
+        elif (deviceName in pic32cx_bz6_family):
+            Database.sendMessage("pic32cx_bz6_devsupport", "DEEP_SLEEP_ENABLE", {"target": "pic32cx_bz6_devsupport",
+                                                        "source": "IEEE_802154_MAC","isEnabled":True})
             
     if sleepEnable == False:
         preprocessorSleepMacro = preprocessorCompiler.getValue()
@@ -448,6 +465,9 @@ def HandleSleep(sleepEnable):
                                                         "source": "IEEE_802154_MAC","isEnabled":False})
         elif (deviceName in pic32cx_bz3_family):
             Database.sendMessage("pic32cx_bz3_devsupport", "DEEP_SLEEP_ENABLE", {"target": "pic32cx_bz3_devsupport",
+                                                        "source": "IEEE_802154_MAC","isEnabled":False})
+        elif (deviceName in pic32cx_bz6_family):
+            Database.sendMessage("pic32cx_bz6_devsupport", "DEEP_SLEEP_ENABLE", {"target": "pic32cx_bz6_devsupport",
                                                         "source": "IEEE_802154_MAC","isEnabled":False})
 
 #-----------------------------------------------------------------------------------------------------

@@ -51,6 +51,10 @@
 #include "config\default\driver\security\sxsymcrypt\aead_api.h"
 </#if>
 
+<#if DEVICE_SOC_FAMILY_TYPE == "bz6">
+#include "config\default\driver\security\cryptosym\keyref_api.h"
+#include "config\default\driver\security\cryptosym\aead_api.h"
+</#if>
 /* === Macros ============================================================== */
 
 /* === Types =============================================================== */
@@ -65,6 +69,12 @@ static struct Aes aes;
 /* aead structure in which to store the supplied key and data*/
 static struct sxaead aead;
 static struct sxkeyref keyref;
+</#if>
+
+<#if DEVICE_SOC_FAMILY_TYPE == "bz6">
+/* aead structure in which to store the supplied key and data*/
+static struct crmaead aead;
+static struct crmkeyref keyref;
 </#if>
 /* === Implementation ====================================================== */
 
@@ -113,6 +123,16 @@ SAL_AesStatus_t SAL_AesSetKey(uint8_t *key, uint8_t key_len)
     keyref = SX_KEYREF_LOAD_MATERIAL(key_len,(const char *) key);
     /* Disable Silex/BA457 Clock */
     SX_CLK_DISABLE();
+</#if>
+
+<#if DEVICE_SOC_FAMILY_TYPE == "bz6">
+    SAL_AesStatus_t aesStatus = AES_SUCCESS;
+    
+    /* Enable Crypto/BA457 Clock */
+    CRYPTO_CLK_ENABLE();
+    keyref = CRM_KEYREF_LOAD_MATERIAL(key_len,(const char *) key);
+    /* Disable Crypto/BA457 Clock */
+    CRYPTO_CLK_DISABLE();
 </#if>
 
 	return aesStatus;
@@ -235,6 +255,74 @@ SAL_AesStatus_t SAL_AesCcmSecure(uint8_t *buffer,
     
     /* Disable Silex/BA457 Clock */
     SX_CLK_DISABLE();
+</#if>
+
+<#if DEVICE_SOC_FAMILY_TYPE == "bz6">
+    uint8_t fed_sz = 0;
+    uint8_t next_sz = 0;
+
+    plain_text = buffer + hdr_len;
+    /* Enable Crypto/BA457 Clock */
+    CRYPTO_CLK_ENABLE();
+    
+    // Initializations required for AEAD CCM operation
+    if(aes_dir == AES_DIR_ENCRYPT)
+        status = CRM_AEAD_CREATE_AESCCM_ENC(&aead, &keyref, (const char *)nonce, NONCE_SIZE, mic_len, hdr_len, pld_len);
+    else
+        status = CRM_AEAD_CREATE_AESCCM_DEC(&aead, &keyref, (const char *)nonce, NONCE_SIZE, mic_len, hdr_len, pld_len);
+    if (status)
+        return status;
+    
+    // Initialization required for AAD
+    status = CRM_AEAD_FEED_AAD(&aead, (const char *)buffer, hdr_len);
+    if (status)
+        return status;
+    
+    if(pld_len >= AES_BLOCKSIZE)
+        next_sz = AES_BLOCKSIZE;
+    else
+        next_sz = pld_len;
+    do
+    {
+      //Adds next chunk of data to be encrypted or decrypted
+      status = CRM_AEAD_CRYPT(&aead, (const char *)plain_text, next_sz, (char *)plain_text);
+      if (status)
+        return status;
+      fed_sz += next_sz;
+      plain_text = plain_text + next_sz;
+      if(pld_len - fed_sz > AES_BLOCKSIZE)
+        next_sz = AES_BLOCKSIZE;
+      else
+        next_sz = pld_len - fed_sz;
+
+      // state handling for Intermediary and last chunks
+      if(fed_sz < pld_len)
+      {
+        status = CRM_AEAD_SAVE_STATE(&aead);
+        if (status)
+            return status;
+        status = CRM_AEAD_WAIT(&aead);
+        if (status)
+            return status;
+        status = CRM_AEAD_RESUME_STATE(&aead);
+        if (status)
+            return status;
+       }
+    }while(fed_sz < pld_len);
+    
+    // Starts AEAD encryption and tag computation
+    if(aes_dir == AES_DIR_ENCRYPT)
+        status = CRM_AEAD_PRODUCE_TAG(&aead,(char *)(buffer+(hdr_len+pld_len)));
+    else
+        status = CRM_AEAD_VERIFY_TAG(&aead,(char *)(buffer+(hdr_len+pld_len)));
+    if (status)
+        return status;
+    status = CRM_AEAD_WAIT(&aead);
+    if (status)
+        return status;
+    
+    /* Disable Crypto/BA457 Clock */
+    CRYPTO_CLK_DISABLE();
 </#if>
 
     if(status == 0)
