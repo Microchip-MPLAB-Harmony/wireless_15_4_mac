@@ -47,6 +47,11 @@ def loadModule():
                           'PIC32WM_BZ6203',
                           'PIC32WM_BZ6602'
                           }
+    pic32cx_bz36_family = {'PIC32CX5109BZ36048',
+                           'PIC32CX5109BZ36032',
+                           'PIC32WM_BZ3601',
+                           'PIC32WM_BZ3602'
+                           }
     processor = Variables.get('__PROCESSOR') 
     
     print('processor={}'.format(processor))

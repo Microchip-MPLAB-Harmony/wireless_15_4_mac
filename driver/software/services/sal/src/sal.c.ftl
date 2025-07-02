@@ -46,7 +46,7 @@
 #include "wolfcrypt/aes.h"
 </#if>
 
-<#if DEVICE_SOC_FAMILY_TYPE == "bz3">
+<#if (DEVICE_SOC_FAMILY_TYPE == "bz3") || (DEVICE_SOC_FAMILY_TYPE == "bz36")>
 #include "config\default\driver\security\sxsymcrypt\keyref_api.h"
 #include "config\default\driver\security\sxsymcrypt\aead_api.h"
 </#if>
@@ -65,7 +65,7 @@
 static struct Aes aes;
 </#if>
 
-<#if DEVICE_SOC_FAMILY_TYPE == "bz3">
+<#if (DEVICE_SOC_FAMILY_TYPE == "bz3") || (DEVICE_SOC_FAMILY_TYPE == "bz36")>
 /* aead structure in which to store the supplied key and data*/
 static struct sxaead aead;
 static struct sxkeyref keyref;
@@ -115,7 +115,7 @@ SAL_AesStatus_t SAL_AesSetKey(uint8_t *key, uint8_t key_len)
     }
 </#if>
 
-<#if DEVICE_SOC_FAMILY_TYPE == "bz3">
+<#if (DEVICE_SOC_FAMILY_TYPE == "bz3") || (DEVICE_SOC_FAMILY_TYPE == "bz36")>
     SAL_AesStatus_t aesStatus = AES_SUCCESS;
     
     /* Enable Silex/BA457 Clock */
@@ -189,7 +189,7 @@ SAL_AesStatus_t SAL_AesCcmSecure(uint8_t *buffer,
     }
 </#if>
 
-<#if DEVICE_SOC_FAMILY_TYPE == "bz3">
+<#if (DEVICE_SOC_FAMILY_TYPE == "bz3") || (DEVICE_SOC_FAMILY_TYPE == "bz36")>
     uint8_t fed_sz = 0;
     uint8_t next_sz = 0;
 
