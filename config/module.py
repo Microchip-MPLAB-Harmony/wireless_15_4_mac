@@ -64,3 +64,5 @@ def loadModule():
     ieee802154mac.addDependency('FreeRtosDependency', 'RTOS', 'RTOS', True, True)
     ieee802154mac.addDependency('DeviceSupportDependency', 'Device_Support', 'Device_Support', True, True)
     ieee802154mac.addCapability('ieee802154mac_Capability', 'IEEE 802.15.4 MAC', True)
+    if (processor in pic32cx_bz2_family):
+        ieee802154mac.addDependency("MAC_WolfCrypt_Dependency", "LIB_WOLFCRYPT", None, False, True)

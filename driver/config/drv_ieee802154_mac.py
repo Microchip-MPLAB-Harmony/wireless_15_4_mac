@@ -61,6 +61,7 @@ pic32cx_bz36_family = {'PIC32CX5109BZ36048',
 
 global deviceName
 deviceName = Variables.get("__PROCESSOR")
+global configurationWolfcryptSymbols
 
 def instantiateComponent(ieee802154mac):
     print("IEEE 802.15.4 MAC Standalone library driver component")
@@ -75,7 +76,9 @@ def instantiateComponent(ieee802154mac):
               "RTOS"
           ]
     if (deviceName in pic32cx_bz2_family):
-          requiredComponents.extend(["pic32cx_bz2_devsupport","trng"])
+          requiredComponents.extend(["pic32cx_bz2_devsupport","trng","lib_wolfcrypt","lib_crypto"])
+          if(Database.getSymbolValue("core", "AES_CLOCK_ENABLE") != True) :
+              Database.sendMessage("core", "AES_CLOCK_ENABLE", {"isEnabled":True})
     elif ((deviceName in pic32cx_bz3_family) or (deviceName in pic32cx_bz36_family)):
           requiredComponents.extend(["pic32cx_bz3_devsupport"])
     elif (deviceName in pic32cx_bz6_family):
@@ -491,18 +494,12 @@ def SecurityConfiguration(symbol,event):
         preprocessorSecurity = preprocessorSecurity + ";MAC_SECURITY_ZIP;MAC_SECURITY_2006;STB_ON_SAL"
         preprocessorCompiler.setValue(preprocessorSecurity)
         preprocessorCompiler.setAppend(True, ";")
-        if (deviceName in pic32cx_bz2_family):        
-            Database.activateComponents(['lib_wolfcrypt']) 
-            Database.setSymbolValue("core", "AES_CLOCK_ENABLE", True)
                   
     if Securityoption == 0:#Disabled
         preprocessorSecurity = preprocessorCompiler.getValue()
         preprocessorSecurity = preprocessorSecurity.replace(";MAC_SECURITY_ZIP;MAC_SECURITY_2006;STB_ON_SAL","")
         preprocessorCompiler.setValue(preprocessorSecurity)
         preprocessorCompiler.setAppend(False, ";")
-        if (deviceName in pic32cx_bz2_family):
-            Database.deactivateComponents(['lib_wolfcrypt'])        
-            Database.setSymbolValue("core", "AES_CLOCK_ENABLE", False)
 
 #-----------------------------------------------------------------------------------------------------
 #~~~~~~~~~~~~~~~ Security Files Config CALLBACK ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -538,6 +535,33 @@ def handleMessage(messageID, args):
     
 # end handle message
 
+def configurationWolfcryptSymbols():
+    if(deviceName in pic32cx_bz2_family):
+          Database.sendMessage("pic32cx_bz2_devsupport", "WOLFCRYPT_SYMBOL_CONFIG", {"target": "pic32cx_bz2_devsupport",
+                                                    "source": "IEEE_802154_MAC",
+                                                    "wolfcrypt_hw": True,
+                                                    "wolfcrypt_md5": False,
+                                                    "wolfcrypt_sha1": False,
+                                                    "wolfcrypt_sha256": True,
+                                                    "wolfcrypt_hmac": False,
+                                                    "wolfcrypt_tdes": False,
+                                                    "wolfcrypt_aes": True,
+                                                    "wolfcrypt_aes_hw": True,
+                                                    "wolfcrypt_aes_128": True,
+                                                    "wolfcrypt_aes_192": False,
+                                                    "wolfcrypt_aes_256": False,
+                                                    "wolfcrypt_aes_ecb": True,
+                                                    "wolfcrypt_aes_ecb_hw": True,
+                                                    "wolfcrypt_aes_cbc": True,
+                                                    "wolfcrypt_aes_cbc_hw": True,
+                                                    "wolfcrypt_aes_ctr": False,
+                                                    "wolfcrypt_aes_gcm": False,
+                                                    "wolfcrypt_aes_ccm": True,
+                                                    "wolfcrypt_ecc": False,
+                                                    "wolfcrypt_rsa": False,
+                                                    "wolfcrypt_oaep": False,
+                                                    "wolfcrypt_asn1": False})
+
 def onAttachmentConnected(source, target):
     localComponent = source["component"]
     remoteComponent = target["component"]
@@ -554,7 +578,37 @@ def onAttachmentConnected(source, target):
               print('Printing TRNG remoteComponent Value')
               remoteComponent.getSymbolByID("trngEnableInterrupt").setReadOnly(True)
               remoteComponent.getSymbolByID("trngEnableEvent").setReadOnly(True)
-              remoteComponent.getSymbolByID("TRNG_STANDBY").setReadOnly(True)         
+              remoteComponent.getSymbolByID("TRNG_STANDBY").setReadOnly(True) 
+        if (connectID == "MAC_WolfCrypt_Dependency"):
+              print("ieee802154mac :onAttachmentConnected configuring lib_wolfcrypt")
+              activeList = Database.getActiveComponentIDs()
+              bleLoaded = False
+              if "BLE_STACK_LIB" in activeList:
+                  bleLoaded = True
+              if bleLoaded != True:
+                  Database.clearSymbolValue('lib_wolfcrypt', "wolfcrypt_hw")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_md5")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_sha1")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_sha256")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_hmac")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_tdes")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_aes")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_aes_hw")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_aes_128")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_aes_192")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_aes_256")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_aes_ecb")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_aes_ecb_hw")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_aes_cbc")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_aes_cbc_hw")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_aes_ctr")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_aes_gcm")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_aes_ccm")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_ecc")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_rsa")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_oaep")
+                  Database.clearSymbolValue("lib_wolfcrypt", "wolfcrypt_asn1")
+              configurationWolfcryptSymbols()            
 
 #end onAttachmentConnected  
     
@@ -569,6 +623,12 @@ def onAttachmentDisconnected(source, target):
     if  connectID == 'ieee802154phyDependency':   
           remoteComponent.getSymbolByID("CREATE_PHY_RTOS_TASK").setValue(True)
           remoteComponent.getSymbolByID("CREATE_PHY_RTOS_TASK").setReadOnly(False)
+          
+def finalizeComponent(ieee802154mac):
+    # pass
+    if (deviceName in pic32cx_bz2_family):
+         result = Database.connectDependencies([['IEEE_802154_MAC', 'MAC_WolfCrypt_Dependency', 'lib_wolfcrypt', 'lib_wolfcrypt']])
+         result = Database.connectDependencies([['lib_crypto', 'LIB_CRYPTO_WOLFCRYPT_Dependency', 'lib_wolfcrypt', 'lib_wolfcrypt']])
           
 #end onAttachmentDisconnected 
           
