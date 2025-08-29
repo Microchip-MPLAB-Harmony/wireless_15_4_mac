@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Package name="wireless_15_4_mac">
     <Dependencies>
-        <Dependency name="wireless_15_4_phy" version="v1.4.0-rc.2"/>
+        <Dependency name="wireless_15_4_phy" version="v1.4.0"/>
     </Dependencies>
 </Package>

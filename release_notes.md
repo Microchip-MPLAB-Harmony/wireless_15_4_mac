@@ -3,6 +3,24 @@
 
 # Microchip PIC32CX-BZ2 Device Standalone IEEE 802.15.4 Mac Layer Release Notes
 
+## Release v1.2.0
+
+### Features/Bug Fixes
+-  Added support for PIC32CXBZ3 device.
+-  Added support for PIC32CXBZ6 device.
+-  MCC severity issue fixes(with latest MCC plugin revisions).
+
+### Known Issues
+-  None
+
+## Development Tools
+-   [MPLAB X v6.25 or higher](https://www.microchip.com/mplab/mplab-x-ide)
+-   [MPLAB® XC32 C/C++ Compiler v4.60 or higher](https://www.microchip.com/mplab/compilers)
+-   MPLAB® X IDE plug-ins: MPLAB® Code Configurator (MCC) v5.5.3 and above
+-   Device Pack: PIC32CX-BZ2-DFP (1.4.243), PIC32CX-BZ2-DFP (1.3.216), PIC32CX-BZ6-DFP (1.3.38)
+
+________________________________
+
 ## Release v1.1.0
 
 ### New Features
