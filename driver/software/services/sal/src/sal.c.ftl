@@ -47,13 +47,13 @@
 </#if>
 
 <#if (DEVICE_SOC_FAMILY_TYPE == "bz3") || (DEVICE_SOC_FAMILY_TYPE == "bz36")>
-#include "config\default\driver\security\sxsymcrypt\keyref_api.h"
-#include "config\default\driver\security\sxsymcrypt\aead_api.h"
+#include "driver\security\sxsymcrypt\keyref_api.h"
+#include "driver\security\sxsymcrypt\aead_api.h"
 </#if>
 
 <#if DEVICE_SOC_FAMILY_TYPE == "bz6">
-#include "config\default\driver\security\cryptosym\keyref_api.h"
-#include "config\default\driver\security\cryptosym\aead_api.h"
+#include "driver\security\cryptosym\keyref_api.h"
+#include "driver\security\cryptosym\aead_api.h"
 </#if>
 /* === Macros ============================================================== */
 
