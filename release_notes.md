@@ -1,14 +1,14 @@
 ﻿![Microchip logo](https://raw.githubusercontent.com/wiki/Microchip-MPLAB-Harmony/Microchip-MPLAB-Harmony.github.io/images/microchip_logo.png)
 ![Harmony logo small](https://raw.githubusercontent.com/wiki/Microchip-MPLAB-Harmony/Microchip-MPLAB-Harmony.github.io/images/microchip_mplab_harmony_logo_small.png)
 
-# Microchip PIC32CX-BZ2 Device Standalone IEEE 802.15.4 Mac Layer Release Notes
+# Microchip PIC32CX-BZx Device Standalone IEEE 802.15.4 Mac Layer Release Notes
 
 ## Release v1.2.0
 
 ### Features/Bug Fixes
 -  Added support for PIC32CXBZ3 device.
 -  Added support for PIC32CXBZ6 device.
--  MCC severity issue fixes(with latest MCC plugin revisions).
+-  General Enhancements to MAC MCC Component.
 
 ### Known Issues
 -  None
