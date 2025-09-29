@@ -6,16 +6,15 @@
 ## Release v1.2.0
 
 ### Features/Bug Fixes
--  Added support for PIC32CXBZ3 device.
--  Added support for PIC32CXBZ6 device.
+-  Added support for PIC32CXBZ3, PIC32CXBZ6 and PIC32CXBZ36 devices.
 -  General Enhancements to MAC MCC Component.
 
 ### Known Issues
 -  None
 
 ## Development Tools
--   [MPLAB X v6.25 or higher](https://www.microchip.com/mplab/mplab-x-ide)
--   [MPLAB® XC32 C/C++ Compiler v4.60 or higher](https://www.microchip.com/mplab/compilers)
+-   [MPLAB X v6.25](https://www.microchip.com/mplab/mplab-x-ide)
+-   [MPLAB® XC32 C/C++ Compiler v4.60](https://www.microchip.com/mplab/compilers)
 -   MPLAB® X IDE plug-ins: MPLAB® Code Configurator (MCC) v5.5.3 and above
 -   Device Pack: PIC32CX-BZ2-DFP (1.4.243), PIC32CX-BZ2-DFP (1.3.216), PIC32CX-BZ6-DFP (1.3.38)
 
