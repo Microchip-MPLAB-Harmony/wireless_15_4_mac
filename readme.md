@@ -17,7 +17,7 @@ the following links for release notes, training materials, and interface
 reference information.
 
 - [Release Notes](./release_notes.md)
-- [MPLAB® Harmony License](mplab_harmony_license.md)
+- [License](License.md)
 - [MPLAB® Harmony 3 Standalone IEEE 802.15.4 Mac Layer Wiki](https://github.com/Microchip-MPLAB-Harmony/wireless_15_4_mac/wiki)
 - [MPLAB® Harmony 3 Standalone IEEE 802.15.4 Mac Layer API Help](https://onlinedocs.microchip.com/oxy/GUID-D769F037-FBC7-4D1C-9892-ADA91E643160-en-US-2/index.html)
 
@@ -29,10 +29,17 @@ reference information.
 | docs       | [Standalone IEEE 802.15.4 Mac Layer API documentation](https://onlinedocs.microchip.com/oxy/GUID-D769F037-FBC7-4D1C-9892-ADA91E643160-en-US-2/index.html) |
 | driver     | Mac layer files and dependent files for pic32cxbzx products     |
 
+## Documentation
 
+Click [here](https://onlinedocs.microchip.com/g/GUID-D769F037-FBC7-4D1C-9892-ADA91E643160) to view the online documentation of wireless_15_4_mac repository.
+
+To view the documentation offline, follow these steps:
+ - Download the publication as a zip file from [here](https://onlinedocs.microchip.com/download/GUID-D769F037-FBC7-4D1C-9892-ADA91E643160?type=webhelp).
+ - Extract the zip file into a folder.
+ - Navigate to the folder and open **index.html** in a web browser of your choice.
 ____
 
-[![License](https://img.shields.io/badge/license-Harmony%20license-orange.svg)](https://github.com/Microchip-MPLAB-Harmony/wireless_15_4_mac/blob/master/mplab_harmony_license.md)
+[![License](https://img.shields.io/badge/license-Harmony%20license-orange.svg)](https://github.com/Microchip-MPLAB-Harmony/wireless_15_4_mac/blob/master/License.md)
 [![Latest release](https://img.shields.io/github/release/Microchip-MPLAB-Harmony/wireless_15_4_mac.svg)](https://github.com/Microchip-MPLAB-Harmony/wireless_15_4_mac/releases/latest)
 [![Latest release date](https://img.shields.io/github/release-date/Microchip-MPLAB-Harmony/wireless_15_4_mac.svg)](https://github.com/Microchip-MPLAB-Harmony/wireless_15_4_mac/releases/latest)
 [![Commit activity](https://img.shields.io/github/commit-activity/y/Microchip-MPLAB-Harmony/wireless_15_4_mac.svg)](https://github.com/Microchip-MPLAB-Harmony/wireless_15_4_mac/graphs/commit-activity)
